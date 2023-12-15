@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="App_Assets/**/*" Exclude="App_Assets/Files.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="kwld.CoreUtil" Version="1.3.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="20.0.4" />
@@ -28,4 +32,12 @@
     <ProjectReference Include="..\GitPackage\GitPackage.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="App_Assets\GlobCheckoutTests\CheckoutAll\expected\Folder2\item1.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

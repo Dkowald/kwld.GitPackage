@@ -1,23 +1,22 @@
-﻿
-using System.IO.Abstractions;
-using System.Linq;
-
+﻿using System.IO.Abstractions.TestingHelpers;
+using GitPackage.Tests.App_Assets;
+using GitPackage.Tests.Util;
 using LibGit2Sharp;
 
 namespace GitPackage.Tests.DiffCheckout;
 
 public class DiffCheckoutTests
 {
-  private Repository GetRepo() =>
-    new("C:\\Source\\Temp\\TestRepository");
-    //new ("C:\\Source\\kwd\\kwd.kBox");
-    //new("C:\\Source\\kwld\\kwld.CoreUtil");
-
-
   [Fact]
   public void ListBranches()
   {
-    using var repo = GetRepo();
+    
+    var expected = Files.DiffCheckoutTests.LatestChangesInBranch(new MockFileSystem().Current());
+
+    var f1 = expected.GetFile("readme.md");
+    var content = f1.ReadAllText();
+
+    using var repo = TestRepository.OpenTestRepository();
 
     var names = repo.Branches.Select(x => x.CanonicalName);
 
@@ -25,65 +24,22 @@ public class DiffCheckoutTests
   }
   
   [Fact]
-  public void Run()
+  public void LatestChangesInBranch()
   {
-    using var repo = GetRepo();
-
+    using var repo = TestRepository.OpenTestRepository();
+    
     var sourceRef = "refs/heads/master";
-    //var sourceRef = "refs/tags/v1.3.1";
-    var gitRef = repo.Refs[sourceRef]?.ResolveToDirectReference()
-      ?? throw new Exception("Invalid ref");
 
-    var sourceCommit = gitRef.Target as Commit 
-      ?? throw new Exception("Ref must have a commit target");
+    var actual = new FileSystem().Project()
+      .GetFolder("App_Data", nameof(DiffCheckoutTests), nameof(LatestChangesInBranch), "actual")
+      .EnsureEmpty();
 
-    var oldCommit = sourceCommit.Parents.First();
+    var target = new GitPackage.DiffCheckout.DiffCheckout(repo);
 
-    var diff = repo.Diff.Compare<TreeChanges>(oldCommit.Tree, sourceCommit.Tree);
+    target.Checkout(sourceRef, actual);
 
-    var diffItems = diff.Select(x =>
-    {
-      //if (x.Status == ChangeKind.Renamed)
-      //{
-      //  return new ChangeEntry[]
-      //  {
-      //    new (ChangeKind.Deleted, x.OldPath),
-      //    new (ChangeKind.Added, x.Path)
-      //  };
-      //}
+    var expected = Files.DiffCheckoutTests.LatestChangesInBranch(new MockFileSystem().Current());
 
-      if (x.Status == ChangeKind.Deleted)
-      {
-        return new[] { new ChangeEntry(ChangeKind.Deleted, x.OldPath, null) };
-      }
-
-      return new[] { new ChangeEntry(x.Status, x.Path, repo.Lookup(x.Oid)) };
-    }).SelectMany(i => i)
-    .ToArray();
-
-    //todo: GitGlob the diffs.
-
-    //checkout.
-    var outDir = new FileSystem().Project().GetFolder("App_Data", nameof(DiffCheckoutTests));
-
-    outDir.EnsureEmpty();
-    foreach (var item in diffItems)
-    {
-      var outFile = outDir.GetFile(item.Path)
-        .EnsureDirectory();
-      if (item.Change == ChangeKind.Deleted)
-        outFile = outFile.ChangeExtension($"deleted.{outFile.Extension}");
-
-      if (item.Item is Blob content)
-      {
-        using var rd = content.GetContentStream();
-        using var wr = outFile.Create();
-        rd.CopyTo(wr);
-      }
-      else
-      {
-        outFile.Touch();
-      }
-    }
+    AssertFiles.Same(expected, actual);
   }
 }

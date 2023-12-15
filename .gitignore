@@ -3,5 +3,5 @@ Old/
 **/bin/*
 **/obj/*
 .vs/
-samples/packages/*
+samples/packages/
 App_Data/
