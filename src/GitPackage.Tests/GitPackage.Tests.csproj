@@ -14,7 +14,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\config" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\description" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\FETCH_HEAD" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\HEAD" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\hooks\README.sample" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\info\exclude" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\objects\pack\pack-fb30003d408cc13940f5a4b10ad3d4a01977e35c.idx" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\objects\pack\pack-fb30003d408cc13940f5a4b10ad3d4a01977e35c.pack" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\heads\master" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\remotes\origin\develop" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\remotes\origin\HEAD" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\remotes\origin\master" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\1.0.0" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\1.2.3" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\1.2.4" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\1.3.0" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\v1.3.1" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\v1.3.1-preview1" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\v1.3.1-preview2" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\v1.3.2" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\v1.3.2-preview1" />
+    <None Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\refs\tags\v1.3.2-preview2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="kwld.CoreUtil" Version="1.3.2" />
+    <PackageReference Include="kwld.Xunit.Ordering" Version="1.0.0-preview1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="20.0.4" />
     <PackageReference Include="xunit" Version="2.4.2" />
@@ -39,5 +65,9 @@
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Data\.gitpackages\github.com\Dkowald\kwld.CoreUtil.git\objects\info\" />
   </ItemGroup>
 </Project>

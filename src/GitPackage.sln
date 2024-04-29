@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitPackage", "GitPackage\Gi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "..\Repository.csproj", "{2073D97C-2529-4787-953A-50A1A0928305}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicDemo", "..\samples\BasicDemo\BasicDemo.csproj", "{5EBA0BFB-E558-4796-AC5C-A0EF877C7C56}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{F51CFCF6-8A0A-48D0-BD7F-FD5F7CE2B9BE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,9 @@ Global
 		{2073D97C-2529-4787-953A-50A1A0928305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2073D97C-2529-4787-953A-50A1A0928305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2073D97C-2529-4787-953A-50A1A0928305}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5EBA0BFB-E558-4796-AC5C-A0EF877C7C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5EBA0BFB-E558-4796-AC5C-A0EF877C7C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5EBA0BFB-E558-4796-AC5C-A0EF877C7C56} = {F51CFCF6-8A0A-48D0-BD7F-FD5F7CE2B9BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A63C9F3B-DCC2-40ED-8925-1FAB867DB73C}

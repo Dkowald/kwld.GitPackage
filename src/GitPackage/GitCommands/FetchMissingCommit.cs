@@ -3,11 +3,15 @@ using LibGit2Sharp;
 
 namespace GitPackage.GitCommands;
 
-internal class ResolveReferenceCommit
+/// <summary>
+/// Verify the given commit is available in the
+/// repository, if not; try fetch to get the commit.
+/// </summary>
+public class FetchMissingCommit
 {
   private readonly Repository _repository;
 
-  public ResolveReferenceCommit(Repository repository)
+  public FetchMissingCommit(Repository repository)
   {
     _repository = repository;
   }

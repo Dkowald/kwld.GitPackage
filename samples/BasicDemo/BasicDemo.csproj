@@ -9,4 +9,8 @@
   <ItemGroup>
     <PackageReference Include="GitPackage" Version="99.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!--<GitPackage  />-->
+  </ItemGroup>
 </Project>

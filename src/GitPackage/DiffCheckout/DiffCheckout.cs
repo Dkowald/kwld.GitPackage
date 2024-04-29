@@ -15,7 +15,7 @@ public class DiffCheckout
 
   public void Checkout(string commit, IDirectoryInfo outDir)
   {
-    var gitCommit = new ResolveReferenceCommit(_repository)
+    var gitCommit = new FetchMissingCommit(_repository)
       .Resolve(commit);
 
     var parentCommit = gitCommit.Parents?.First();
