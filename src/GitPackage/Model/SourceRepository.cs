@@ -6,7 +6,7 @@
 internal class SourceRepository
 {
     public SourceRepository(IDirectoryInfo localRoot, string originUrl)
-    {   
+    {
         if (!Uri.TryCreate(originUrl, UriKind.Absolute, out var origin))
         {
             throw new Exception("todo: allow simplified url with assume github");
