@@ -5,3 +5,5 @@ Old/
 .vs/
 samples/packages/
 App_Data/
+
+*.received.*
