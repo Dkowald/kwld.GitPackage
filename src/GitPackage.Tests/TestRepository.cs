@@ -14,4 +14,6 @@ static class TestRepository
 
         return new Repository(Path.FullName);
     }
+
+    internal static readonly string TestRepositoryUrl = Path.FullName;
 }

@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitPackage", "GitPackage\Gi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "..\Repository.csproj", "{2073D97C-2529-4787-953A-50A1A0928305}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitPackage.Cli", "GitPackage.Cli\GitPackage.Cli.csproj", "{8C732519-CA1A-458E-BB0F-A7196DD1338B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2073D97C-2529-4787-953A-50A1A0928305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2073D97C-2529-4787-953A-50A1A0928305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2073D97C-2529-4787-953A-50A1A0928305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C732519-CA1A-458E-BB0F-A7196DD1338B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C732519-CA1A-458E-BB0F-A7196DD1338B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C732519-CA1A-458E-BB0F-A7196DD1338B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C732519-CA1A-458E-BB0F-A7196DD1338B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

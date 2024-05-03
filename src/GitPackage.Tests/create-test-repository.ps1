@@ -27,6 +27,7 @@ try{
 
       git add -A
       git commit -am "init"
+      git tag v0
 
       Set-Content "readme.md" -Value "Updated"
       Remove-Item ".\item0.txt" -Force

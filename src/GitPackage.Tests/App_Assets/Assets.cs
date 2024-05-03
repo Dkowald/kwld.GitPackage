@@ -2,7 +2,7 @@
 
 namespace GitPackage.Tests.App_Assets;
 
-internal static class Files
+internal static class Assets
 {
   internal static class DiffCheckoutTests
   {

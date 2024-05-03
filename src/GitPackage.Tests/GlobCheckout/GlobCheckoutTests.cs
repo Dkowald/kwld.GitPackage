@@ -28,7 +28,7 @@ public class GlobCheckoutTests
 
     target.Checkout(sourceRef, outActual, filter);
 
-    var expected = Files.GlobCheckoutTests.CheckoutAll(new MockFileSystem().Current());
+    var expected = Assets.GlobCheckoutTests.CheckoutAll(new MockFileSystem().Current());
 
     //var outExpected = outDir.FileSystem.Project()
     //  .GetFolder("App_Assets", nameof(GlobCheckoutTests), nameof(CheckoutAll), "expected")
@@ -54,7 +54,7 @@ public class GlobCheckoutTests
 
     target.Checkout("refs/tags/CheckoutAll", actual, filter);
 
-    var expected = Files.GlobCheckoutTests.CheckoutFiltered(new MockFileSystem().Current());
+    var expected = Assets.GlobCheckoutTests.CheckoutFiltered(new MockFileSystem().Current());
 
     AssertFiles.Same(expected, actual, true);
   }

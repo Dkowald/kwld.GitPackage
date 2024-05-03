@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GitPackage.Cli\GitPackage.Cli.csproj" />
     <ProjectReference Include="..\GitPackage\GitPackage.csproj" />
   </ItemGroup>
 
@@ -44,6 +45,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GitCommands\Snapshot\GetFiltered\" />
+    <None Include="App_Data/.gitpackages/**/*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="App_Assets\Assets.cs" />
+  </ItemGroup>
+    
 </Project>

@@ -11,7 +11,7 @@ public class DiffCheckoutTests
   public void ListBranches()
   {
     
-    var expected = Files.DiffCheckoutTests.LatestChangesInBranch(new MockFileSystem().Current());
+    var expected = Assets.DiffCheckoutTests.LatestChangesInBranch(new MockFileSystem().Current());
 
     var f1 = expected.GetFile("readme.md");
     var content = f1.ReadAllText();
@@ -38,7 +38,7 @@ public class DiffCheckoutTests
 
     target.Checkout(sourceRef, actual);
 
-    var expected = Files.DiffCheckoutTests.LatestChangesInBranch(new MockFileSystem().Current());
+    var expected = Assets.DiffCheckoutTests.LatestChangesInBranch(new MockFileSystem().Current());
 
     AssertFiles.Same(expected, actual);
   }

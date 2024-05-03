@@ -1,18 +1,18 @@
-﻿using GitPackage.Model;
+﻿using GitPackage.Cli.Model;
 
 namespace GitPackage.Tests.Model
 {
-    public class SourceRepositoryTests
+    public class RepositoryCacheTests
     {
         [Fact]
-        public void LocalRepoCahcePath()
+        public void LocalRepoCachePath()
         {
             var root = new FileSystem().Project()
                 .GetFolder("App_Data", "Cache");
 
-            var target = new SourceRepository(root, "c:/some/path/to/repo");
+            var target = new RepositoryCache(root, "c:/some/path/to/repo");
 
-            var cachePath = target.LocalPath.FullName.ToLower();
+            var cachePath = target.CachePath.FullName.Replace('\\','/').ToLower();
             var expectedPath = "local/repo";
 
             Assert.True(cachePath.EndsWith(expectedPath));

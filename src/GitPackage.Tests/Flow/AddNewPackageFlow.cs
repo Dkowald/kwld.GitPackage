@@ -1,4 +1,5 @@
-﻿using GitPackage.Tasks;
+﻿using GitPackage.Cli;
+using GitPackage.Cli.Model;
 using GitPackage.Tests.TestHelpers;
 using kwld.Xunit.Ordering;
 
@@ -7,51 +8,26 @@ namespace GitPackage.Tests.Flow;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class AddNewPackageFlow
 {
-    private IDirectoryInfo _code = new FileSystem().Project()
-        .GetFolder("App_Data", "Flow", "AddNew");
+    private static readonly IDirectoryInfo AppData =  new FileSystem().Project()
+        .GetFolder("App_Data");
 
     [Ordered, Fact]
-    public void Setup() { }
-
-    [Ordered, Fact]
-    public void GetByTag()
+    public async Task GetByTag()
     {
-        var itemData = new StubTaskItem();
-        var item = new GitPackageItem(itemData)
+        var item = new GitPackageItem
         {
             Include = TestRepository.Path.AsUri().ToString(),
-            Path = _code.FullName
+            Path = AppData.GetFolder("Flow", nameof(GetByTag)).FullName,
+            Version = new("tag/CheckoutAll")// "tags/v0"
+        };
+        
+        var cfg = new AppConfig
+        {
+            RepositoryCache = Files.TestPackageCacheRoot.FullName
         };
 
-        new Clone
-        {
-            Item = itemData
-        }.Execute();
+        var result = await Program.Run(cfg, item);
+
+        Assert.Equal(0, result);
     }
-
-    [Ordered, Fact]
-    public void GetByBranch() { }
-
-    [Ordered, Fact]
-    public void UpdateOriginBranchAndTag() { }
-
-    [Ordered, Fact]
-    public void GetByNewerTag() { }
-
-    [Ordered, Fact]
-    public void GetByBranchHead() { }
-
-    [Ordered, Fact]
-    public void DisableFetchAbility()
-    {
-        //disable access to origin (so no fetch)
-    }
-
-    [Ordered, Fact]
-    public void GetByTag_NoChange()
-    {
-    }
-
-    [Ordered, Fact]
-    public void GetByBranch_NoChange() { }
 }

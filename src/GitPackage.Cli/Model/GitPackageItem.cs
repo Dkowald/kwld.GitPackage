@@ -1,14 +1,10 @@
-﻿using Microsoft.Build.Framework;
-
-namespace GitPackage.Model;
+﻿namespace GitPackage.Cli.Model;
 
 /// <summary>
-/// A git package build item.
+/// 
 /// </summary>
-public class GitPackageItem
+internal class GitPackageItem
 {
-    public GitPackageItem(){}
-
     /// <summary>
     /// Url to the source repository: e.g.
     /// https://github.com/Dkowald/kwld.Xunit.Ordering.git
@@ -18,12 +14,12 @@ public class GitPackageItem
 
     /// <summary>
     /// The Version; corresponds to a git commit.
-    /// Can be either a branch or a tag:
-    /// tag/v1.0.0-preview1
-    /// branch/dev
-    /// If not prefixed with branch or tag; then it is assumed to be tag.
+    /// Can be either a branch or a tag ref:
+    /// tags/v1.0.0-preview1
+    /// heads/dev
+    /// If not prefixed with tags or heads; then it is assumed to be tags.
     /// </summary>
-    public string Version { get; set; }
+    public GitRef Version { get; set; }
 
     /// <summary>
     /// Optional glob filter on source files.
@@ -34,13 +30,4 @@ public class GitPackageItem
     /// Local path to place files.
     /// </summary>
     public string Path { get; set; }
-
-    //Attached
-    
-    public string RepositoryRoot { get; set; }
-
-    /// <summary>
-    /// True when the target already exists, and has the expected file(s)
-    /// </summary>
-    public bool TargetExists { get; set; }
 }

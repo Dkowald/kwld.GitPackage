@@ -1,28 +1,24 @@
-﻿using DotNet.Globbing;
+﻿using GitPackage.Cli.Model;
+
 using LibGit2Sharp;
 
-namespace GitPackage.GitCommands;
+namespace GitPackage.Cli.GitCommands;
 
 /// <summary>
 /// Get (rather than checkout) files for the repository.
 /// </summary>
-public class GitGet(Repository repository)
+internal class GitGet(Repository repository)
 {
-    public void Run(IDirectoryInfo target, string commit, string? glob = null)
+    public void Run(IDirectoryInfo target, GitRef commit, GetFilter filter)
     {
-        var globs = !glob.IsNullOrEmpty() ?
-                glob!.Split(';', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(Glob.Parse)
-                    .ToArray() : [Glob.Parse("**/*")];
-
-        var commitRef = repository.Refs[commit]
+        var commitRef = repository.Refs[commit.Value]
             ?.ResolveToDirectReference()
             ?.Target.Peel<Commit>()
             ?? throw new Exception($"Commit {commit} not found");
 
         var rootTree = commitRef.Tree;
 
-        foreach (var file in ReadTree(rootTree, globs)) {
+        foreach (var file in ReadTree(rootTree, filter)) {
 
             if (file.Item.TargetType != TreeEntryTargetType.Blob)
                 throw new Exception("can only handle blobs(not sure about link.");
@@ -38,7 +34,7 @@ public class GitGet(Repository repository)
 
     private record BlobEntry(string Path, TreeEntry Item);
 
-    private IEnumerable<BlobEntry> ReadTree(Tree root, Glob[] filters)
+    private IEnumerable<BlobEntry> ReadTree(Tree root, GetFilter filters)
     {
         var stack = new Stack<(Tree Tree, string Path)>([(root, "")]);
 
@@ -56,7 +52,7 @@ public class GitGet(Repository repository)
 
                 var path = $"{next.Path}/{item.Name}";
                 
-                if(filters.Any(x => x.IsMatch(path)))
+                if(filters.IsMatch(path))
                     yield return new(path, item);
             }
         }

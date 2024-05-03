@@ -1,5 +1,4 @@
 ﻿using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 
 namespace GitPackage.Tasks;
 
@@ -8,10 +7,10 @@ namespace GitPackage.Tasks;
 /// </summary>
 public class GitPackageItem
 {
-    private readonly ITaskItem _taskItem;
+    public readonly ITaskItem TaskItem;
 
     public GitPackageItem(ITaskItem item)
-    { _taskItem = item; }
+    { TaskItem = item; }
 
     /// <summary>
     /// Url to the source repository: e.g.
@@ -20,8 +19,8 @@ public class GitPackageItem
     /// </summary>
     public string Include 
     {
-        get => _taskItem.GetMetadata(nameof(Include));
-        set => _taskItem.SetMetadata(nameof(Include), value);
+        get => TaskItem.GetMetadata(nameof(Include));
+        set => TaskItem.SetMetadata(nameof(Include), value);
     }
 
     /// <summary>
@@ -33,8 +32,8 @@ public class GitPackageItem
     /// </summary>
     public string Version
     {
-        get => _taskItem.GetMetadata(nameof(Version));
-        set => _taskItem.SetMetadata(nameof(Version), value);
+        get => TaskItem.GetMetadata(nameof(Version));
+        set => TaskItem.SetMetadata(nameof(Version), value);
     }
 
     /// <summary>
@@ -42,16 +41,16 @@ public class GitPackageItem
     /// </summary>
     public string Filter
     {
-        get => _taskItem.GetMetadata(nameof(Filter));
-        set => _taskItem.SetMetadata(nameof(Filter), value);
+        get => TaskItem.GetMetadata(nameof(Filter));
+        set => TaskItem.SetMetadata(nameof(Filter), value);
     }
 
     /// <summary>
     /// Local path to place files.
     /// </summary>
     public string Path {
-        get => _taskItem.GetMetadata(nameof(Path));
-        set => _taskItem.SetMetadata(nameof(Path), value);
+        get => TaskItem.GetMetadata(nameof(Path));
+        set => TaskItem.SetMetadata(nameof(Path), value);
     }
 
     /// <summary>
@@ -59,8 +58,8 @@ public class GitPackageItem
     /// </summary>
     public string RepositoryRoot
     {
-        get => _taskItem.GetMetadata(nameof(RepositoryRoot));
-        set => _taskItem.SetMetadata(nameof(RepositoryRoot), value);
+        get => TaskItem.GetMetadata(nameof(RepositoryRoot));
+        set => TaskItem.SetMetadata(nameof(RepositoryRoot), value);
     }
 
     /// <summary>
@@ -68,7 +67,7 @@ public class GitPackageItem
     /// </summary>
     public string TargetExists 
     {
-        get => _taskItem.GetMetadata(nameof(TargetExists));
-        set => _taskItem.SetMetadata(nameof(TargetExists), value);
+        get => TaskItem.GetMetadata(nameof(TargetExists));
+        set => TaskItem.SetMetadata(nameof(TargetExists), value);
     }
 }
