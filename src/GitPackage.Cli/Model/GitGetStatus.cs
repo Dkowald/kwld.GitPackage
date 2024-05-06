@@ -23,17 +23,17 @@ internal class GitGetStatus
     public bool IsMatch()
     {
         if (!_statusFile.Exists) return false;
-
+        
         var current = TryLoadStatusFile();
-        if (current is null) return false;
-
+        
         return current == _expected;
     }
 
-    public Task SetMatched()=> 
-        JsonSerializer.SerializeAsync(
-            _statusFile.EnsureDirectory().Create(),
-            _expected);
+    public Task SetMatched()
+    {
+        using var wr = _statusFile.EnsureDirectory().Create();
+        return JsonSerializer.SerializeAsync(wr,_expected);
+    }
 
     private Content? TryLoadStatusFile()
     {

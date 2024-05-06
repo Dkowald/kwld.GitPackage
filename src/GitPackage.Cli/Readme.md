@@ -15,8 +15,5 @@ JSON can be provided using inpu file via
 > -f options
 > GitPackage -f myinput.json
 
-Can also provide multiple JSON's for processing via a input
-[JSONL](https://jsonlines.org/) file 
-> GitPackage -f myinput.jsonl
 
 

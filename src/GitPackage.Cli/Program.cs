@@ -8,9 +8,18 @@ internal class Program
 {
     static async Task<int> Main(string[] args)
     {
-        if(!args.Any()) Help();
+        Version();
+        Console.WriteLine("ARGS");
+        foreach (var item in args)
+        {
+            Console.WriteLine(item);
+        }
 
-        throw new NotImplementedException();
+        //if(args.Any(x => x.Same("--version")))
+        //    Version();
+
+        return 0;
+        if(!args.Any()) Help();
     }
 
     public static async Task<int> Run(AppConfig config, GitPackageItem item)
@@ -65,7 +74,10 @@ internal class Program
         return 0;
     }
 
-    static void Version(){}
+    static void Version()
+    {
+        Console.WriteLine("Version 0.0.1");
+    }
 
     static void Help()
     {

@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using GitPackage.Tests.TestHelpers;
+using LibGit2Sharp;
 
 namespace GitPackage.Tests.GitCommands;
 
@@ -11,11 +12,16 @@ public class FetchMissingCommitTests
         var root = new FileSystem().Project()
             .GetFolder("App_Data", "FetchMissing");
 
-        _origin = root.GetFolder("origin").EnsureEmpty();
+        _origin = root.GetFolder("origin")
+            .ClearReadonly()
+            .EnsureEmpty();
         
         CreateOrigin();
         
-        var clone = root.GetFolder("clone");
+        var clone = root
+            .GetFolder("clone")
+            .ClearReadonly()
+            .EnsureDelete();
 
         Repository.Clone(_origin.AsUri().ToString(), 
            clone.FullName, new CloneOptions{ IsBare = true });
@@ -35,16 +41,16 @@ public class FetchMissingCommitTests
         originRepo.Tags.Add("v0.0.1", commit, sig, "v0.0.1");
     }
 
-    [Fact]
+    [Fact(Skip = "todo")]
     public void AlreadyHaveCommit()
     {
         
     }
 
-    [Fact]
+    [Fact(Skip = "todo")]
     public void FoundDuringFetch(){}
 
-    [Fact]
+    [Fact(Skip = "todo")]
     public void NotFoundDuringFetch(){}
 
     

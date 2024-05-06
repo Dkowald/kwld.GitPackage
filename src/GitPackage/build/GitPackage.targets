@@ -3,179 +3,19 @@
     <GitPack-Cache Condition="'$(GitPack-Cache)' == '' And '$(HOME)' != ''">$(HOME)\.gitpack</GitPack-Cache>
     <GitPack-Cache Condition="'$(GitPack-Cache)' == '' And '$(USERPROFILE)' != ''">$(USERPROFILE)\.gitpack</GitPack-Cache>
 
-    <GitPack-ProjectDir Condition="'$(GitPack-ProjectDir)' == ''">$(MSBuildProjectDirectory)\gist</GitPack-ProjectDir>
-
-    <GitPack-AutoRestore Condition="'$(GitPack-AutoRestore)' == ''">true</GitPack-AutoRestore>
-
-    <GitPackRestoreDependsOn>
-      _gpInit;
-      _gpPrune;_gpCollectUpdates;
-      _gpClone;
-      _gpFetchVersioned;_gpFetchUnversioned;
-      _gpCheckoutPackages
-    </GitPackRestoreDependsOn>
-
-    <GitPackRefreshDependsOn>
-      _gpInit;
-      _gpPrune;
-      _gpRefresh;_gpCollectUpdates;
-      _gpClone;
-      _gpFetchVersioned;_gpFetchUnversioned;
-      _gpCheckoutPackages
-    </GitPackRefreshDependsOn>
+    <GitPackageCli>$(MSBuildThisFileDirectory)/../cli/GitPackage.Cli.exe</GitPackageCli>
 
   </PropertyGroup>
 
-  <UsingTask TaskName="GitPackage.Clone"
-             AssemblyFile="$(MSBuildThisFileDirectory)..\lib\netstandard2.0\GitPackage.dll" />
-
-  <UsingTask TaskName="GitPackage.CollectGitPackageInfo" 
-    AssemblyFile="$(MSBuildThisFileDirectory)..\lib\netstandard2.0\GitPackage.dll" />
-
-  <Target Name="GitPackRestore" DependsOnTargets="$(GitPackRestoreDependsOn)" />
-
-  <Target Name="GitPackRefresh" DependsOnTargets="$(GitPackRefreshDependsOn)" />
-
-  <Target Name="gpAutoRestore"
-          BeforeTargets="Restore"
-          DependsOnTargets="GitPackRestore"
-          Condition="'$(GitPack-AutoRestore)' == 'true'">
-    <Message Text="Restored git packages" Importance="High" />
-  </Target>
-
-  <Target Name="gpAutoRestoreInVStudio"
-          BeforeTargets="ResolveProjectReferences"
-          DependsOnTargets="gpAutoRestore"
-          Condition="$(BuildingInsideVisualStudio) == 'true'">
-    <!--
-		This will include GitPackage restore in visual-studio design time builds.
-		See: https://github.com/dotnet/project-system/blob/master/docs/design-time-builds.md
-	-->
-  </Target>
-
-  <Target Name="_gpInit">
-    <MakeDir Directories="$(GitPack-Cache)" />
-    <MakeDir Directories="$(GitPack-ProjectDir)" />
-    
-    <Error Text="Missing Uri for GitPackage %(GitPackage.Identity)"
-           Condition="'%(GitPackage.Uri)' == '' And '@(GitPackage)' != ''" />
-
-    <CollectGitPackageInfo Root="$(GitPack-ProjectDir)" Items="@(GitPackage)">
-      <Output TaskParameter="Info" ItemName="gpInfo" />
-    </CollectGitPackageInfo>
-    
-  </Target>
-  
-  <Target Name="_gpPrune">
+  <Target Name="Check" BeforeTargets="Build">
     <ItemGroup>
-      <gpRemoved Include="@(gpInfo)" Condition="'%(gpInfo.Uri)' == ''" />
-      <gpInfo Remove="@(gpRemoved)" /> 
+      <Args Include="$(MSBuildThisFileDirectory)" />
+      <Args Include="--version" />
     </ItemGroup>
-
-    <Message Text="Pruning %(gpRemoved.Identity)" Importance="High"/>
-    <Delete Files="%(gpRemoved.VersionFile)" />
-    <RemoveDir Directories="%(gpRemoved.WorkTreeFolder)" />
-  </Target>
-
-  <Target Name="_gpRefresh">
-    <ItemGroup>
-      <gpVersionFiles Include="$(GitPack-ProjectDir)/*.ver" />
-    </ItemGroup>
-    <Delete Files="@(gpVersionFiles)" />
-  </Target>
-
-  <Target Name="_gpClone" Inputs="@(gpToClone)" Outputs="%(Identity)">
-    <PropertyGroup>
-      <cloneFolder>$(GitPack-Cache)/%(gpInfo.CloneFolderName)</cloneFolder>
-    </PropertyGroup>
     
-    <Message Text="Clone '%(gpInfo.Uri)' to '%(gpInfo.CloneFolderName)'"
-             Importance="High" />
-
-    <Exec Command="git clone --bare %(gpInfo.Uri) $(GitPack-Cache)/%(gpInfo.CloneFolderName)"
-          WorkingDirectory="$(GitPack-Cache)"
-          Condition="!Exists('$(GitPack-Cache)/%(gpInfo.CloneFolderName)')"
-          StandardOutputImportance="normal"
-          StandardErrorImportance="normal"/>
-  </Target>
-
-  <Target Name="_gpCollectUpdates">
-    <ItemGroup>
-
-      <gpToClone Include="@(gpInfo)" 
-        Condition="%(gpInfo.Uri) != '' And !Exists('$(GitPack-Cache)/%(gpInfo.CloneFolderName)')"/>
-
-      <gpUnversionedToUpdate Include="@(gpInfo)"
-        Condition="'%(gpInfo.Version)' == '' And !Exists('%(VersionFile)')"/>
-
-      <gpVersionedToUpdate Include="@(gpInfo)"
-                        Condition="%(gpInfo.Version) != '' And %(gpInfo.Actual) != %(gpInfo.Version)"/>
-
-      <gpToUpdate Include="@(gpVersionedToUpdate)"/>
-      <gpToUpdate Include="@(gpUnversionedToUpdate)"/>
-    </ItemGroup>
-  </Target>
-
-  <Target Name="_gpFetchVersioned" Inputs="@(gpVersionedToUpdate)" Outputs="%(Identity)">
-    <PropertyGroup>
-      <repositoryDir>$(GitPack-Cache)/%(gpVersionedToUpdate.CloneFolderName)</repositoryDir>
-      <foundMatchingTag>0</foundMatchingTag>
-    </PropertyGroup>
-
-    <Exec Command="git describe --tags --match %(gpVersionedToUpdate.Version)"
-          StandardErrorImportance="Low"
-          StandardOutputImportance = "Low"
-          WorkingDirectory="$(repositoryDir)"
-          EchoOff="true"
+    <Exec Command="$(GitPackageCli) @(Args, ' ')" 
           ConsoleToMsBuild="true"
-          IgnoreExitCode="true">
-      <Output TaskParameter="ExitCode" PropertyName="foundMatchingTag" />
-    </Exec>
-
-    <Exec Command="git fetch --tags --prune origin *:*"
-          StandardOutputImportance="High"
-          StandardErrorImportance="High"
-          WorkingDirectory="$(repositoryDir)"
-          Condition="$(foundMatchingTag) != '0'">
-    </Exec>
-  </Target>
-
-  <Target Name="_gpFetchUnversioned" Inputs="@(gpUnversionedToUpdate)" Outputs="%(Identity)">
-    <PropertyGroup>
-      <repositoryDir>$(GitPack-Cache)/%(gpUnversionedToUpdate.CloneFolderName)</repositoryDir>
-    </PropertyGroup>
-
-    <Exec Command="git fetch --tags --prune origin master:master"
-          StandardOutputImportance="High"
-          StandardErrorImportance="High"
-          WorkingDirectory="$(repositoryDir)">
-    </Exec>
-  </Target>
-
-  <Target Name="_gpCheckoutPackages" Inputs="@(gpToUpdate)" Outputs="%(Identity)">
-    <PropertyGroup>
-      <repositoryDir>$(GitPack-Cache)/%(gpToUpdate.CloneFolderName)</repositoryDir>
-    </PropertyGroup>
-
-    <RemoveDir Directories="%(gpToUpdate.WorkTreeFolder)" Condition="Exists('%(gpToUpdate.WorkTreeFolder)')"/>
-
-    <Exec Command="git worktree prune"
-          EchoOff="true"
-          WorkingDirectory="$(repositoryDir)"/>
-
-    <Exec Command="git worktree add %(gpToUpdate.WorkTreeFolder) %(gpToUpdate.WorkTreeCommit)"
-          WorkingDirectory="$(repositoryDir)" ContinueOnError="WarnAndContinue">
-      <Output TaskParameter="ExitCode" PropertyName="workTreeAdded" />
-    </Exec>
-
-    <Error Text="GitPackage %(gpToUpdate.Identity) failed invalid version %(gpToUpdate.Version) [$(workTreeAdded)]" 
-           Condition="$(workTreeAdded) != '0'"/>
-
-    <ItemGroup>
-      <VersionFileLine Include="Version: %(gpToUpdate.Version)" />
-      <VersionFileLine Include="Repository:  %(gpToUpdate.CloneFolderName)" />
-    </ItemGroup>
-    <WriteLinesToFile Overwrite="true" File=" %(gpToUpdate.VersionFile)" 
-                      Lines="@(VersionFileLine)" />
+          EchoOff="false"
+          StandardOutputImportance="High" />
   </Target>
 </Project>

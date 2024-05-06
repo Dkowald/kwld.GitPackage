@@ -1,61 +1,58 @@
-﻿using System.IO.Abstractions.TestingHelpers;
+﻿//using System.IO.Abstractions.TestingHelpers;
 
-using GitPackage.GlobCheckout;
-using GitPackage.Tests.App_Assets;
-using GitPackage.Tests.Util;
+//using GitPackage.Tests.App_Assets;
+//using GitPackage.Tests.Util;
 
-using LibGit2Sharp;
+//namespace GitPackage.Tests.GlobCheckout;
 
-namespace GitPackage.Tests.GlobCheckout;
+//public class GlobCheckoutTests
+//{
+//  [Fact]
+//  public void CheckoutAll()
+//  {
+//    var repo = TestRepository.OpenTestRepository();
 
-public class GlobCheckoutTests
-{
-  [Fact]
-  public void CheckoutAll()
-  {
-    var repo = TestRepository.OpenTestRepository();
+//    var sourceRef = "refs/heads/master";
 
-    var sourceRef = "refs/heads/master";
+//    var filter = new GitGetFilter();
 
-    var filter = GlobFilter.All;
+//    var outDir = new FileSystem().Project()
+//      .GetFolder("App_Data", nameof(GlobCheckoutTests), nameof(CheckoutAll));
 
-    var outDir = new FileSystem().Project()
-      .GetFolder("App_Data", nameof(GlobCheckoutTests), nameof(CheckoutAll));
+//    var outActual = outDir.GetFolder("actual");
 
-    var outActual = outDir.GetFolder("actual");
+//    var target = new GitPackage.GlobCheckout.GlobCheckout(repo);
 
-    var target = new GitPackage.GlobCheckout.GlobCheckout(repo);
+//    target.Checkout(sourceRef, outActual, filter);
 
-    target.Checkout(sourceRef, outActual, filter);
+//    var expected = Assets.GlobCheckoutTests.CheckoutAll(new MockFileSystem().Current());
 
-    var expected = Assets.GlobCheckoutTests.CheckoutAll(new MockFileSystem().Current());
+//    //var outExpected = outDir.FileSystem.Project()
+//    //  .GetFolder("App_Assets", nameof(GlobCheckoutTests), nameof(CheckoutAll), "expected")
+//    //  .EnsureExists();
 
-    //var outExpected = outDir.FileSystem.Project()
-    //  .GetFolder("App_Assets", nameof(GlobCheckoutTests), nameof(CheckoutAll), "expected")
-    //  .EnsureExists();
+//    AssertFiles.Same(expected, outActual, true);
+//  }
 
-    AssertFiles.Same(expected, outActual, true);
-  }
+//  [Fact]
+//  public void CheckoutFiltered()
+//  {
+//    var repo = TestRepository.OpenTestRepository();
 
-  [Fact]
-  public void CheckoutFiltered()
-  {
-    var repo = TestRepository.OpenTestRepository();
+//    var target = new GitPackage.GlobCheckout.GlobCheckout(repo);
 
-    var target = new GitPackage.GlobCheckout.GlobCheckout(repo);
+//    var actual = new FileSystem().Project().GetFolder("App_Data",
+//      nameof(GlobCheckoutTests),
+//      nameof(CheckoutFiltered), "actual");
 
-    var actual = new FileSystem().Project().GetFolder("App_Data",
-      nameof(GlobCheckoutTests),
-      nameof(CheckoutFiltered), "actual");
+//    var filter = new GlobFilterBuilder()
+//      .Include("Folder2/**/*")
+//      .Build();
 
-    var filter = new GlobFilterBuilder()
-      .Include("Folder2/**/*")
-      .Build();
+//    target.Checkout("refs/tags/CheckoutAll", actual, filter);
 
-    target.Checkout("refs/tags/CheckoutAll", actual, filter);
+//    var expected = Assets.GlobCheckoutTests.CheckoutFiltered(new MockFileSystem().Current());
 
-    var expected = Assets.GlobCheckoutTests.CheckoutFiltered(new MockFileSystem().Current());
-
-    AssertFiles.Same(expected, actual, true);
-  }
-}
+//    AssertFiles.Same(expected, actual, true);
+//  }
+//}

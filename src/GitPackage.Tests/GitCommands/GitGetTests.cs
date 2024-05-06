@@ -1,5 +1,5 @@
-﻿using GitPackage.Cli.Model;
-using GitPackage.GitCommands;
+﻿using GitPackage.Cli.GitCommands;
+using GitPackage.Cli.Model;
 
 namespace GitPackage.Tests.GitCommands
 {
@@ -18,7 +18,7 @@ namespace GitPackage.Tests.GitCommands
 
             var target = new GitGet(repo);
 
-            target.Run(destRoot, commit.Value);
+            target.Run(destRoot, commit, new());
 
             await VerifyDirectory(destRoot.FullName)
                 .UseFileName(nameof(GetByAnnotatedTag))
@@ -33,14 +33,12 @@ namespace GitPackage.Tests.GitCommands
 
             var glob = "/Folder1/**/*.md;/Folder2/**/*";
 
-            var filter = new GetFilter(glob);
-            
             var destRoot = OutRoot.GetFolder("Tag0Filtered")
                 .EnsureEmpty();
 
             var target = new GitGet(repo);
 
-            target.Run(destRoot, commit.Value, glob);
+            target.Run(destRoot, commit, new(glob));
 
             await VerifyDirectory(destRoot.FullName)
                 .UseFileName(nameof(GetFiltered))

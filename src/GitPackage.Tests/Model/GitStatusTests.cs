@@ -9,18 +9,39 @@ public class GitGetStatusTests
         .Current();
         
     [Fact]
-    public void IsMatch_()
+    public async Task IsMatch_()
     {
-        var noMatch = _root.GetFolder("noMatch");
-        var repo = TestRepository.OpenTestRepository();
+        var localFolder = _root.GetFolder("noMatch")
+            .EnsureExists();
         
-        var target = new GitGetStatus(noMatch, TestRepository.TestRepositoryUrl, new("branch/dev"));
+        var target = new GitGetStatus(localFolder, TestRepository.TestRepositoryUrl, new("branch/dev"));
 
         Assert.False(target.IsMatch());
 
-        target.SetMatched();
+        await target.SetMatched();
 
         Assert.True(target.IsMatch());
+    }
+
+    [Fact]
+    public async Task IsMatch_CorruptedStatusFile()
+    {
+        var localFolder = _root.GetFolder("noMatch")
+            .EnsureExists();
+
+        var target = new GitGetStatus(localFolder, TestRepository.TestRepositoryUrl, new("branch/dev"));
+
+        Assert.False(target.IsMatch());
+
+        await target.SetMatched();
+
+        var localFile = localFolder.GetFile(GitGetStatus.StatusFileName);
+
+        await localFile.WriteAllTextAsync("corrupted-file-content");
+        
+        Assert.False(target.IsMatch());
+
+        Assert.False(localFile.Exists());
     }
 
     [Fact]

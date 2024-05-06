@@ -13,8 +13,10 @@ namespace GitPackage.Tests.Tasks
                 Files.TestPackageCacheRoot,
                 "https://github.com/Dkowald/kwld.CoreUtil.git");
 
-            srcRepo.CachePath.EnsureDelete();
-
+            srcRepo.CachePath
+                .ClearReadonly()
+                .EnsureDelete();
+            
             var target = new CloneIfMissing(srcRepo, null);
 
             target.Run();

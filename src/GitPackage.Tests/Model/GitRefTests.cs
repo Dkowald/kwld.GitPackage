@@ -28,7 +28,7 @@ namespace GitPackage.Tests.Model
             var result = GitRef.TryParse("refs/heads/main");
             Assert.NotNull(result);
 
-            Assert.Equal("refs/head/main", result.ToString());
+            Assert.Equal("refs/heads/main", result.ToString());
             Assert.Equal("branch/main", result.Version);
         }
 

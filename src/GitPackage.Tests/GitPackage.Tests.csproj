@@ -51,5 +51,9 @@
   <ItemGroup>
     <EmbeddedResource Remove="App_Assets\Assets.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DiffCheckout\" />
+  </ItemGroup>
     
 </Project>
