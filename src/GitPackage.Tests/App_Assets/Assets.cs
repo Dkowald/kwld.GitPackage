@@ -75,6 +75,11 @@ internal static class Assets
     }
   }
 
+  internal static Stream CoreUtilGitPackage()
+    => Assembly.GetExecutingAssembly()
+          .GetManifestResourceStream(typeof(Assets), "CoreUtil.gitpackage") ??
+       throw new Exception("Resource not found");
+  
   private static void LoadTree(string resourceNameRoot, IDirectoryInfo target, string[] items)
   {
     var assembly = Assembly.GetExecutingAssembly();

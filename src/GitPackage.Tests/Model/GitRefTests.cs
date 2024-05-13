@@ -1,9 +1,20 @@
-﻿using GitPackage.Cli.Model;
+﻿using System.Text.Json;
+using GitPackage.Cli.Model;
 
 namespace GitPackage.Tests.Model
 {
     public class GitRefTests
     {
+        [Fact]
+        public void Serializable()
+        {
+            var data = new GitRef("v1");
+
+            var json = JsonSerializer.Serialize(data);
+            var reload = JsonSerializer.Deserialize<GitRef>(json);
+            Assert.Equal(data,reload);
+        }
+
         [Fact]
         public void Ctor_TagOnly()
         {

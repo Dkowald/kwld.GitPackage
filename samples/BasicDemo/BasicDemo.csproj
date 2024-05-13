@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<GitPackage  />-->
+    <GitPackage Include="https://github.com/Dkowald/kwld.CoreUtil.git">
+      <Version>tag/v1.3.2</Version>
+      <Path>./external/kwld.utils/</Path>
+      <Filter>**/*.md</Filter>
+    </GitPackage>
   </ItemGroup>
 </Project>

@@ -2,7 +2,9 @@
 
 internal static class Files
 {
-    public static IDirectoryInfo TestPackageCacheRoot =
-        new FileSystem().Project()
-            .GetFolder("App_Data", ".gitpackages");
+    public static readonly IDirectoryInfo AppData =
+        new FileSystem().Project().GetFolder("App_Data");
+
+    public static readonly IDirectoryInfo TestPackageCacheRoot =
+        AppData.GetFolder(".gitpackages");
 }

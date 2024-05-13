@@ -1,4 +1,6 @@
-﻿namespace GitPackage.Cli.Model;
+﻿using System.Text.Json.Serialization;
+
+namespace GitPackage.Cli.Model;
 
 /// <summary>
 /// Present user input as valid git refs. <br/>
@@ -15,7 +17,8 @@
 /// <remarks>
 /// Note: git refs are case preserving.
 /// </remarks>
-internal class GitRef : IDataString<GitRef>
+[JsonConverter(typeof(DataStringConverterFactory))]
+internal record GitRef : IDataString<GitRef>
 {
     private readonly string _prefix;
     private readonly string _path;

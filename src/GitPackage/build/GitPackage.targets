@@ -7,15 +7,38 @@
 
   </PropertyGroup>
 
-  <Target Name="Check" BeforeTargets="Build">
+  <UsingTask
+    TaskName="GitPackage.GitPackageTask"
+    AssemblyFile="$(MSBuildThisFileDirectory)..\lib\netstandard2.0\GitPackage.dll" />
+
+  <Target Name="_gpInit" BeforeTargets="Build" 
+          Inputs="@(GitPackage)" 
+          Outputs="%(GitPackage.Path)/.gitpackage">
+
+    <GitPackageTask  Package="@(GitPackage)">
+      <Output TaskParameter="Item" ItemName="gpPackages" />
+    </GitPackageTask>
+  </Target>
+
+  <Target Name="Check" AfterTargets="_gpInit">
+
+    <Message Importance="High" Text="@(gpPackages)" />
+
+    <!--<Message Importance="High" Text="$(packagesJson)" />
+
     <ItemGroup>
       <Args Include="$(MSBuildThisFileDirectory)" />
-      <Args Include="--version" />
-    </ItemGroup>
+      <Args Include="-i "/>
+      <Args Include="$(packagesJson)" />
+    </ItemGroup>-->
     
-    <Exec Command="$(GitPackageCli) @(Args, ' ')" 
+    <!--<Exec Command='$(GitPackageCli) -i $(packagesJson)'
           ConsoleToMsBuild="true"
           EchoOff="false"
-          StandardOutputImportance="High" />
+          StandardOutputImportance="High" />-->
   </Target>
+
+  <!--
+  TODO: build schema for gitpackage item
+  -->
 </Project>

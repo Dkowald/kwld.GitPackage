@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--<ImplicitUsings>enable</ImplicitUsings>-->
+    <!--<Nullable>enable</Nullable>-->
     <IsPackable>true</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -34,20 +34,16 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\GitPackage.Cli\GitPackage.Cli.csproj" Targets="Pack">
+    <!--<ProjectReference Include="..\GitPackage.Cli\GitPackage.Cli.csproj" Targets="Pack">
       <PrivateAssets>all</PrivateAssets>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    </ProjectReference>-->
 
-    <None Include="../GitPackage.Cli/bin/$(Configuration)/$(TargetFramework)\publish/**/*" Exclude="**/*.pdb">
+    <None Include="../GitPackage.Cli/bin/$(Configuration)/net8.0/publish/**/*" Exclude="**/*.pdb">
       <Link>cli/%(RecursiveDir)%(FileName)%(Extension)</Link>
       <Pack>true</Pack>
       <PackagePath>cli/%(RecursiveDir)%(FileName)%(Extension)</PackagePath>
     </None>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="GitCommands\" />
   </ItemGroup>
   
   <Target Name="AfterPack" AfterTargets="Pack">
