@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace GitPackage.Cli.Model;
 
@@ -67,6 +68,16 @@ internal record GitRef : IDataString<GitRef>
         return (null, new(prefix, path));
     }
 
+    /// <summary>Try parse version as a <see cref="GitRef"/> </summary>
+    public static GitRef? TryParse(string? data)
+    {
+        if (data is null) return null;
+
+        var (_, item) = TryRead(data);
+
+        return item;
+    }
+
     /// <inheritdoc cref="GitRef"/>
     public GitRef(string data)
     {
@@ -78,17 +89,7 @@ internal record GitRef : IDataString<GitRef>
         _prefix = item._prefix;
         _path = item._path;
     }
-
-    /// <summary>Try parse version as a <see cref="GitRef"/> </summary>
-    public static GitRef? TryParse(string? data)
-    {
-        if (data is null) return null;
-
-        var (_, item) = TryRead(data);
-
-        return item;
-    }
-
+    
     /// <summary>The full git ref string</summary>
     public string Value => $"{_prefix}/{_path}";
 
@@ -100,6 +101,10 @@ internal record GitRef : IDataString<GitRef>
     /// </list>
     /// </summary>
     public string Version => $"{GitToShortForm}/{_path}";
+
+    /// <inheritdoc cref="Value"/>
+    [return:NotNullIfNotNull(nameof(GitRef))]
+    public static implicit operator string?(GitRef? self) => self?.ToString();
 
     /// <inheritdoc cref="Value"/>
     public override string ToString() => Value;

@@ -7,18 +7,18 @@
 /// TODO: consider represent the status file as html,
 /// so then I could just open it in browser to see info
 /// </remarks>
-internal record GitPackageItem
+internal record GitPackageStatusFile
 {
     private readonly IFileInfo _statusFile;
 
-    private GitPackageItem(IFileInfo statusFile)
+    private GitPackageStatusFile(IFileInfo statusFile)
     {
         _statusFile = statusFile;
     }
 
-    public static GitPackageItem Load(IFileInfo dataFile)
+    public static GitPackageStatusFile Load(IFileInfo dataFile)
     {
-        var result = new GitPackageItem(dataFile);
+        var result = new GitPackageStatusFile(dataFile);
 
         if(dataFile.Exists)
             foreach (var line in dataFile.ReadAllLines())
@@ -90,5 +90,8 @@ internal record GitPackageItem
     /// </summary>
     public string Path { get; set; }
 
-    public string Commit { get; set; }
+    /// <summary>
+    /// The commit used for current files, if files have been collected
+    /// </summary>
+    public string? Commit { get; set; }
 }
