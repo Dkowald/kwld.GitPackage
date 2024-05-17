@@ -1,4 +1,7 @@
-﻿namespace GitPackage.Tests;
+﻿using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Logging;
+
+namespace GitPackage.Tests;
 
 public class ToDo
 {
@@ -16,9 +19,17 @@ public class ToDo
     [Fact]
     public void CloneWithStructure()
     {
-        //set the gitPackage cache root.
-        //add gitPackage.
-        //verify default is git
+        var logFactory = LoggerFactory.Create(cfg => {
+            cfg.AddConsole();
+            cfg.AddDebug();
+
+            cfg.AddFilter<ConsoleLoggerProvider>("GitGet", LogLevel.Information);
+        });
+
+        var appLog = logFactory.CreateLogger("GitGet");
+
+        appLog.LogInformation("GitGet");
+
     }
 
     [Fact]

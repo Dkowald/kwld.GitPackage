@@ -21,7 +21,8 @@ namespace GitPackage
         [Required]
         public ITaskItem Package { get; set; }
 
-        [Output] public ITaskItem Item { get; set; }
+        [Output] 
+        public ITaskItem Item { get; set; }
 
         public override bool Execute()
         {

@@ -1,7 +1,10 @@
-﻿using GitPackage.Cli.GitCommands;
-using GitPackage.Cli.Model;
+﻿using GitPackage.Cli.Model;
 using GitPackage.Cli.Tasks;
-using LibGit2Sharp;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
+
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace GitPackage.Cli;
 
@@ -11,94 +14,46 @@ internal class Program
     {
         var files = new FileSystem();
 
-        var argInfo = new Args(args);
+        var argInfo = new Config().Read(args);
+        
+        var logFactory = LoggerFactory.Create(cfg =>
+        {
+            cfg.AddConsole(x =>
+            {
+                x.LogToStandardErrorThreshold = LogLevel.Error;
+            });
 
-        if(argInfo.ShowVersion) {
-            Version();
-            return 0;
+            //todo: custom formatter, or something to get rid of the eventid in console out
+            cfg.AddSimpleConsole(x =>
+                {
+                    x.SingleLine = true;
+                    x.TimestampFormat = "HH:mm:ss ";
+                    x.IncludeScopes = false;
+                });
+                cfg.AddDebug();
+                cfg.AddFilter<ConsoleLoggerProvider>("", argInfo.LogLevel);
+        });
+    
+        var appLog = logFactory.CreateLogger("");
+
+        if (argInfo.Errors.Any())
+        {
+            foreach (var item in argInfo.Errors)
+            {
+                appLog.LogError(item);
+            }
+
+            return 1;
         }
 
-        var config = new AppConfig(files, argInfo);
+        if (argInfo.ShowVersion) 
+            return await new Help(appLog).Run();
+        
+        var config = new AppConfig(appLog, files, argInfo);
 
-        var result = await new SyncFilesWithPackage().Run(config);
+        var result = await new SyncFilesWithPackage(appLog)
+            .Run(config);
 
         return result;
-    }
-
-    //public static async Task<int> Run(AppConfig config)
-    //{
-    //    var package = config.GetPackage();
-    //    if (package is null) 
-    //        throw new Exception("No package defined");
-        
-    //    var cache = new RepositoryCache(config.RepositoryCache(), package.Include);
-
-    //    //Clone
-    //    var repo = CloneIfMissing(cache);
-
-    //    //Check for ref.
-    //    var targetRef = FetchReference(repo, package.Version)
-    //        ?? throw new Exception($"Cannot find {package.Version}");
-
-    //    //Check if already have.
-    //    var commit = targetRef.Target.Peel<Commit>();
-
-    //    if (package.Commit == commit.Sha)
-    //    {
-    //        return 0;
-    //    }
-
-    //    new GitGet(repo)
-    //        .Run(config.OutFolder(), package.Version, new(package.Filter));
-
-    //    package.Commit = commit.Sha;
-    //    package.Write();
-
-    //    return 0;
-    //}
-
-    private static Repository CloneIfMissing(RepositoryCache cache)
-    {
-        if (!cache.CachePath.Exists)
-        {
-            cache.CachePath.EnsureExists();
-            Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName,
-                new CloneOptions { IsBare = true });
-        }
-
-        var repo = new Repository(cache.CachePath.FullName);
-
-        return repo;
-    }
-
-    private static DirectReference? FetchReference(Repository repo, GitRef gitRef)
-    {
-        var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
-
-        if (targetRef is null)
-        {
-            //fetch.
-            var refSpecs = repo.Network.Remotes["origin"].FetchRefSpecs.Select(x => x.Specification);
-            Commands.Fetch(repo, "origin", refSpecs, new() { TagFetchMode = TagFetchMode.All }, "");
-        }
-
-        targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
-
-        return targetRef;
-    }
-
-    static void Version()
-    {
-        Console.WriteLine("Version 0.0.1");
-    }
-
-    static void EchoArgs(string[] args)
-    {
-        Console.WriteLine("ARGS");
-        foreach (var item in args)
-        {
-            Console.WriteLine(item);
-        }
-        Console.WriteLine("----------------");
     }
 }

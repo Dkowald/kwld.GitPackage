@@ -1,4 +1,6 @@
-﻿namespace GitPackage.Cli.Model;
+﻿using Microsoft.Extensions.Logging;
+
+namespace GitPackage.Cli.Model;
 
 /// <summary>
 /// 
@@ -9,49 +11,56 @@
 /// </remarks>
 internal record GitPackageStatusFile
 {
-    private readonly IFileInfo _statusFile;
+    private readonly ILogger _appLog;
+    internal const string StatusFileName = ".gitpackage";
 
-    private GitPackageStatusFile(IFileInfo statusFile)
+    public static GitPackageStatusFile Load(ILogger appLog, IFileInfo dataFile)
     {
-        _statusFile = statusFile;
-    }
+        var result = new GitPackageStatusFile(appLog, dataFile);
 
-    public static GitPackageStatusFile Load(IFileInfo dataFile)
-    {
-        var result = new GitPackageStatusFile(dataFile);
+        if (!dataFile.Exists)
+        {
+            appLog.LogError("Status file missing: {StatusFile}", dataFile.FullName);
+            return result;
+        }
 
-        if(dataFile.Exists)
-            foreach (var line in dataFile.ReadAllLines())
+        foreach (var line in dataFile.ReadAllLines())
+        {
+            var idx = line.IndexOf('=');
+            if (idx < 0 || idx == line.Length - 1)
             {
-                var idx = line.IndexOf('=');
-                if(idx < 0 || idx == line.Length-1)
-                    throw new Exception("Data file corrupt");
-                var key = line[..idx++].Trim();
-                var value = line[idx..].Trim();
-                
-                if(key.Same(nameof(Include)))
-                    result.Include = value;
-
-                if (key.Same(nameof(Version)))
-                    result.Version = new(value);
-
-                if (key.Same(nameof(Filter)))
-                    result.Filter = new(value);
-
-                if (key.Same(nameof(Path)))
-                    result.Path = new(value);
-                
-                if (key.Same(nameof(Commit)))
-                    result.Commit = new(value);
+                appLog.LogError("Status File corrupt: {StatusFile}", dataFile.FullName);
             }
 
-        //actually path will always be wherever the status file is.
-        result.Path = dataFile.DirectoryName!;
-        
+            var key = line[..idx++].Trim();
+            var value = line[idx..].Trim();
+
+            if (key.Same(nameof(Include)))
+                result.Include = value;
+
+            if (key.Same(nameof(Version)))
+                result.Version = new(value);
+
+            if (key.Same(nameof(Filter)))
+                result.Filter = new(value);
+
+            if (key.Same(nameof(Commit)))
+                result.Commit = new(value);
+        }
+
         return result;
     }
 
-    public void Write()
+    public GitPackageStatusFile(ILogger appLog, IFileInfo statusFile)
+    {
+        _appLog = appLog;
+        BackingFile = statusFile;
+    }
+
+    public GitPackageStatusFile(ILogger appLog, IDirectoryInfo folder) 
+        : this(appLog, folder.GetFile(StatusFileName)){}
+
+    public GitPackageStatusFile Write()
     {
         var content = new[]
         {
@@ -61,15 +70,23 @@ internal record GitPackageStatusFile
             $"{nameof(Commit)} = {Commit}",
         };
 
-        _statusFile.WriteAllLines(content);
+        _appLog.LogDebug("Updating status file: {statusFile}", BackingFile.FullName);
+
+        BackingFile
+            .EnsureDirectory()
+            .WriteAllLines(content);
+
+        return this;
     }
+
+    public IFileInfo BackingFile { get; }
 
     /// <summary>
     /// Url to the source repository: e.g.
     /// https://github.com/Dkowald/kwld.Xunit.Ordering.git
     /// Note the leading https:// can be removed if desired
     /// </summary>
-    public string Include { get; set; }
+    public string? Include { get; set; }
 
     /// <summary>
     /// The Version; corresponds to a git commit.
@@ -78,17 +95,18 @@ internal record GitPackageStatusFile
     /// heads/dev
     /// If not prefixed with tags or heads; then it is assumed to be tags.
     /// </summary>
-    public GitRef Version { get; set; }
+    public GitRef? Version { get; set; }
 
     /// <summary>
     /// Optional glob filter on source files.
+    /// Defaults to 
     /// </summary>
-    public string Filter { get; set; }
+    public GetFilter Filter { get; set; } = new();
 
     /// <summary>
     /// Local path to place files.
     /// </summary>
-    public string Path { get; set; }
+    public string Path => BackingFile.DirectoryName!;
 
     /// <summary>
     /// The commit used for current files, if files have been collected

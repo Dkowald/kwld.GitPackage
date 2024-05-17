@@ -35,18 +35,18 @@ internal record GitRef : IDataString<GitRef>
         data = data.Trim();
         var parts = data.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length == 0) return ("Cannot be empty", null);
+        if (parts.Length == 0) return ($"{nameof(GitRef)} Cannot be empty", null);
 
         if (parts[0].Same("refs"))
         {
             if (parts.Length < 2)
-                return ("Invalid git ref format", null);
+                return ($"{nameof(GitRef)} invalid format, must contain a /", null);
 
             if (!parts[1].Same("heads") && !parts[1].Same("tags"))
-                return ("Git ref must be either for head or tag", null);
+                return ($"{nameof(GitRef)} ref must be either for head or tag", null);
 
             if (parts.Length < 3)
-                return ("Git ref must include path to item", null);
+                return ($"{nameof(GitRef)} ref must include path to item", null);
 
             return (null, new($"{parts[0]}/{parts[1]}", string.Join('/', parts[2..])));
         }

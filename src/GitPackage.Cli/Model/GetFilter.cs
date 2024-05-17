@@ -8,16 +8,24 @@ namespace GitPackage.Cli.Model;
 /// </summary>
 internal class GetFilter
 {
+    public const string NoFilter = "**/*";
+
     private readonly Glob[] _filters;
 
-    public GetFilter(string? globs = null)
+    /// <summary>
+    /// Create glob filter, defaults to no filter glob.
+    /// </summary>
+    public GetFilter(string globs = NoFilter)
     {
-        var parts = globs is not null ? globs.Split(';', StringSplitOptions.RemoveEmptyEntries) : [];
+        var options = GlobOptions.Default;
+        options.Evaluation.CaseInsensitive = true;
+
+        var parts = globs.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         parts = parts.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 
         if(parts.Length == 0)
-        {_filters = [Glob.Parse("/*"),Glob.Parse("/**/*")];}
+        {_filters = [Glob.Parse("/*"),Glob.Parse("/**/*", options)];}
         else
         {
             _filters = parts.Select(x => Glob.Parse(
@@ -28,4 +36,7 @@ internal class GetFilter
 
     public bool IsMatch(string path) =>
         _filters.Any(x => x.IsMatch(path));
+
+    public override string ToString()
+        => string.Join(';', _filters.Select(x => x.ToString()));
 }
