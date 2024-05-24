@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using GitPackage.Cli.Model;
+using GitPackage.Tests.TestHelpers;
 
 namespace GitPackage.Tests.Model;
 
@@ -35,7 +36,7 @@ public class GitGetStatusTests
 
         await target.SetMatched();
 
-        var localFile = localFolder.GetFile(GitGetStatus.StatusFileName);
+        var localFile = localFolder.GetFile(GitPackageStatusFile.StatusFileName);
 
         await localFile.WriteAllTextAsync("corrupted-file-content");
         

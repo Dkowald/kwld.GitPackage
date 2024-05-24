@@ -6,6 +6,8 @@ internal class Config
 {
     private readonly List<string> _errors = new();
 
+    public static readonly string HomeRepository = "https://github.com/Dkowald/kwld.GitPackage";
+
     public Config Read(string[] args)
     {
         _errors.Clear();
@@ -37,6 +39,9 @@ internal class Config
         }
 
         LogLevel = ResolveLogLevel(logLevel);
+
+        if (args.Length == 0)
+            ShowVersion = true;
 
         return this;
     }

@@ -11,7 +11,7 @@ namespace GitPackage.Tests.Flow;
 public class Basic
 {
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Flow", "Basic", "CorUtil");
-    private IFileInfo StatusFile => _root.GetFile(GitGetStatus.StatusFileName);
+    private IFileInfo StatusFile => _root.GetFile(GitPackageStatusFile.StatusFileName);
 
     [Ordered, Fact]
     public async Task ResetWorkFolder()

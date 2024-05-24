@@ -3,7 +3,7 @@
     "GitPackage.Cli": {
       "commandName": "Project",
       "workingDirectory": "./App_Data",
-      "commandLineArgs": "-l t -c .gitpackages -f ./Sample1/.gitpackage"
+      "commandLineArgs": "-v -l t -c .gitpackages -f ./Sample1/.gitpackage"
     }
   }
 }

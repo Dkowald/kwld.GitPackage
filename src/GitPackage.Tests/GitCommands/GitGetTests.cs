@@ -1,5 +1,6 @@
 ﻿using GitPackage.Cli.GitCommands;
 using GitPackage.Cli.Model;
+using GitPackage.Tests.TestHelpers;
 
 namespace GitPackage.Tests.GitCommands
 {
