@@ -66,11 +66,12 @@ internal class Config
 
         if (lvl.Same("i"))
             return LogLevel.Information;
+
         if (lvl.Same("d"))
             return LogLevel.Debug;
 
         if (lvl.Same("t"))
-            return LogLevel.Debug;
+            return LogLevel.Trace;
 
         _errors.Add($"Unknown LogLevel '{lvl}'");
         return LogLevel.Warning;

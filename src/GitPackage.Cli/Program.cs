@@ -1,6 +1,7 @@
 ﻿using GitPackage.Cli.Model;
+using GitPackage.Cli.Model.AppLogging;
 using GitPackage.Cli.Tasks;
-
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 
@@ -12,29 +13,32 @@ internal class Program
 {
     internal static async Task<int> Main(string[] args)
     {
-        var files = new FileSystem();
-
         var argInfo = new Config().Read(args);
-        
-        var logFactory = LoggerFactory.Create(cfg =>
-        {
-            cfg.AddConsole(x =>
-            {
-                x.LogToStandardErrorThreshold = LogLevel.Error;
-            });
 
-            //todo: custom formatter, or something to get rid of the eventid in console out
-            cfg.AddSimpleConsole(x =>
-                {
-                    x.SingleLine = true;
-                    x.TimestampFormat = "HH:mm:ss ";
-                    x.IncludeScopes = false;
-                });
-                cfg.AddDebug();
-                cfg.AddFilter<ConsoleLoggerProvider>("", argInfo.LogLevel);
+        var cont = new ServiceCollection();
+
+        cont.AddSingleton(TimeProvider.System)
+            .AddSingleton<IFileSystem, FileSystem>();
+
+        cont.AddLogging(log =>
+        {
+            log.AddDebug()
+             .AddConsole(x =>
+             {
+                 x.LogToStandardErrorThreshold = LogLevel.Error;
+                 x.FormatterName = nameof(AppLoggerFormatter);
+             });
+            
+            log.AddConsoleFormatter<AppLoggerFormatter, SimpleConsoleFormatterOptions>();
+
+            log.AddFilter("", argInfo.LogLevel);
+            //log.AddFilter<ConsoleLoggerProvider>("", argInfo.LogLevel);
         });
-    
-        var appLog = logFactory.CreateLogger("");
+
+        await using var svc = cont.BuildServiceProvider();
+
+        var appLog = svc.GetRequiredService<ILoggerFactory>().CreateLogger("");
+        var files = svc.GetRequiredService<IFileSystem>();
 
         if (argInfo.Errors.Any())
         {

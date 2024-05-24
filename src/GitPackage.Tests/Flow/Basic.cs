@@ -2,6 +2,8 @@
 using GitPackage.Cli.Model;
 using GitPackage.Tests.App_Assets;
 using GitPackage.Tests.TestHelpers;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 
 namespace GitPackage.Tests.Flow;
 
@@ -9,6 +11,7 @@ namespace GitPackage.Tests.Flow;
 public class Basic
 {
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Flow", "Basic", "CorUtil");
+    private IFileInfo StatusFile => _root.GetFile(GitGetStatus.StatusFileName);
 
     [Ordered, Fact]
     public async Task ResetWorkFolder()
@@ -19,15 +22,19 @@ public class Basic
         _root.FileSystem.Project().SetCurrentDirectory();
     }
 
-    private IFileInfo StatusFile => _root.GetFile(GitGetStatus.StatusFileName);
 
     [Ordered, Fact]
-    public async Task CreateTargetStatusFile()
+    public void CreateTargetStatusFile()
     {
-        await using (var wr = StatusFile.Create())
+        var logger = Substitute.For<ILogger>();
+        
+        new GitPackageStatusFile(logger, StatusFile)
         {
-            await Assets.CoreUtilGitPackage().CopyToAsync(wr);
+            Include = "https://github.com/Dkowald/kwld.CoreUtil.git",
+            Version = new("tag/v1.3.2"),
+            Filter = new("*.md;docs/*.md")
         }
+        .Write();
     }
 
     [Ordered, Fact]

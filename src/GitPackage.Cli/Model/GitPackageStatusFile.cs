@@ -14,14 +14,17 @@ internal record GitPackageStatusFile
     private readonly ILogger _appLog;
     internal const string StatusFileName = ".gitpackage";
 
-    public static GitPackageStatusFile Load(ILogger appLog, IFileInfo dataFile)
+    public static GitPackageStatusFile? Load(ILogger appLog, IDirectoryInfo dataFolder)
+        => Load(appLog, dataFolder.GetFile(StatusFileName));
+
+    public static GitPackageStatusFile? Load(ILogger appLog, IFileInfo dataFile)
     {
         var result = new GitPackageStatusFile(appLog, dataFile);
 
         if (!dataFile.Exists)
         {
             appLog.LogError("Status file missing: {StatusFile}", dataFile.FullName);
-            return result;
+            return null;
         }
 
         foreach (var line in dataFile.ReadAllLines())
