@@ -40,9 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="App_Assets\GlobCheckoutTests\CheckoutAll\expected\Folder2\item1.txt">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -56,6 +53,10 @@
     <None Include="App_Data/.gitpackages/**/*" />
     <None Include="App_Data/**/.*" />
     
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Assets\" />
   </ItemGroup>
     
 </Project>

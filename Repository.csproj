@@ -10,5 +10,10 @@
     <None Include="doc/**" />
     <None Include="samples/*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="Readme.md" />
+  </ItemGroup>
 	
 </Project>

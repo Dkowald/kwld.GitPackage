@@ -1,8 +1,9 @@
 ﻿using GitPackage.Cli;
 using GitPackage.Cli.Model;
-using GitPackage.Tests.App_Assets;
 using GitPackage.Tests.TestHelpers;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 namespace GitPackage.Tests.Flow;

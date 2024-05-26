@@ -1,16 +1,63 @@
+Tooling to include raw files from git repositories via CLI and MSBuild.
 
-Migration notes:
+See [Details](https://github.com/Dkowald/kwld.GitPackage/blob/wip/layout/doc/Home.md) for more info.
 
-This is a re-boot of the earlier [GitPackage](https://github.com/Dkowald/GitPackage)
+#### GitPackage
 
-This time around, I want to remove the dependency on git cli;
-and replace it with in-code git capabilities via LibGit2Sharp
+MSBuild wrapper around GitGet to include git source files in a project
 
-This should provide a more flexability on how to consume a git repository.
+__E.g__  MSBuild to create a local clone and extract files from a repository.
+``` xml
+<ItemGroup>
+ <!--Include package-->
+ <PackageReference Include="GitPackage" Version="99.0.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; buildtransitive</IncludeAssets>
+ </PackageReference>
+</ItemGroup>
 
-But, as a concequence of leveraging additional libraries;
-this now seperated the engin into its own packaged exe: GitGet
-This avoids challenged with custom MSBuild task's and dependencies
+<ItemGroup>
+  <!--Get doc files for this repo -->
+  <GitPackage Include="./external/kwld.GitPackage/"
+    Url='https://github.com/Dkowald/kwld.GitPackage.git'
+    Version = 'branch/main'
+    Filter = 'doc/**/*.md'>
+  </GitPackage>
+</ItemGroup>
+```
 
-see: 
-https://natemcmaster.com/blog/2017/11/11/msbuild-task-with-dependencies/  
+--------
+#### GitGet
+CLI to create a local clone and extract files from a repository.
+
+__E.g__
+
+Install and get docs for this repository.
+
+``` pwsh
+
+# Install cli tool
+dotnet tool install gitget
+
+#write gitpackage file
+echo `
+Url=https://github.com/Dkowald/kwld.GitPackage `
+Version=branch/main `
+Filter=doc/**/*.md `
+> .gitpackage
+
+#clone and extract files in curent folder.
+dotnet gitget
+```
+
+__Url__  
+
+Specifies the target repository.   
+This repository is cloned locally to a cache %HOME%/.gitpackage
+
+__Version__ 
+
+Specifies the particular commit to use; can be '_branch/_'or '_tag/_' 
+
+__Filter__  
+Glob patter to limit files. Can be multiple globs seperated by ';'
