@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <!--<ImplicitUsings>enable</ImplicitUsings>-->
-    <!--<Nullable>enable</Nullable>-->
     <IsPackable>true</IsPackable>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -39,7 +37,7 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>-->
 
-    <None Include="../GitPackage.Cli/bin/$(Configuration)/net8.0/publish/**/*" Exclude="**/*.pdb">
+    <None Include="../git-get/bin/$(Configuration)/net8.0/publish/**/*" Exclude="**/*.pdb">
       <Link>cli/%(RecursiveDir)%(FileName)%(Extension)</Link>
       <Pack>true</Pack>
       <PackagePath>cli/%(RecursiveDir)%(FileName)%(Extension)</PackagePath>

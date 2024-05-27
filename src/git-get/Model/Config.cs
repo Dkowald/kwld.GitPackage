@@ -11,8 +11,8 @@ internal class Config
     public Config Read(string[] args)
     {
         _errors.Clear();
-
         var logLevel = "w";
+
         for (var idx = 0; idx < args.Length; idx++)
         {
             var key = args[idx];

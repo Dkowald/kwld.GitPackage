@@ -1,12 +1,8 @@
-﻿using GitPackage.Cli;
-using GitPackage.Cli.Model;
-using GitPackage.Tests.TestHelpers;
-
+﻿using GitPackage.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
-
 using NSubstitute;
 
-namespace GitPackage.Tests.Flow;
+namespace GitPackage.Tests.Usage;
 
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class Basic

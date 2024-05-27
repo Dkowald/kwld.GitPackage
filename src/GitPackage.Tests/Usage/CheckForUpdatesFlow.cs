@@ -1,6 +1,4 @@
-﻿using kwld.Xunit.Ordering;
-
-namespace GitPackage.Tests.Flow;
+﻿namespace GitPackage.Tests.Usage;
 
 public class CheckForUpdatesFlow
 {

@@ -91,6 +91,18 @@ If [version] is a branch ref, will also fetch latest from origin.
 - tag : only force if [version-ref] is a tag ref
 - all: force for both branch and tag references
 
+--log-level:[log-level]
+
+Logging reported whilst running.
+[log-level] is one of
+
+- c : Critical 
+- e : Error
+- w : Warning (default)
+- i : Information
+- d : Debug
+- t : Trace
+
 --target-path:[target-path]
 
 Explicit define target path.  

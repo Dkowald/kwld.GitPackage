@@ -10,6 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <PackageOutputPath>../../samples/packages</PackageOutputPath>
   </PropertyGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="GitPackage.Tests" />
   </ItemGroup>
@@ -29,6 +30,15 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--Include exe in tool package-->
+    <None Include="bin/$(Configuration)/net8.0/publish/git-get.exe">
+      <Pack>true</Pack>
+      <PackagePath>tools/$(TargetFramework)/any/git-get.exe</PackagePath>
+    </None>
+
   </ItemGroup>
 
 </Project>
