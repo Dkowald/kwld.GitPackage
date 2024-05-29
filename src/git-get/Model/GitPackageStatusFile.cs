@@ -14,6 +14,13 @@ internal record GitPackageStatusFile
     private readonly ILogger _appLog;
     internal const string StatusFileName = ".gitpackage";
 
+    public static GitPackageStatusFile? LoadIfFound(ILogger appLog, IDirectoryInfo dataFolder)
+    {
+        var file = dataFolder.GetFile(StatusFileName);
+        if (!file.Exists) return null;
+        return Load(appLog, file);
+    }
+
     public static GitPackageStatusFile? Load(ILogger appLog, IDirectoryInfo dataFolder)
         => Load(appLog, dataFolder.GetFile(StatusFileName));
 
@@ -33,13 +40,15 @@ internal record GitPackageStatusFile
             if (idx < 0 || idx == line.Length - 1)
             {
                 appLog.LogError("Status File corrupt: {StatusFile}", dataFile.FullName);
+                appLog.LogInformation("Deleting corrupted status file");
+                dataFile.Delete();
             }
 
             var key = line[..idx++].Trim();
             var value = line[idx..].Trim();
 
-            if (key.Same(nameof(Include)))
-                result.Include = value;
+            if (key.Same(nameof(Origin)))
+                result.Origin = value;
 
             if (key.Same(nameof(Version)))
                 result.Version = new(value);
@@ -67,7 +76,7 @@ internal record GitPackageStatusFile
     {
         var content = new[]
         {
-            $"{nameof(Include)} = {Include}",
+            $"{nameof(Origin)} = {Origin}",
             $"{nameof(Version)} = {Version}",
             $"{nameof(Filter)} = {Filter}",
             $"{nameof(Commit)} = {Commit}",
@@ -89,7 +98,7 @@ internal record GitPackageStatusFile
     /// https://github.com/Dkowald/kwld.Xunit.Ordering.git
     /// Note the leading https:// can be removed if desired
     /// </summary>
-    public string? Include { get; set; }
+    public string? Origin { get; set; }
 
     /// <summary>
     /// The Version; corresponds to a git commit.

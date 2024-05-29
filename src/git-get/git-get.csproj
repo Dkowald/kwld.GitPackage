@@ -9,6 +9,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackAsTool>true</PackAsTool>
     <PackageOutputPath>../../samples/packages</PackageOutputPath>
+    <RootNamespace>GitGet</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,13 +1,12 @@
 ﻿using GitPackage.Cli.Model;
-
 using LibGit2Sharp;
 
-namespace GitPackage.Cli.GitCommands;
+namespace GitGet.GitCommands;
 
 /// <summary>
 /// Get (rather than checkout) files for the repository.
 /// </summary>
-internal class GitGet(Repository repository)
+internal class Get(Repository repository)
 {
     public void Run(IDirectoryInfo target, GitRef commit, GetFilter filter)
     {

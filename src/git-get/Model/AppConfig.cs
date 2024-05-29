@@ -1,4 +1,4 @@
-﻿using GitPackage.Cli.Utility;
+﻿using GitGet.Utility;
 using Microsoft.Extensions.Logging;
 
 namespace GitPackage.Cli.Model;

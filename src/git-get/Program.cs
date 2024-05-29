@@ -1,19 +1,19 @@
-﻿using GitPackage.Cli.Model;
+﻿using GitGet.Model;
+using GitPackage.Cli.Model;
 using GitPackage.Cli.Model.AppLogging;
 using GitPackage.Cli.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
-
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
-namespace GitPackage.Cli;
+namespace GitGet;
 
 internal class Program
 {
     internal static async Task<int> Main(string[] args)
     {
-        var argInfo = new Config().Read(args);
+        var logLevel = Args.ReadLogLevel(args);
 
         var cont = new ServiceCollection();
 
@@ -31,33 +31,37 @@ internal class Program
             
             log.AddConsoleFormatter<AppLoggerFormatter, SimpleConsoleFormatterOptions>();
 
-            log.AddFilter("", argInfo.LogLevel);
-            //log.AddFilter<ConsoleLoggerProvider>("", argInfo.LogLevel);
+            log.AddFilter("", logLevel);
         });
+
+        //register default (app)logger
+        cont.AddSingleton(ctx => ctx.GetRequiredService<ILoggerFactory>().CreateLogger(""));
 
         await using var svc = cont.BuildServiceProvider();
 
-        var appLog = svc.GetRequiredService<ILoggerFactory>().CreateLogger("");
-        var files = svc.GetRequiredService<IFileSystem>();
+        var log = svc.GetRequiredService<ILogger>();
 
-        if (argInfo.Errors.Any())
+        var parsedArgs = Args.Load(
+            svc.GetRequiredService<IFileSystem>(),
+            svc.GetRequiredService<ILogger>(),
+            logLevel, args);
+
+        if (parsedArgs is null)
         {
-            foreach (var item in argInfo.Errors)
-            {
-                appLog.LogError(item);
-            }
-
+            log.LogCritical("Command line parse failed; aborting");
             return 1;
         }
 
-        if (argInfo.ShowVersion) 
-            return await new Help(appLog).Run();
-        
-        var config = new AppConfig(appLog, files, argInfo);
+        var cache = new RepositoryCache(log, svc.GetRequiredService<IFileSystem>(), parsedArgs.Cache);
 
-        var result = await new SyncFilesWithPackage(appLog)
-            .Run(config);
+        if (parsedArgs.Action == Actions.Get)
+        {
+            var action = new Get(log, cache);
 
-        return result;
+            return await action.Run(parsedArgs);
+        }
+
+        //todo: other actions.
+        return -1;
     }
 }

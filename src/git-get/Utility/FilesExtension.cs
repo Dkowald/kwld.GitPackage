@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.IsolatedStorage;
 
-namespace GitPackage.Cli.Utility
+namespace GitGet.Utility;
+
+internal static class FilesExtension
 {
-    internal static class FilesExtension
+    public static IDirectoryInfo? TryGetHome(this IFileSystem fileSystem)
     {
-        public static IDirectoryInfo? TryGetHome(this IFileSystem fileSystem)
-        {
-            var home = Environment.GetEnvironmentVariable("HOME") ??
-                       Environment.GetEnvironmentVariable("USERPROFILE");
+        var home = Environment.GetEnvironmentVariable("HOME") ??
+                   Environment.GetEnvironmentVariable("USERPROFILE");
 
-            return home is null ? null : fileSystem.DirectoryInfo.New(home);
-        }
+        return home is null ? null : fileSystem.DirectoryInfo.New(home);
     }
+
+    public static bool IsFile(this IDirectoryInfo root, string path)
+        => root.GetFile(path).Exists;
 }

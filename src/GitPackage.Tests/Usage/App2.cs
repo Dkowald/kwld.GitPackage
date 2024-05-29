@@ -1,4 +1,7 @@
-﻿using GitPackage.Tests.TestHelpers;
+﻿using GitGet;
+using GitPackage.Cli;
+using GitPackage.Cli.Model;
+using GitPackage.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 
 namespace GitPackage.Tests.Usage;
@@ -22,15 +25,13 @@ public class App2 : IClassFixture<TestHost>
 
         _appLogger = _host.Get<ILoggerProvider>().CreateLogger("");
 
-        _nfsCsiYaml = 
-            GitPackageStatusFile.Load(_appLogger, _root.GetFolder("CSI/NFSFolders/data")) ??
-            new GitPackageStatusFile(_appLogger, _root.GetFolder("CSI/NFSFolders/data")) {
-            Include = "https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/",
+        _nfsCsiYaml = new GitPackageStatusFile(_appLogger, _root.GetFolder("CSI/NFSFolders/data")) {
+            Origin = "https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/",
             Filter = new("readme.md;deploy/*.yaml") };
-
+        
         _args = [
-            "-f", _nfsCsiYaml.BackingFile.FullName,
-            "-l","t"
+            _nfsCsiYaml.BackingFile.Directory!.FullName,
+            "--log-level:t"
         ];
     }
 

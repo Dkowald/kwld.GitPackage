@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <Project Path="..\Repository.csproj">
+      <Configuration Solution="*|*" Project="*|*|NoBuild" />
+    </Project>
+  </Folder>
+  
+  <Project Path="git-get\git-get.csproj" />
+  <Project Path="GitPackage.Tests\GitPackage.Tests.csproj" />
+  <Project Path="GitPackage\GitPackage.csproj" />
+</Solution>

@@ -1,4 +1,5 @@
-﻿using GitPackage.Cli.Model;
+﻿using GitGet.Model;
+using GitPackage.Cli.Model;
 using GitPackage.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 
@@ -15,14 +16,15 @@ namespace GitPackage.Tests.Model
             var root = new FileSystem().Project()
                 .GetFolder("App_Data", "Cache");
 
-            var target = RepositoryCache.New(appLogger, root, "c:/some/path/to/repo");
+            var target = new RepositoryCache(appLogger, root.FileSystem, null)
+                .Get(new("c:/some/path/to/repo"));
 
             Assert.NotNull(target);
 
             var cachePath = target.CachePath.FullName.Replace('\\','/').ToLower();
             var expectedPath = "local/repo";
 
-            Assert.True(cachePath.EndsWith(expectedPath));
+            Assert.EndsWith(expectedPath, cachePath);
         }
     }
 }

@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GitGet\git-get.csproj" />
+    <ProjectReference Include="..\git-get\git-get.csproj" />
     <ProjectReference Include="..\GitPackage\GitPackage.csproj" />
   </ItemGroup>
 

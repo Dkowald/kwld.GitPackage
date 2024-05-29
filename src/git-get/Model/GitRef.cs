@@ -30,7 +30,7 @@ internal record GitRef : IDataString<GitRef>
         _path = path;
     }
 
-    private static (string? error, GitRef? value) TryRead(string data)
+    public static (string? error, GitRef? value) TryRead(string data)
     {
         data = data.Trim();
         var parts = data.Split('/', StringSplitOptions.RemoveEmptyEntries);

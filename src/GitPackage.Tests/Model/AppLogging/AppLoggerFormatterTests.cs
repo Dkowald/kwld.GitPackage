@@ -32,20 +32,20 @@ public class AppLoggerFormatterTests
 
         public void Dispose()
         {
+            _stdOut.Flush();
+            StdOut = _stdOut.GetStringBuilder().ToString();
+            _stdOut.Dispose();
+
+            _stdError.Flush();
+            StdError = _stdError.GetStringBuilder().ToString();
+            _stdError.Dispose();
+
             Console.SetOut(new StreamWriter(Console.OpenStandardOutput())
                 { AutoFlush = true });
             Console.SetError(new StreamWriter(Console.OpenStandardError())
                 { AutoFlush = true });
 
             IsRedirecting = false;
-
-            _stdOut.Flush();
-            StdOut = _stdOut.GetStringBuilder().ToString();
-            _stdOut.Dispose();
-            
-            _stdError.Flush();
-            StdError = _stdError.GetStringBuilder().ToString();
-            _stdError.Dispose();
         }
     }
 
@@ -76,9 +76,10 @@ public class AppLoggerFormatterTests
         await Verify(txt);
     }
 
+    [Fact(Skip = "todo: fix so it capture console properly??")]
     public async Task Log_Console()
     {
-        await using var cont = new ServiceCollection()
+        var cont = new ServiceCollection()
             .AddLogging(log =>
             {
                 log.AddConsoleFormatter<AppLoggerFormatter, SimpleConsoleFormatterOptions>();
@@ -89,16 +90,20 @@ public class AppLoggerFormatterTests
                 });
                 log.AddFilter("", LogLevel.Debug);
             })
-            .BuildServiceProvider();
+            .AddSingleton<TimeProvider>(new FakeTimeProvider());
 
-        var logger = cont.GetRequiredService<ILoggerFactory>().CreateLogger("");
-
-        using var con = new CaptureIO();
-        
-        logger.LogError("Test error");
-        logger.LogInformation("Test info");
-        logger.LogDebug("Test debug");
-        logger.LogTrace("Test trace");
+        var con = new CaptureIO();
+        await using (var svc = cont.BuildServiceProvider())
+        {
+            var logger = svc.GetRequiredService<ILoggerFactory>().CreateLogger("");
+            using (con)
+            {
+                logger.LogError("Test error");
+                logger.LogInformation("Test info");
+                logger.LogDebug("Test debug");
+                logger.LogTrace("Test trace");
+            }
+        }
 
         Assert.Contains("Test info", con.StdOut);
         Assert.Contains("Test debug", con.StdOut);

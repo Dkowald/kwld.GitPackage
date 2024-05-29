@@ -1,6 +1,8 @@
 ﻿using InMemLogger;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ILoggerFactory = Castle.Core.Logging.ILoggerFactory;
 
 namespace GitPackage.Tests.TestHelpers;
 
@@ -13,8 +15,13 @@ public class TestHost : IDisposable
         var cont = new ServiceCollection()
             .AddLogging(cfg =>
             {
-                cfg.AddInMemory();
-            });
+                cfg.AddInMemory()
+                    .AddDebug()
+                    .AddConsole();
+
+                cfg.AddFilter("", LogLevel.Trace);
+            })
+            .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().Create(""));
 
         _svc = cont.BuildServiceProvider();
     }

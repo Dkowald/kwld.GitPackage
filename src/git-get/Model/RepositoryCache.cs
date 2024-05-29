@@ -1,50 +1,73 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GitGet.Utility;
 
-namespace GitPackage.Cli.Model;
+using Microsoft.Extensions.Logging;
+
+namespace GitGet.Model;
 
 /// <summary>
 /// Match a source repository URL to a local Folder.
 /// </summary>
 internal class RepositoryCache
 {
-    public static RepositoryCache? New(ILogger appLog, IDirectoryInfo cacheRoot, string? originUrl)
+    public static readonly string DefaultCacheFolderName = ".gitpackages";
+
+    private readonly ILogger _appLog;
+    private readonly IDirectoryInfo _cacheRoot;
+
+    public RepositoryCache(ILogger appLog, IFileSystem files, IDirectoryInfo? customRoot)
     {
-        if (originUrl is null)
+        _appLog = appLog;
+
+        if (customRoot is not null)
         {
-            appLog.LogError("Repository URL cannot be empty");
-            return null;
-        }
-
-        if (!Uri.TryCreate(originUrl, UriKind.Absolute, out var origin))
-        {
-            appLog.LogError("Repository origin must be URl: {PackageUrl}", originUrl);
-            return null;
-        }
-
-        return new RepositoryCache(appLog, cacheRoot, origin);
-    }
-
-    public RepositoryCache(ILogger appLog, IDirectoryInfo cacheRoot, Uri origin)
-    {
-        Origin = origin;
-
-        if (origin.IsFile)
-        {
-            appLog.LogInformation("Repository is Local folder, using 'local' as cache host name");
-
-            var localRepo = cacheRoot.FileSystem.DirectoryInfo.New(origin.LocalPath);
-            CachePath = cacheRoot.GetFolder("local", localRepo.Name);
+            appLog.LogInformation("Using custom repository cache");
+            _cacheRoot = customRoot;
         }
         else
         {
-            var relPath = $"{origin.Host}{origin.AbsolutePath}".Replace('\\', '/');
-            CachePath = cacheRoot.GetFolder(relPath);
+            _cacheRoot = ResolveCache(files);
         }
-
-        appLog.LogInformation("Using repository cache at {RepositoryCache}", CachePath.FullName);
+        
+        
+        appLog.LogDebug("Using repository cache at {RepositoryCache}", _cacheRoot.FullName);
     }
 
-    public Uri Origin { get; }
+    public CacheEntry Get(Uri origin)
+    {
+        if (origin.IsFile)
+        {
+            _appLog.LogInformation("Repository is Local folder, using 'local' as cache host name");
 
-    public IDirectoryInfo CachePath { get; }
+            var localRepo = _cacheRoot.FileSystem.DirectoryInfo.New(origin.LocalPath);
+
+            return new CacheEntry(origin, _cacheRoot.GetFolder("local", localRepo.Name));
+        }
+
+        var relPath = $"{origin.Host}{origin.AbsolutePath}".Replace('\\', '/');
+        var path = _cacheRoot.GetFolder(relPath);
+        return new(origin, path);
+    }
+
+    public class CacheEntry(Uri origin, IDirectoryInfo cachePath)
+    {
+        public Uri Origin => origin;
+
+        public IDirectoryInfo CachePath => cachePath;
+    }
+
+    private IDirectoryInfo ResolveCache(IFileSystem files)
+    {
+        var home = files.TryGetHome();
+
+        if (home is null)
+        {
+            _appLog.LogWarning("No home directory found!, using current directory");
+        }
+
+        home ??= files.Current();
+
+        var cache = home.GetFolder(DefaultCacheFolderName);
+
+        return cache;
+    }
 }

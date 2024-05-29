@@ -1,4 +1,7 @@
-﻿using GitPackage.Tests.TestHelpers;
+﻿using GitGet;
+using GitPackage.Cli;
+using GitPackage.Cli.Model;
+using GitPackage.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -11,7 +14,7 @@ public class Basic
     private IFileInfo StatusFile => _root.GetFile(GitPackageStatusFile.StatusFileName);
 
     [Ordered, Fact]
-    public async Task ResetWorkFolder()
+    public void ResetWorkFolder()
     {
         _root.EnsureExists()
             .EnsureEmpty();
@@ -27,7 +30,7 @@ public class Basic
         
         new GitPackageStatusFile(logger, StatusFile)
         {
-            Include = "https://github.com/Dkowald/kwld.CoreUtil.git",
+            Origin = "https://github.com/Dkowald/kwld.CoreUtil.git",
             Version = new("tag/v1.3.2"),
             Filter = new("*.md;docs/*.md")
         }
@@ -39,8 +42,9 @@ public class Basic
     {
         var args = new[]
         {
-            "-c", Files.TestPackageCacheRoot.FullName,
-            "-f", StatusFile.FullName
+            StatusFile.Directory!.FullName,
+            $"--cache:{Files.TestPackageCacheRoot.FullName}",
+            "--log-level:t"
         };
 
         var result = await Program.Main(args);

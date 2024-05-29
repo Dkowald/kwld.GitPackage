@@ -7,14 +7,14 @@ namespace GitPackage.Tests.TestHelpers;
 static class TestRepository
 {
     private static readonly IDirectoryInfo Path = new FileSystem()
-        .Project().GetFolder("App_Data", "TestRepository2");
+        .Project().GetFolder("App_Data", "TestRepository");
 
     internal static Repository OpenTestRepository(bool forceRebuild = false)
     {
         if (!Repository.IsValid(Path.FullName) || forceRebuild)
         {
             Debug.WriteLine("Creating test repository");
-            Path.ClearReadonly().Delete(true);
+            Path.ClearReadonly().EnsureDelete();
             var repo = new Repository(Repository.Init(Path.FullName));
 
             Init(repo);

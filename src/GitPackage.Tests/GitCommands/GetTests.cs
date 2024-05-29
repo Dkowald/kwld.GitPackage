@@ -1,10 +1,9 @@
-﻿using GitPackage.Cli.GitCommands;
-using GitPackage.Cli.Model;
+﻿using GitPackage.Cli.Model;
 using GitPackage.Tests.TestHelpers;
 
 namespace GitPackage.Tests.GitCommands
 {
-    public class GitGetTests
+    public class GetTests
     {
         private readonly IDirectoryInfo OutRoot = 
             new FileSystem().Project().GetFolder("App_Data", "GitGet");
@@ -17,7 +16,7 @@ namespace GitPackage.Tests.GitCommands
             var destRoot = OutRoot.GetFolder("Tag0")
                 .EnsureEmpty();
 
-            var target = new GitGet(repo);
+            var target = new GitGet.GitCommands.Get(repo);
 
             target.Run(destRoot, commit, new());
 
@@ -37,7 +36,7 @@ namespace GitPackage.Tests.GitCommands
             var destRoot = OutRoot.GetFolder("Tag0Filtered")
                 .EnsureEmpty();
 
-            var target = new GitGet(repo);
+            var target = new GitGet.GitCommands.Get(repo);
 
             target.Run(destRoot, commit, new(glob));
 

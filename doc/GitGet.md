@@ -58,7 +58,7 @@ If no options provided, 'target-path/.gitpackage' file is read for details.
 
 The target repository uri
 
---verison:[version-ref]
+--version:[version-ref]
 
 The git ref to use, such as _refs/heads/main_  
 Can be a shorthand ref e.g 'head/main' or 'tag/v1.0'
@@ -106,7 +106,7 @@ Logging reported whilst running.
 --target-path:[target-path]
 
 Explicit define target path.  
-Also used as the action.  
+Alternately used as the action.  
 Defaults to current directory (./).
 
 ## .gitpackage format
