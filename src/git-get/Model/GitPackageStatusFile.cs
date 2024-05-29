@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GitPackage.Cli.Model;
+using Microsoft.Extensions.Logging;
 
-namespace GitPackage.Cli.Model;
+namespace GitGet.Model;
 
 /// <summary>
 /// 
@@ -11,8 +12,7 @@ namespace GitPackage.Cli.Model;
 /// </remarks>
 internal record GitPackageStatusFile
 {
-    private readonly ILogger _appLog;
-    internal const string StatusFileName = ".gitpackage";
+    internal const string StatusFileName = ".gitget";
 
     public static GitPackageStatusFile? LoadIfFound(ILogger appLog, IDirectoryInfo dataFolder)
     {
@@ -21,18 +21,18 @@ internal record GitPackageStatusFile
         return Load(appLog, file);
     }
 
-    public static GitPackageStatusFile? Load(ILogger appLog, IDirectoryInfo dataFolder)
-        => Load(appLog, dataFolder.GetFile(StatusFileName));
-
     public static GitPackageStatusFile? Load(ILogger appLog, IFileInfo dataFile)
     {
-        var result = new GitPackageStatusFile(appLog, dataFile);
-
         if (!dataFile.Exists)
         {
             appLog.LogError("Status file missing: {StatusFile}", dataFile.FullName);
             return null;
         }
+
+        Uri? origin = null;
+        GitRef? version = null;
+        GetFilter? filter = null;
+        string? commit = null;
 
         foreach (var line in dataFile.ReadAllLines())
         {
@@ -48,31 +48,55 @@ internal record GitPackageStatusFile
             var value = line[idx..].Trim();
 
             if (key.Same(nameof(Origin)))
-                result.Origin = value;
+            {
+                if (!Uri.TryCreate(value, UriKind.Absolute, out origin))
+                {
+                    appLog.LogError("corrupt file: origin invalid");
+                }
+                continue;
+            }
 
             if (key.Same(nameof(Version)))
-                result.Version = new(value);
+            {
+                (var error, version) = GitRef.TryRead(value);
+                if (version is null)
+                {
+                    appLog.LogError("corrupt file: invalid version: {error}", error);
+                }
+                continue;
+            }
 
             if (key.Same(nameof(Filter)))
-                result.Filter = new(value);
+            {
+                filter = new(value);
+                continue;
+            }
 
             if (key.Same(nameof(Commit)))
-                result.Commit = new(value);
+            {
+                commit = value.IsNullOrWhiteSpace()?null:value;
+                continue;
+            }
         }
 
-        return result;
+        return new(dataFile, origin, version, filter)
+        {
+            Commit = commit
+        };
     }
 
-    public GitPackageStatusFile(ILogger appLog, IFileInfo statusFile)
+    public GitPackageStatusFile(IDirectoryInfo targetFolder, Uri origin, GitRef version, GetFilter filter)
+        :this(targetFolder.GetFile(StatusFileName), origin, version, filter){}
+
+    public GitPackageStatusFile(IFileInfo statusFile, Uri origin, GitRef version, GetFilter filter)
     {
-        _appLog = appLog;
         BackingFile = statusFile;
+        Origin = origin;
+        Version = version;
+        Filter = filter;
     }
 
-    public GitPackageStatusFile(ILogger appLog, IDirectoryInfo folder) 
-        : this(appLog, folder.GetFile(StatusFileName)){}
-
-    public GitPackageStatusFile Write()
+    public GitPackageStatusFile Write(ILogger log)
     {
         var content = new[]
         {
@@ -82,7 +106,7 @@ internal record GitPackageStatusFile
             $"{nameof(Commit)} = {Commit}",
         };
 
-        _appLog.LogDebug("Updating status file: {statusFile}", BackingFile.FullName);
+        log.LogDebug("Updating status file: {statusFile}", BackingFile.FullName);
 
         BackingFile
             .EnsureDirectory()
@@ -98,7 +122,7 @@ internal record GitPackageStatusFile
     /// https://github.com/Dkowald/kwld.Xunit.Ordering.git
     /// Note the leading https:// can be removed if desired
     /// </summary>
-    public string? Origin { get; set; }
+    public Uri Origin { get; set; }
 
     /// <summary>
     /// The Version; corresponds to a git commit.
@@ -107,7 +131,7 @@ internal record GitPackageStatusFile
     /// heads/dev
     /// If not prefixed with tags or heads; then it is assumed to be tags.
     /// </summary>
-    public GitRef? Version { get; set; }
+    public GitRef Version { get; set; }
 
     /// <summary>
     /// Optional glob filter on source files.

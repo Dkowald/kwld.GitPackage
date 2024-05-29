@@ -89,7 +89,10 @@ internal record GitRef : IDataString<GitRef>
         _prefix = item._prefix;
         _path = item._path;
     }
-    
+
+    public bool IsBranch => Value.StartsWith("refs/heads");
+    public bool IsTag => Value.StartsWith("refs/tags");
+
     /// <summary>The full git ref string</summary>
     public string Value => $"{_prefix}/{_path}";
 

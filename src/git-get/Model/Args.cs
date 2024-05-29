@@ -1,4 +1,5 @@
-﻿using GitPackage.Cli.Model;
+﻿using GitGet.Utility;
+using GitPackage.Cli.Model;
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -13,6 +14,8 @@ internal class Args
     private const string ForceKey = "--force:";
     private const string TargetPathKey = "--target-path:";
 
+    public static readonly string DefaultCacheFolderName = ".gitpackages";
+    
     public static LogLevel ReadLogLevel(string[] args)
     {
         var entry = args.LastOrDefault(x => x.StartsWith(LogLevelKey))?[LogLevelKey.Length..]
@@ -28,160 +31,196 @@ internal class Args
         throw new Exception($"Unknown LogLevel '{entry}'");
     }
 
-    public static Args? Load(IFileSystem files, ILogger log, LogLevel logLevel, string[] args)
+    public static Args? Load(IFileSystem files, ILogger log, LogLevel logLevel, string[] inputArgs)
     {
-        if (args.Length == 0)
+        ActionOptions? action = null;
+        IDirectoryInfo? targetPath = null;
+        Uri? origin = null;
+        GitRef? version = null;
+        GetFilter? filter = null;
+        IDirectoryInfo? cache = null;
+        ForceOption? force = null;
+
+        if (inputArgs.Length == 0)
         {
             log.LogTrace("No arguments; get using the current folder.");
-            return new(logLevel, Actions.Get, files.Current());
+            return new(logLevel, ActionOptions.Get, files.Current(), DefaultCache(files, log));
         }
-
+        
         var idx = 1;
+        
+        var arg0 = inputArgs.First();
 
-        Actions? action;
-        IDirectoryInfo? targetPath = null;
-
-        var arg0 = args[0];
         if (arg0.Same("init"))
-        { action = Actions.Init; }
+        { action = ActionOptions.Init; }
         else if (arg0.Same("info"))
-        { action = Actions.Info; }
+        { action = ActionOptions.Info; }
         else if (arg0.Same("where"))
-        { action = Actions.Where; }
-        else{ action = Actions.Get;
-          
-            if (!arg0.StartsWith("--"))
+        { action = ActionOptions.Where; }
+        else {
+            action = ActionOptions.Get;
+            if (arg0.StartsWith("--"))
+            {
+                idx = 0;
+                targetPath = files.Current();
+                log.LogInformation("No action provided, using get with current directory");
+            }
+            else
             {
                 var isFile = files.Current().GetFile(arg0).Exists;
-                if (isFile)
-                {
+                if (isFile) {
                     log.LogError("Target path should be a directory, not file");
                     return null;
                 }
-                log.LogDebug("Target path set from action");
+                log.LogTrace("Target path set from action");
                 targetPath = files.Current().GetFolder(arg0);
             }
         }
-        
+
         if (action is null) throw new Exception("Failed resolve action");
-
-        if (targetPath is null)
-        {
-            log.LogDebug("TargetPath set to current directory");
-            targetPath = files.Current();
-        }
         
-        var result = new Args(logLevel, action.Value, targetPath)
+        for (; idx < inputArgs.Length; idx++)
         {
-            TargetPath = targetPath
-        };
-
-        for (; idx < args.Length; idx++)
-        {
-            var next = args[idx];
+            var next = inputArgs[idx];
 
             if (next.StartsWith(OrignKey))
             {
+                if (origin is not null)
+                {
+                    log.LogError("Origin url already provided");
+                    return null;
+                }
                 var value = next[OrignKey.Length..];
-                if (!Uri.TryCreate(value, UriKind.Absolute, out var url))
+                if (!Uri.TryCreate(value, UriKind.Absolute, out origin))
                 {
                     log.LogError("Invalid Origin '{origin}' must be a valid url to the repository", value);
                     return null;
                 }
-                result.Origin = url; continue;
+                continue;
             }
 
             if (next.StartsWith(VersionKey))
             {
+                if (version is not null)
+                {
+                    log.LogError("Version already provided");
+                    return null;
+                }
+
                 var value = next[VersionKey.Length..];
-                (var error, result.Version) = GitRef.TryRead(value);
-                if (result.Version is null)
+                (var error, version) = GitRef.TryRead(value);
+                if (version is null)
                 {
                     log.LogError("Invalid version {version}", value);
                     log.LogInformation("Version parse error: {error}", error);
                 }
+                continue;
             }
 
             if (next.StartsWith(FilterKey))
             {
+                if (filter is not null)
+                {
+                    log.LogError("Filter already provided");
+                    return null;
+                }
                 var value = next[FilterKey.Length..];
                 try
                 {
-                    result.Filter = new(value);
+                    filter = new(value);
                 }
                 catch(Exception ex)
                 {
                     log.LogError("Invalid filter : {filter}", value);
                     log.LogInformation(ex, $"Failed create {nameof(GetFilter)}");
                 }
+                continue;
             }
 
             if (next.StartsWith(CacheKey))
             {
+                if(cache is not null)
+                {
+                    log.LogError("Cache already provided");
+                    return null;
+                }
+
                 var value = next[ForceKey.Length..];
                 if (files.Current().GetFile(value).Exists)
                 {
                     log.LogError("Cache folder cannot be a file");
                     return null;
                 }
-
-                result.Cache = files.Current().GetFolder(value); continue;
+                cache = files.Current().GetFolder(value); 
+                continue;
             }
 
             if (next.StartsWith(ForceKey))
             {
                 var value = next[ForceKey.Length..];
 
-                if (!Enum.TryParse(value, true, out ForceOption force))
+                if (!Enum.TryParse<ForceOption>(value, true, out var forceValue))
                 {
                     log.LogError("Invalid force option {force}", value);
                     return null;
                 }
 
-                result.Force = force;
+                force = forceValue;
+
                 continue;
             }
 
             if (next.StartsWith(TargetPathKey))
             {
-                if (result.Action == Actions.Get)
+                if (targetPath is not null)
                 {
-                    log.LogWarning("Target path already provided, ignoring {option}", TargetPathKey);
+                    log.LogError("TargetPath already provided");
+                    return null;
                 }
-                else
+                var value = next[TargetPathKey.Length..];
+                if (files.Current().GetFile(value).Exists)
                 {
-                    var value = next[TargetPathKey.Length..];
-                    if (files.Current().GetFile(value).Exists)
-                    {
                         log.LogError("Target path cannot be a file");
                         return null;
-                    }
-
-                    result.TargetPath = files.Current().GetFolder(value);
-                    continue;
                 }
+                targetPath = files.Current().GetFolder(value);
+                continue;
             }
 
-            //set as 
             if(next.StartsWith(LogLevelKey))continue;
 
             log.LogError("Unknown option: {option}", next);
             return null;
         }
 
-        return result;
+        if (targetPath is null)
+        {
+            log.LogInformation("Setting target path to current");
+            targetPath = files.Current();
+        }
+
+        cache ??= DefaultCache(files, log);
+
+        return new(logLevel, action.Value, targetPath, cache)
+        {
+            Origin = origin,
+            Version = version,
+            Filter = filter,
+            Force = force
+        };
     }
 
-    public Args(LogLevel logLevel, Actions action, IDirectoryInfo targetPath)
+    public Args(LogLevel logLevel, ActionOptions action, IDirectoryInfo targetPath, IDirectoryInfo cache)
     { 
         LogLevel = logLevel;
         Action = action;
         TargetPath = targetPath;
+        Cache = cache;
     }
 
     public LogLevel LogLevel { get; private set; }
 
-    public Actions Action { get; private set; }
+    public ActionOptions Action { get; private set; }
 
     public IDirectoryInfo TargetPath { get; private set; }
     
@@ -191,7 +230,24 @@ internal class Args
 
     public GetFilter? Filter { get; private set; }
 
-    public IDirectoryInfo? Cache { get; private set; }
+    public IDirectoryInfo Cache { get; private set; }
 
     public ForceOption? Force { get; private set; }
+
+    private static IDirectoryInfo DefaultCache(IFileSystem files, ILogger log)
+    {   
+        var home = files.TryGetHome();
+
+        if (home is null)
+        {
+            log.LogWarning("No home directory found!, using cwd");
+            home = files.Current();
+        }
+        
+        var cache = home.GetFolder(DefaultCacheFolderName);
+
+        log.LogDebug("Cache path: '{cache}'", cache.FullName);
+
+        return cache;
+    }
 }

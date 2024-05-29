@@ -1,10 +1,11 @@
-﻿using GitGet.Model;
+﻿using GitGet.Actions;
+using GitGet.Model;
 
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Tasks;
 
-internal class Init
+internal class Init : IAction
 {
     private readonly ILogger _log;
     public Init(ILogger log)

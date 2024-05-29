@@ -1,6 +1,6 @@
 ﻿namespace GitGet.Model;
 
-internal enum Actions
+internal enum ActionOptions
 {
     Get,
     Init,

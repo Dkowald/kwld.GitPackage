@@ -9,14 +9,19 @@ GitGet clones files to a local cache.
 Repositories are pulled with _--bare_ and stored in a (configurable) 
 local cache folder.
 
+The target folder includes a '.gitget' file to track options used, including resultant commit.
 ## Basic usage.
+
+``` pwsh
+#read .gitpackage in current directory, and get files if need.
+dotnet git-get
+```
 
 Get latest readme from libgit2sharp
 ``` pwsh
+# get readme.md from the libgit2sharp repo master branch
 dotnet git-get --origin:https://github.com/libgit2/libgit2sharp.git --version:branch/master --filter:/readme.md
 ```
-This will clone libgit2sharp to a local cache folder, then 
-get the latest '/readme.md' from master branch.
 
 # Details
 
@@ -64,7 +69,7 @@ The git ref to use, such as _refs/heads/main_
 Can be a shorthand ref e.g 'head/main' or 'tag/v1.0'
 
 -filter:{globs}  
-A set of ';' delimited globas to select files. defaults to all.
+A set of ';' delimited globs to select files. defaults to all.
 
 --cache:[cache-path]  
 
@@ -75,13 +80,13 @@ The cache is determined by:
 - Use [cache-path] if provided
 - Use _%HOME%/.gitpackages_ if %HOME% specified
 - Use _%USERPROFILE%/.gitpackages_ (windows fallback)
-- Use _target-path_/.gitpackages
+- Use current-directory/.gitpackages as last resort.
 
 --force:[force]
 
 Force fetch and get.  
 By default if the 'target-path/.gitpackage' has a commit, 
-it is skiped when running git-get. 
+it is skipped when running git-get. 
 This option forces a re-evaluate of the commit. 
 If [version] is a branch ref, will also fetch latest from origin.
 
@@ -109,9 +114,9 @@ Explicit define target path.
 Alternately used as the action.  
 Defaults to current directory (./).
 
-## .gitpackage format
+## .gitget format
 
-The gitpackage status file is a set of key-value pairs delimited by '/r/n'
+The .gitget status file is a set of key-value pairs delimited by '/r/n'
 Each line is of the form 'key=value'
 
 |key|value|
@@ -120,3 +125,11 @@ Each line is of the form 'key=value'
 |version| git ref to use|
 |filter| glob filter(s) to use |
 |commit| resolved git commit, set when files are extracted |
+
+## .gitpackages
+
+The .gitpackages folder maintains a local cache of cloned repositories.
+
+Each repository is in a sub-folder made from the origin url.
+
+IF a local git-repository is use, it is stored un .gitpackages/local/

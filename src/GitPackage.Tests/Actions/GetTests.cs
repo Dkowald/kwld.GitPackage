@@ -1,6 +1,6 @@
-﻿namespace GitPackage.Tests.Tasks;
+﻿namespace GitPackage.Tests.Actions;
 
-public class SyncFilesWithPackageTests
+public class GetTests
 {
 
     [Fact(Skip = "todo")]
@@ -18,5 +18,4 @@ public class SyncFilesWithPackageTests
         //Need target to report when it does network activity.
     }
 
-    
 }

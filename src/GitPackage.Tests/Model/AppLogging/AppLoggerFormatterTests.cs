@@ -1,5 +1,4 @@
-﻿using GitPackage.Cli.Model.AppLogging;
-
+﻿using GitGet.Model.AppLogging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;

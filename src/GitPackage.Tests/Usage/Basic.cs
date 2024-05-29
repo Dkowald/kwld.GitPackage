@@ -1,4 +1,5 @@
 ﻿using GitGet;
+using GitGet.Model;
 using GitPackage.Cli;
 using GitPackage.Cli.Model;
 using GitPackage.Tests.TestHelpers;
@@ -28,13 +29,11 @@ public class Basic
     {
         var logger = Substitute.For<ILogger>();
         
-        new GitPackageStatusFile(logger, StatusFile)
-        {
-            Origin = "https://github.com/Dkowald/kwld.CoreUtil.git",
-            Version = new("tag/v1.3.2"),
-            Filter = new("*.md;docs/*.md")
-        }
-        .Write();
+        new GitPackageStatusFile(StatusFile, 
+                new("https://github.com/Dkowald/kwld.CoreUtil.git"),
+                new("tag/v1.3.2"),
+                new("*.md;docs/*.md"))
+        .Write(logger);
     }
 
     [Ordered, Fact]

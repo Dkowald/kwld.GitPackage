@@ -1,10 +1,9 @@
 ﻿using GitGet.Model;
-using GitPackage.Cli.Model;
-using GitPackage.Cli.Model.AppLogging;
-using GitPackage.Cli.Tasks;
+using GitGet.Model.AppLogging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace GitGet;
@@ -54,9 +53,9 @@ internal class Program
 
         var cache = new RepositoryCache(log, svc.GetRequiredService<IFileSystem>(), parsedArgs.Cache);
 
-        if (parsedArgs.Action == Actions.Get)
+        if (parsedArgs.Action == ActionOptions.Get)
         {
-            var action = new Get(log, cache);
+            var action = new Actions.Get(log, cache);
 
             return await action.Run(parsedArgs);
         }

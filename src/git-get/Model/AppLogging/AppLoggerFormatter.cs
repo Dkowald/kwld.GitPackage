@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 
-namespace GitPackage.Cli.Model.AppLogging;
+namespace GitGet.Model.AppLogging;
 
 /// <summary>
 /// Simplified console formatter,

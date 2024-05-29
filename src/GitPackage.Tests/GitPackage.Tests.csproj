@@ -57,6 +57,7 @@
 
   <ItemGroup>
     <Folder Include="App_Assets\" />
+    <Folder Include="Tasks\" />
   </ItemGroup>
     
 </Project>
