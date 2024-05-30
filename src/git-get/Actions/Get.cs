@@ -19,15 +19,16 @@ internal class Get : IAction
 
     public async Task<int> Run(Args args)
     {
-        var package = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+        var package = TryBuildStatusFile(args);
 
-        if(package is null)
-            package =  TryCreatePackageFromArgs(args);
-        else AssignArgsToPackage(args, package);
-        
         if (package is null) return 1;
-        
-        _log.LogInformation("Package sync for '{outPath}'", args.TargetPath.Name);
+
+        return await Run(package);
+    }
+
+    public async Task<int> Run(GitPackageStatusFile package)
+    {
+        _log.LogInformation("Package sync for '{outPath}'", package.BackingFile.Name);
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
@@ -60,12 +61,22 @@ internal class Get : IAction
         }
 
         new GitCommands.Get(repo)
-            .Run(args.TargetPath, package.Version, package.Filter);
+            .Run(package.BackingFile.Directory!, package.Version, package.Filter);
 
         package.Commit = commit.Sha;
         package.Write(_log);
 
         return 0;
+    }
+
+    private GitPackageStatusFile? TryBuildStatusFile(Args args)
+    {
+        var package = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+
+        if (package is null) package = TryCreatePackageFromArgs(args);
+        else AssignArgsToPackage(args, package);
+
+        return package;
     }
 
     private GitPackageStatusFile? TryCreatePackageFromArgs(Args args)

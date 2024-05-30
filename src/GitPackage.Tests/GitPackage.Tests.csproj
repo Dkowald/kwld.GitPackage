@@ -52,12 +52,6 @@
   <ItemGroup>
     <None Include="App_Data/.gitpackages/**/*" />
     <None Include="App_Data/**/.*" />
-    
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="App_Assets\" />
-    <Folder Include="Tasks\" />
   </ItemGroup>
     
 </Project>

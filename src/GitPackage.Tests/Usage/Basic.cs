@@ -11,7 +11,7 @@ namespace GitPackage.Tests.Usage;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class Basic
 {
-    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Flow", "Basic", "CorUtil");
+    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", "Basic", "CorUtil");
     private IFileInfo StatusFile => _root.GetFile(GitPackageStatusFile.StatusFileName);
 
     [Ordered, Fact]
@@ -52,6 +52,4 @@ public class Basic
 
         await VerifyDirectory(_root.FullName);
     }
-
-    
 }

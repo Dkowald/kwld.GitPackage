@@ -2,7 +2,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ILoggerFactory = Castle.Core.Logging.ILoggerFactory;
 
 namespace GitPackage.Tests.TestHelpers;
 
@@ -21,7 +20,7 @@ public class TestHost : IDisposable
 
                 cfg.AddFilter("", LogLevel.Trace);
             })
-            .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().Create(""));
+            .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().CreateLogger(""));
 
         _svc = cont.BuildServiceProvider();
     }

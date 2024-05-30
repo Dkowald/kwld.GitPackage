@@ -24,7 +24,7 @@ public class App2 : IClassFixture<TestHost>
     {
         _host = state;
 
-        _appLogger = _host.Get<ILoggerProvider>().CreateLogger("");
+        _appLogger = _host.Get<ILogger>();
 
         _nfsCsiYaml = new GitPackageStatusFile(_root.GetFolder("CSI/NFSFolders/data"),
             new("https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/"),

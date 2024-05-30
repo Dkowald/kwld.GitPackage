@@ -6,6 +6,10 @@ namespace GitPackage.Cli.Model;
 /// A set of glob filter(s) to select files.
 /// The default is match all.
 /// </summary>
+/// <remarks>
+/// Consider making this behave like gitignore
+/// https://git-scm.com/docs/gitignore?ref=linuxandubuntu.com#_pattern_format
+/// </remarks>
 internal class GetFilter
 {
     public const string NoFilter = "**/*";
@@ -19,19 +23,15 @@ internal class GetFilter
     {
         var options = GlobOptions.Default;
         options.Evaluation.CaseInsensitive = true;
-
+        
         var parts = globs.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
-        parts = parts.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+        parts = parts.Where(x => !string.IsNullOrWhiteSpace(x))
+            .ToArray();
 
-        if(parts.Length == 0)
-        {_filters = [Glob.Parse("/*"),Glob.Parse("/**/*", options)];}
-        else
-        {
-            _filters = parts.Select(x => Glob.Parse(
-                x.StartsWith('/') ? x: $"/{x}"
-            )).ToArray();
-        }
+        _filters = parts.Length == 0 ?
+            [Glob.Parse("**/*")] :
+            parts.Select(Glob.Parse).ToArray();
     }
 
     public bool IsMatch(string path) =>

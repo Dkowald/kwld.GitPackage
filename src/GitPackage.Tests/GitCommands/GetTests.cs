@@ -11,14 +11,14 @@ namespace GitPackage.Tests.GitCommands
         [Fact]
         public async Task GetByAnnotatedTag()
         {
-            var repo = TestRepository.OpenTestRepository();
-            var commit = new GitRef("tag/CheckoutAll");
+            using var repo = TestRepository.OpenTestRepository();
+            var version = new GitRef("tag/CheckoutAll");
             var destRoot = OutRoot.GetFolder("Tag0")
                 .EnsureEmpty();
 
             var target = new GitGet.GitCommands.Get(repo);
 
-            target.Run(destRoot, commit, new());
+            target.Run(destRoot, version, new());
 
             await VerifyDirectory(destRoot.FullName)
                 .UseFileName(nameof(GetByAnnotatedTag))
@@ -28,10 +28,10 @@ namespace GitPackage.Tests.GitCommands
         [Fact]
         public async Task GetFiltered()
         {
-            var repo = TestRepository.OpenTestRepository();
+            using var repo = TestRepository.OpenTestRepository();
             var commit = new GitRef("tag/v0");
 
-            var glob = "/Folder1/**/*.md;/Folder2/**/*";
+            var glob = "Folder1/**/*.md;Folder2/**/*";
 
             var destRoot = OutRoot.GetFolder("Tag0Filtered")
                 .EnsureEmpty();
@@ -45,5 +45,24 @@ namespace GitPackage.Tests.GitCommands
                 .UseDirectory("Snapshot");
         }
 
+        [Fact]
+        public async Task GetNoAnchorFiltered() 
+        {
+            using var repo = TestRepository.OpenTestRepository();
+            var commit = new GitRef("branch/IncludeNestedSameNameFolder");
+
+            var glob = "**/folder1/*.txt";
+
+            var destRoot = OutRoot.GetFolder(nameof(GetNoAnchorFiltered))
+                .EnsureEmpty();
+
+            var target = new GitGet.GitCommands.Get(repo);
+
+            target.Run(destRoot, commit, new(glob));
+
+            await VerifyDirectory(destRoot.FullName)
+                .UseFileName(nameof(GetNoAnchorFiltered))
+                .UseDirectory("Snapshot");
+        }
     }
 }

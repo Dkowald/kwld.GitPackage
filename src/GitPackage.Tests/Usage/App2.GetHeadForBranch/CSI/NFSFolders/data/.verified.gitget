@@ -1,0 +1,4 @@
+Include = https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/
+Version = refs/heads/master
+Filter = /readme.md;/deploy/*.yaml
+Commit = 59a3ca2cd10febfbe200c8676c4107be95f267a9

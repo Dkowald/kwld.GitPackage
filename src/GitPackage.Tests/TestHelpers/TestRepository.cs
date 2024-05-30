@@ -9,16 +9,21 @@ static class TestRepository
     private static readonly IDirectoryInfo Path = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepository");
 
+    private static Signature Sig =>
+        new ("test", "Test@com.au", DateTimeOffset.UtcNow);
+
     internal static Repository OpenTestRepository(bool forceRebuild = false)
     {
         if (!Repository.IsValid(Path.FullName) || forceRebuild)
         {
             Debug.WriteLine("Creating test repository");
             Path.ClearReadonly().EnsureDelete();
+            
             var repo = new Repository(Repository.Init(Path.FullName));
 
             Init(repo);
             UpdateDeleteAndMove(repo);
+            IncludeNestedSameNameFolder(repo);
         }
 
         if (!Repository.IsValid(Path.FullName))
@@ -26,8 +31,6 @@ static class TestRepository
 
         return new Repository(Path.FullName);
     }
-
-    internal static readonly string TestRepositoryUrl = Path.FullName;
 
     private static void Init(Repository repo)
     {
@@ -51,9 +54,7 @@ static class TestRepository
         
         repo.Index.Write();
 
-        var sig = new Signature("test", "Test@com.au", DateTimeOffset.UtcNow);
-
-        repo.Commit("Init", sig, sig);
+        repo.Commit("Init", Sig, Sig);
         repo.ApplyTag("v0");
     }
 
@@ -73,10 +74,25 @@ static class TestRepository
         repo.Index.Add("folder2/item1.txt");
         repo.Index.Write();
 
-        var sig = new Signature("test", "Test@com.au", DateTimeOffset.UtcNow);
+        repo.Commit("update-del-move", Sig, Sig);
 
-        repo.Commit("update-del-move", sig, sig);
+        repo.ApplyTag("CheckoutAll", Sig, "CheckoutAll");
+    }
 
-        repo.ApplyTag("CheckoutAll", sig, "CheckoutAll");
+    private static void IncludeNestedSameNameFolder(Repository repo)
+    {
+        Commands.Checkout(repo, "refs/tags/v0");
+
+        Commands.Checkout(repo, 
+        repo.CreateBranch(nameof(IncludeNestedSameNameFolder)));
+        
+        var f = Path.GetFile("Folder2", "Folder1", "nested.txt");
+        f.EnsureDirectory().WriteAllText("nested.txt");
+        
+        repo.Index.Add(f.GetRelativePath(Path));
+
+        repo.Index.Write();
+        repo.Commit(nameof(IncludeNestedSameNameFolder), Sig, Sig);
+        repo.ApplyTag("v1");
     }
 }

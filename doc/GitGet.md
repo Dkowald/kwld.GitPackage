@@ -71,7 +71,12 @@ Can be a shorthand ref e.g 'head/main' or 'tag/v1.0'
 -filter:{globs}  
 A set of ';' delimited globs to select files. defaults to all.
 
---cache:[cache-path]  
+glob entries are case-insensitive.
+
+glob's are simple pattern match, using ** to match any-folder and * to match any char.
+
+
+--cache:[cache-path] 
 
 Alternate path for local cached repositories.
 
