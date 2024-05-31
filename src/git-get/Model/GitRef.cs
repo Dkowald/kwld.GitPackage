@@ -7,11 +7,12 @@ namespace GitPackage.Cli.Model;
 /// Present user input as valid git refs. <br/>
 /// Cannot be empty. <br/>
 /// Value can be a regular git-ref, or short-form <br/>
+/// Must have origin remote for branches <br/>
 /// <list type="bullet">
 /// <item>[tag]</item>
 /// <item>tag/[tag]</item>
 /// <item>branch/[branch]</item>
-/// <item>refs/heads/[branch]</item>
+/// <item>refs/remotes/origin/[branch]</item>
 /// <item>refs/tags/[tag]</item>
 /// </list>
 /// </summary>
@@ -21,6 +22,9 @@ namespace GitPackage.Cli.Model;
 [JsonConverter(typeof(DataStringConverterFactory))]
 internal record GitRef : IDataString<GitRef>
 {
+    private const string BranchRefPrefix = "refs/remotes/origin";
+    private const string TagRefPrefix = "refs/tags";
+
     private readonly string _prefix;
     private readonly string _path;
 
@@ -33,32 +37,50 @@ internal record GitRef : IDataString<GitRef>
     public static (string? error, GitRef? value) TryRead(string data)
     {
         data = data.Trim();
+
+        //explicit ref.
+        if (data.StartsWith("refs"))
+        {
+            var isBranchRef = data.StartsWith(BranchRefPrefix, StringComparison.OrdinalIgnoreCase);
+            var isTagRef = data.StartsWith(TagRefPrefix, StringComparison.OrdinalIgnoreCase);
+
+            if (!isBranchRef && !isTagRef)
+                return ($"{nameof(GitRef)} explicit ref must be either branch ('{BranchRefPrefix}/[branch]') or tag '{TagRefPrefix}/[tag]' ", null);
+
+            if (isBranchRef)
+            {
+                if (data.Same(BranchRefPrefix))
+                    return ($"{nameof(GitRef)} explicit branch ref must include path to branch", null);
+                return (null, new(BranchRefPrefix, data[(BranchRefPrefix.Length+1)..]));
+            }
+
+            if (isTagRef)
+            {
+                if (data.Same(TagRefPrefix))
+                    return ($"{nameof(GitRef)} explicit tag ref must include path to branch", null);
+                return (null, new(TagRefPrefix, data[(TagRefPrefix.Length+1)..]));
+            }
+        }
+
+        //short-form
+
         var parts = data.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length == 0) return ($"{nameof(GitRef)} Cannot be empty", null);
 
         if (parts[0].Same("refs"))
         {
-            if (parts.Length < 2)
-                return ($"{nameof(GitRef)} invalid format, must contain a /", null);
-
-            if (!parts[1].Same("heads") && !parts[1].Same("tags"))
-                return ($"{nameof(GitRef)} ref must be either for head or tag", null);
-
-            if (parts.Length < 3)
-                return ($"{nameof(GitRef)} ref must include path to item", null);
-
             return (null, new($"{parts[0]}/{parts[1]}", string.Join('/', parts[2..])));
         }
          
         if (parts.Length == 1)
         {
-            return (null, new("refs/tags", parts[0]));
+            return (null, new(TagRefPrefix, parts[0]));
         }
 
         var prefix = 
-            parts[0].Same("branch") ?"refs/heads" :
-            parts[0].Same("tag")? "refs/tags" : null;
+            parts[0].Same("branch") ?BranchRefPrefix :
+            parts[0].Same("tag")? TagRefPrefix : null;
 
         if(prefix is null)
             return ("short form must use branch or tag", null);
@@ -82,16 +104,16 @@ internal record GitRef : IDataString<GitRef>
     public GitRef(string data)
     {
         var (error, item) = TryRead(data);
-
-        if (error is not null)
-            throw new ArgumentException(error, nameof(data));
+        
+        if (item is null)
+            throw new ArgumentException(error??"Invalid format", nameof(data));
 
         _prefix = item._prefix;
         _path = item._path;
     }
 
-    public bool IsBranch => Value.StartsWith("refs/heads");
-    public bool IsTag => Value.StartsWith("refs/tags");
+    public bool IsBranch => Value.StartsWith(BranchRefPrefix);
+    public bool IsTag => Value.StartsWith(TagRefPrefix);
 
     /// <summary>The full git ref string</summary>
     public string Value => $"{_prefix}/{_path}";
@@ -113,5 +135,5 @@ internal record GitRef : IDataString<GitRef>
     public override string ToString() => Value;
 
     private string GitToShortForm =>
-        _prefix.Same("refs/heads") ? "branch" : "tag";
+        _prefix.Same(BranchRefPrefix) ? "branch" : "tag";
 }

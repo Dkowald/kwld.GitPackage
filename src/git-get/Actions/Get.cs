@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using GitGet.Model;
+using GitGet.Utility;
+
 using GitPackage.Cli.Model;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
@@ -28,7 +30,7 @@ internal class Get : IAction
 
     public async Task<int> Run(GitPackageStatusFile package)
     {
-        _log.LogInformation("Package sync for '{outPath}'", package.BackingFile.Name);
+        _log.LogInformation("Package sync for '{outPath}'", package.BackingFile.DirectoryName);
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
@@ -57,8 +59,13 @@ internal class Get : IAction
 
         if (package.Commit == commit.Sha)
         {
+            _log.LogInformation("Required commit already extracted");
             return 0;
         }
+        
+        //reset out folder.
+        package.BackingFile.Directory!.EnsureEmptyWithoutDelete();
+        package.Write(_log);
 
         new GitCommands.Get(repo)
             .Run(package.BackingFile.Directory!, package.Version, package.Filter);
@@ -125,6 +132,7 @@ internal class Get : IAction
 
     private DirectReference? FetchReference(Repository repo, GitRef gitRef)
     {
+        //[24] = refs / remotes / origin / master => "5085a0c6173cdb2a3fde205330b327a8eb0a26c4"
         var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
 
         if (targetRef is null)
@@ -173,9 +181,13 @@ internal class Get : IAction
         if (args.Force is not null)
         {
             if (args.Force == ForceOption.All ||
-               (args.Force == ForceOption.Branch && package.Version.IsBranch) ||
-               (args.Force == ForceOption.Tag && package.Version.IsTag)
-            ) hasChanged = true;
+                (args.Force == ForceOption.Branch && package.Version.IsBranch) ||
+                (args.Force == ForceOption.Tag && package.Version.IsTag)
+               )
+            {
+                _log.LogInformation("Forcing re-evaluate get files.");
+                hasChanged = true;
+            }
         }
 
         if (hasChanged) 

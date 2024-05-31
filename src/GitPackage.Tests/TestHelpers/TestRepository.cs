@@ -7,6 +7,9 @@ namespace GitPackage.Tests.TestHelpers;
 static class TestRepository
 {
     private static readonly IDirectoryInfo Path = new FileSystem()
+        .Project().GetFolder("App_Data", "TestRepositoryWorking");
+
+    private static readonly IDirectoryInfo BareRepoPath = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepository");
 
     private static Signature Sig =>
@@ -14,22 +17,28 @@ static class TestRepository
 
     internal static Repository OpenTestRepository(bool forceRebuild = false)
     {
-        if (!Repository.IsValid(Path.FullName) || forceRebuild)
+        if (!Repository.IsValid(BareRepoPath.FullName) || forceRebuild)
         {
             Debug.WriteLine("Creating test repository");
-            Path.ClearReadonly().EnsureDelete();
+            BareRepoPath.ClearReadonly().EnsureEmpty();
+            Path.ClearReadonly().EnsureEmpty();
             
             var repo = new Repository(Repository.Init(Path.FullName));
 
             Init(repo);
             UpdateDeleteAndMove(repo);
             IncludeNestedSameNameFolder(repo);
+            Repository.Clone(Path.FullName, BareRepoPath.FullName, new()
+            {
+                IsBare = true,
+                FetchOptions = { TagFetchMode = TagFetchMode.All}
+            });
         }
 
-        if (!Repository.IsValid(Path.FullName))
+        if (!Repository.IsValid(BareRepoPath.FullName))
             throw new Exception("Create test repository failed");
 
-        return new Repository(Path.FullName);
+        return new Repository(BareRepoPath.FullName);
     }
 
     private static void Init(Repository repo)

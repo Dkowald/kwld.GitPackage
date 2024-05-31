@@ -1,4 +1,4 @@
 Origin = https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/
-Version = refs/tags/nfs-subdir-external-provisioner-4.0.17
-Filter = readme.md;deploy/*.yaml
+Version = tag/nfs-subdir-external-provisioner-4.0.17
+Filter = /readme.md;deploy/**/*.yaml
 Commit = d080ea9670d5e7f881103f3ef5e80efa4d80e3c7

@@ -36,6 +36,8 @@ internal record GitPackageStatusFile
 
         foreach (var line in dataFile.ReadAllLines())
         {
+            if(line.IsNullOrWhiteSpace())continue;
+
             var idx = line.IndexOf('=');
             if (idx < 0 || idx == line.Length - 1)
             {
@@ -79,6 +81,12 @@ internal record GitPackageStatusFile
             }
         }
 
+        if (origin is null || version is null || filter is null)
+        {
+            appLog.LogError($"{StatusFileName} invalid");
+            return null;
+        }
+
         return new(dataFile, origin, version, filter)
         {
             Commit = commit
@@ -101,7 +109,7 @@ internal record GitPackageStatusFile
         var content = new[]
         {
             $"{nameof(Origin)} = {Origin}",
-            $"{nameof(Version)} = {Version}",
+            $"{nameof(Version)} = {Version.Version}",
             $"{nameof(Filter)} = {Filter}",
             $"{nameof(Commit)} = {Commit}",
         };

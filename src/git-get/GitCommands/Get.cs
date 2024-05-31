@@ -23,7 +23,7 @@ internal class Get(Repository repository)
                 throw new Exception("can only handle blobs(not sure about link.");
             
             var content = (Blob)file.Item.Target;
-            var outFile = target.GetFile(file.Path);
+            var outFile = target.GetFile(file.Path[1..]);
 
             using var rd = content.GetContentStream();
             using var wr = outFile.EnsureDirectory().Create();
@@ -49,7 +49,7 @@ internal class Get(Repository repository)
                     continue;
                 }
 
-                var path = $"{next.Path}/{item.Name}".TrimStart('/');
+                var path = $"{next.Path}/{item.Name}";
                 
                 if(filters.IsMatch(path))
                     yield return new(path, item);

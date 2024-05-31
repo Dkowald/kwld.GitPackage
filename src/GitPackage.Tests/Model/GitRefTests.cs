@@ -30,16 +30,16 @@ namespace GitPackage.Tests.Model
             var result = GitRef.TryParse("branch/Wip");
             Assert.NotNull(result);
 
-            Assert.Equal("refs/heads/Wip", result.Value);
+            Assert.Equal("refs/remotes/origin/Wip", result.Value);
         }
 
         [Fact]
         public void Ctor_GitForm()
         {
-            var result = GitRef.TryParse("refs/heads/main");
+            var result = GitRef.TryParse("refs/remotes/origin/main");
             Assert.NotNull(result);
 
-            Assert.Equal("refs/heads/main", result.ToString());
+            Assert.Equal("refs/remotes/origin/main", result.ToString());
             Assert.Equal("branch/main", result.Version);
         }
 

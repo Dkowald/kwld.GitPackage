@@ -13,7 +13,7 @@ The target folder includes a '.gitget' file to track options used, including res
 ## Basic usage.
 
 ``` pwsh
-#read .gitpackage in current directory, and get files if need.
+#read .gitget in current directory, and get files if need.
 dotnet git-get
 ```
 
@@ -59,14 +59,21 @@ Reports where the local cache clone is (will be) located.
 If no options provided, 'target-path/.gitpackage' file is read for details.
 'target-path/.gitpackage' is updated to reflect other options (if provided).
 
---origin:[repository-origin]
+__--origin:[repository-origin]__
 
 The target repository uri
 
---version:[version-ref]
+__--version:[version-ref]__
 
-The git ref to use, such as _refs/heads/main_  
-Can be a shorthand ref e.g 'head/main' or 'tag/v1.0'
+The short-hand git ref to use
+ - branch/main - refer to main branch
+ - tag/v1.0 - refer to tag v1.0
+
+Alternatly, can be a explit git branch or tag ref
+- refs/remotes/origin/main
+- refs/tags/v1.0
+
+Note: _Must_ be for origin remote when using explit branch ref.
 
 -filter:{globs}  
 A set of ';' delimited globs to select files. defaults to all.
@@ -75,8 +82,7 @@ glob entries are case-insensitive.
 
 glob's are simple pattern match, using ** to match any-folder and * to match any char.
 
-
---cache:[cache-path] 
+__--cache:[cache-path]__ 
 
 Alternate path for local cached repositories.
 
@@ -87,7 +93,7 @@ The cache is determined by:
 - Use _%USERPROFILE%/.gitpackages_ (windows fallback)
 - Use current-directory/.gitpackages as last resort.
 
---force:[force]
+__--force:[force]__
 
 Force fetch and get.  
 By default if the 'target-path/.gitpackage' has a commit, 
@@ -101,7 +107,7 @@ If [version] is a branch ref, will also fetch latest from origin.
 - tag : only force if [version-ref] is a tag ref
 - all: force for both branch and tag references
 
---log-level:[log-level]
+__--log-level:[log-level]__
 
 Logging reported whilst running.
 [log-level] is one of
@@ -113,7 +119,7 @@ Logging reported whilst running.
 - d : Debug
 - t : Trace
 
---target-path:[target-path]
+__--target-path:[target-path]__
 
 Explicit define target path.  
 Alternately used as the action.  
