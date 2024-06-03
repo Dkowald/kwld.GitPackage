@@ -23,7 +23,7 @@ internal static class FilesExtension
 
         foreach (var item in folder.EnumerateFileSystemInfos())
         {
-            if(item is IDirectoryInfo dir)
+            if (item is IDirectoryInfo dir)
                 dir.Delete(true);
             else
                 item.Delete();

@@ -2,7 +2,6 @@
 
 public class GetTests
 {
-
     [Fact(Skip = "todo")]
     public void RepositoryRequiresCredentials()
     {

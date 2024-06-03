@@ -54,6 +54,14 @@ If 'target-path/.gitpackage' also reports its details.
 
 Reports where the local cache clone is (will be) located.
 
+This can be used to perform normal git actions on a local cached 
+repository
+
+```pwsh
+$repo = dotnet gitget where --origin:https://github.com/rsafier/DotNetGlob.git
+```
+
+
 ## options
 
 If no options provided, 'target-path/.gitpackage' file is read for details.

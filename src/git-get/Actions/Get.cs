@@ -1,9 +1,10 @@
-﻿using System.Runtime.InteropServices;
-using GitGet.Model;
+﻿using GitGet.Model;
 using GitGet.Utility;
 
 using GitPackage.Cli.Model;
+
 using LibGit2Sharp;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Actions;
@@ -62,7 +63,7 @@ internal class Get : IAction
             _log.LogInformation("Required commit already extracted");
             return 0;
         }
-        
+
         //reset out folder.
         package.BackingFile.Directory!.EnsureEmptyWithoutDelete();
         package.Write(_log);
@@ -190,7 +191,7 @@ internal class Get : IAction
             }
         }
 
-        if (hasChanged) 
+        if (hasChanged)
             package.Commit = null;
     }
 }

@@ -1,5 +1,7 @@
 ﻿using GitGet.Utility;
+
 using GitPackage.Cli.Model;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -15,11 +17,11 @@ internal class Args
     private const string TargetPathKey = "--target-path:";
 
     public static readonly string DefaultCacheFolderName = ".gitpackages";
-    
+
     public static LogLevel ReadLogLevel(string[] args)
     {
         var entry = args.LastOrDefault(x => x.StartsWith(LogLevelKey))?[LogLevelKey.Length..]
-            ??"w";
+            ?? "w";
 
         if (entry.Same("c")) return LogLevel.Critical;
         if (entry.Same("e")) return LogLevel.Error;
@@ -46,9 +48,9 @@ internal class Args
             log.LogTrace("No arguments; get using the current folder.");
             return new(logLevel, ActionOptions.Get, files.Current(), DefaultCache(files, log));
         }
-        
+
         var idx = 1;
-        
+
         var arg0 = inputArgs.First();
 
         if (arg0.Same("init"))
@@ -57,7 +59,8 @@ internal class Args
         { action = ActionOptions.Info; }
         else if (arg0.Same("where"))
         { action = ActionOptions.Where; }
-        else {
+        else
+        {
             action = ActionOptions.Get;
             if (arg0.StartsWith("--"))
             {
@@ -68,7 +71,8 @@ internal class Args
             else
             {
                 var isFile = files.Current().GetFile(arg0).Exists;
-                if (isFile) {
+                if (isFile)
+                {
                     log.LogError("Target path should be a directory, not file");
                     return null;
                 }
@@ -78,7 +82,7 @@ internal class Args
         }
 
         if (action is null) throw new Exception("Failed resolve action");
-        
+
         for (; idx < inputArgs.Length; idx++)
         {
             var next = inputArgs[idx];
@@ -129,7 +133,7 @@ internal class Args
                 {
                     filter = new(value);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     log.LogError("Invalid filter : {filter}", value);
                     log.LogInformation(ex, $"Failed create {nameof(GetFilter)}");
@@ -139,7 +143,7 @@ internal class Args
 
             if (next.StartsWith(CacheKey))
             {
-                if(cache is not null)
+                if (cache is not null)
                 {
                     log.LogError("Cache already provided");
                     return null;
@@ -151,7 +155,7 @@ internal class Args
                     log.LogError("Cache folder cannot be a file");
                     return null;
                 }
-                cache = files.Current().GetFolder(value); 
+                cache = files.Current().GetFolder(value);
                 continue;
             }
 
@@ -180,14 +184,14 @@ internal class Args
                 var value = next[TargetPathKey.Length..];
                 if (files.Current().GetFile(value).Exists)
                 {
-                        log.LogError("Target path cannot be a file");
-                        return null;
+                    log.LogError("Target path cannot be a file");
+                    return null;
                 }
                 targetPath = files.Current().GetFolder(value);
                 continue;
             }
 
-            if(next.StartsWith(LogLevelKey))continue;
+            if (next.StartsWith(LogLevelKey)) continue;
 
             log.LogError("Unknown option: {option}", next);
             return null;
@@ -211,31 +215,31 @@ internal class Args
     }
 
     public Args(LogLevel logLevel, ActionOptions action, IDirectoryInfo targetPath, IDirectoryInfo cache)
-    { 
+    {
         LogLevel = logLevel;
         Action = action;
         TargetPath = targetPath;
         Cache = cache;
     }
 
-    public LogLevel LogLevel { get; private set; }
+    public LogLevel LogLevel { get; init; }
 
-    public ActionOptions Action { get; private set; }
+    public ActionOptions Action { get; init; }
 
-    public IDirectoryInfo TargetPath { get; private set; }
-    
-    public Uri? Origin { get; private set; }
+    public IDirectoryInfo TargetPath { get; init; }
 
-    public GitRef? Version { get; private set; }
+    public Uri? Origin { get; init; }
 
-    public GetFilter? Filter { get; private set; }
+    public GitRef? Version { get; init; }
 
-    public IDirectoryInfo Cache { get; private set; }
+    public GetFilter? Filter { get; init; }
 
-    public ForceOption? Force { get; private set; }
+    public IDirectoryInfo Cache { get; init; }
+
+    public ForceOption? Force { get; init; }
 
     private static IDirectoryInfo DefaultCache(IFileSystem files, ILogger log)
-    {   
+    {
         var home = files.TryGetHome();
 
         if (home is null)
@@ -243,7 +247,7 @@ internal class Args
             log.LogWarning("No home directory found!, using cwd");
             home = files.Current();
         }
-        
+
         var cache = home.GetFolder(DefaultCacheFolderName);
 
         log.LogDebug("Cache path: '{cache}'", cache.FullName);

@@ -8,20 +8,20 @@ namespace GitGet.Model.AppLogging;
 /// Simplified console formatter,
 /// to provide cleaner data for 
 /// </summary>
-public class AppLoggerFormatter: ConsoleFormatter
+public class AppLoggerFormatter : ConsoleFormatter
 {
     private readonly TimeProvider _clock;
 
-    public AppLoggerFormatter(TimeProvider clock):base(nameof(AppLoggerFormatter))
+    public AppLoggerFormatter(TimeProvider clock) : base(nameof(AppLoggerFormatter))
     {
         _clock = clock;
     }
-    
-    public override void Write<TState>(in LogEntry<TState> logEntry, 
+
+    public override void Write<TState>(in LogEntry<TState> logEntry,
         IExternalScopeProvider? scopeProvider, TextWriter textWriter)
     {
         var message = logEntry.Formatter(logEntry.State, logEntry.Exception);
-        if(message.IsNullOrEmpty()) return;
+        if (message.IsNullOrEmpty()) return;
 
         var level = logEntry.LogLevel.ToString().ToUpper();
 

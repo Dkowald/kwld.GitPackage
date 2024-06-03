@@ -23,7 +23,7 @@ internal class GetFilter
     {
         var options = GlobOptions.Default;
         options.Evaluation.CaseInsensitive = true;
-        
+
         var parts = globs.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         parts = parts.Where(x => !string.IsNullOrWhiteSpace(x))
@@ -39,10 +39,10 @@ internal class GetFilter
         _filters.Any(x => x.IsMatch(path));
 
     public override string ToString()
-        => string.Join(';', _filters.Select( x => Decode(x.ToString())));
+        => string.Join(';', _filters.Select(x => Decode(x.ToString())));
 
     private string Encode(string glob)
-        => glob.StartsWith('/') || glob.StartsWith("**/") 
+        => glob.StartsWith('/') || glob.StartsWith("**/")
             ? glob : $"**/{glob}";
 
     private string Decode(string glob)

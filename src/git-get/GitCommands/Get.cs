@@ -1,4 +1,5 @@
 ﻿using GitPackage.Cli.Model;
+
 using LibGit2Sharp;
 
 namespace GitGet.GitCommands;
@@ -17,11 +18,12 @@ internal class Get(Repository repository)
 
         var rootTree = commitRef.Tree;
 
-        foreach (var file in ReadTree(rootTree, filter)) {
+        foreach (var file in ReadTree(rootTree, filter))
+        {
 
             if (file.Item.TargetType != TreeEntryTargetType.Blob)
                 throw new Exception("can only handle blobs(not sure about link.");
-            
+
             var content = (Blob)file.Item.Target;
             var outFile = target.GetFile(file.Path[1..]);
 
@@ -37,12 +39,13 @@ internal class Get(Repository repository)
     {
         var stack = new Stack<(Tree Tree, string Path)>([(root, "")]);
 
-        while(stack.Count > 0)
+        while (stack.Count > 0)
         {
             var next = stack.Pop();
-            foreach(var item in next.Tree) { 
-            
-                if(item.TargetType == TreeEntryTargetType.Tree)
+            foreach (var item in next.Tree)
+            {
+
+                if (item.TargetType == TreeEntryTargetType.Tree)
                 {
                     var subTree = repository.Lookup<Tree>(item.Target.Sha);
                     stack.Push((subTree, $"{next.Path}/{item.Name}"));
@@ -50,8 +53,8 @@ internal class Get(Repository repository)
                 }
 
                 var path = $"{next.Path}/{item.Name}";
-                
-                if(filters.IsMatch(path))
+
+                if (filters.IsMatch(path))
                     yield return new(path, item);
             }
         }

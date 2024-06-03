@@ -32,10 +32,10 @@ internal class Config
 
             var value = args[idx];
 
-            if (key == "-f"){DataFile = value;}
-            else if (key == "-c"){Cache = value;}
-            else if (key == "-l"){logLevel = value;}
-            else{_errors.Add($"Argument {key} unknown"); break;}
+            if (key == "-f") { DataFile = value; }
+            else if (key == "-c") { Cache = value; }
+            else if (key == "-l") { logLevel = value; }
+            else { _errors.Add($"Argument {key} unknown"); break; }
         }
 
         LogLevel = ResolveLogLevel(logLevel);
@@ -50,7 +50,7 @@ internal class Config
 
     public bool ShowVersion { get; private set; }
 
-    public string? DataFile {get; private set; }
+    public string? DataFile { get; private set; }
 
     public string? Cache { get; private set; }
 

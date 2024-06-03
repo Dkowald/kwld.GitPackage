@@ -27,8 +27,8 @@ internal class RepositoryCache
         {
             _cacheRoot = ResolveCache(files);
         }
-        
-        
+
+
         appLog.LogDebug("Using repository cache at {RepositoryCache}", _cacheRoot.FullName);
     }
 

@@ -1,4 +1,5 @@
 ﻿using GitGet.Model.AppLogging;
+using GitPackage.Tests.TestHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -11,43 +12,6 @@ namespace GitPackage.Tests.Model.AppLogging;
 
 public class AppLoggerFormatterTests
 {
-    public class CaptureIO : IDisposable
-    {
-        private readonly StringWriter _stdOut = new();
-        private readonly StringWriter _stdError = new();
-
-        public CaptureIO()
-        {
-            Console.Out.Flush();
-            Console.SetOut(_stdOut);
-            Console.SetError(_stdError);
-            IsRedirecting = true;
-        }
-
-        public bool IsRedirecting { get; private set; }
-
-        public string? StdOut { get; private set; }
-        public string? StdError { get; private set; }
-
-        public void Dispose()
-        {
-            _stdOut.Flush();
-            StdOut = _stdOut.GetStringBuilder().ToString();
-            _stdOut.Dispose();
-
-            _stdError.Flush();
-            StdError = _stdError.GetStringBuilder().ToString();
-            _stdError.Dispose();
-
-            Console.SetOut(new StreamWriter(Console.OpenStandardOutput())
-                { AutoFlush = true });
-            Console.SetError(new StreamWriter(Console.OpenStandardError())
-                { AutoFlush = true });
-
-            IsRedirecting = false;
-        }
-    }
-
     [Fact]
     public async Task Log_()
     {
@@ -91,7 +55,7 @@ public class AppLoggerFormatterTests
             })
             .AddSingleton<TimeProvider>(new FakeTimeProvider());
 
-        var con = new CaptureIO();
+        var con = new CaptureConsole();
         await using (var svc = cont.BuildServiceProvider())
         {
             var logger = svc.GetRequiredService<ILoggerFactory>().CreateLogger("");

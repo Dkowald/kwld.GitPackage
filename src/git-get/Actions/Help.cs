@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
+
 using GitPackage.Cli.Model;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitPackage.Cli.Tasks;
@@ -42,7 +44,7 @@ internal class Help
         {
             Console.WriteLine(line);
         }
-        
+
         return Task.FromResult(0);
     }
 }

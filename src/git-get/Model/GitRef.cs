@@ -51,14 +51,14 @@ internal record GitRef : IDataString<GitRef>
             {
                 if (data.Same(BranchRefPrefix))
                     return ($"{nameof(GitRef)} explicit branch ref must include path to branch", null);
-                return (null, new(BranchRefPrefix, data[(BranchRefPrefix.Length+1)..]));
+                return (null, new(BranchRefPrefix, data[(BranchRefPrefix.Length + 1)..]));
             }
 
             if (isTagRef)
             {
                 if (data.Same(TagRefPrefix))
                     return ($"{nameof(GitRef)} explicit tag ref must include path to branch", null);
-                return (null, new(TagRefPrefix, data[(TagRefPrefix.Length+1)..]));
+                return (null, new(TagRefPrefix, data[(TagRefPrefix.Length + 1)..]));
             }
         }
 
@@ -72,17 +72,17 @@ internal record GitRef : IDataString<GitRef>
         {
             return (null, new($"{parts[0]}/{parts[1]}", string.Join('/', parts[2..])));
         }
-         
+
         if (parts.Length == 1)
         {
             return (null, new(TagRefPrefix, parts[0]));
         }
 
-        var prefix = 
-            parts[0].Same("branch") ?BranchRefPrefix :
-            parts[0].Same("tag")? TagRefPrefix : null;
+        var prefix =
+            parts[0].Same("branch") ? BranchRefPrefix :
+            parts[0].Same("tag") ? TagRefPrefix : null;
 
-        if(prefix is null)
+        if (prefix is null)
             return ("short form must use branch or tag", null);
 
         var path = string.Join('/', parts[1..]);
@@ -104,9 +104,9 @@ internal record GitRef : IDataString<GitRef>
     public GitRef(string data)
     {
         var (error, item) = TryRead(data);
-        
+
         if (item is null)
-            throw new ArgumentException(error??"Invalid format", nameof(data));
+            throw new ArgumentException(error ?? "Invalid format", nameof(data));
 
         _prefix = item._prefix;
         _path = item._path;
@@ -128,7 +128,7 @@ internal record GitRef : IDataString<GitRef>
     public string Version => $"{GitToShortForm}/{_path}";
 
     /// <inheritdoc cref="Value"/>
-    [return:NotNullIfNotNull(nameof(GitRef))]
+    [return: NotNullIfNotNull(nameof(GitRef))]
     public static implicit operator string?(GitRef? self) => self?.ToString();
 
     /// <inheritdoc cref="Value"/>

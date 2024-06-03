@@ -1,4 +1,5 @@
 ﻿using GitPackage.Cli.Model;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -36,7 +37,7 @@ internal record GitPackageStatusFile
 
         foreach (var line in dataFile.ReadAllLines())
         {
-            if(line.IsNullOrWhiteSpace())continue;
+            if (line.IsNullOrWhiteSpace()) continue;
 
             var idx = line.IndexOf('=');
             if (idx < 0 || idx == line.Length - 1)
@@ -76,7 +77,7 @@ internal record GitPackageStatusFile
 
             if (key.Same(nameof(Commit)))
             {
-                commit = value.IsNullOrWhiteSpace()?null:value;
+                commit = value.IsNullOrWhiteSpace() ? null : value;
                 continue;
             }
         }
@@ -94,7 +95,7 @@ internal record GitPackageStatusFile
     }
 
     public GitPackageStatusFile(IDirectoryInfo targetFolder, Uri origin, GitRef version, GetFilter filter)
-        :this(targetFolder.GetFile(StatusFileName), origin, version, filter){}
+        : this(targetFolder.GetFile(StatusFileName), origin, version, filter) { }
 
     public GitPackageStatusFile(IFileInfo statusFile, Uri origin, GitRef version, GetFilter filter)
     {
