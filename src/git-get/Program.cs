@@ -31,7 +31,7 @@ internal static class Program
             return 1;
         }
 
-        var cache = new RepositoryCache(log, svc.GetRequiredService<IFileSystem>(), parsedArgs.Cache);
+        var cache = new RepositoryCache(log, parsedArgs.Cache);
 
         if (parsedArgs.Action == ActionOptions.Get)
         {
@@ -43,6 +43,13 @@ internal static class Program
         if (parsedArgs.Action == ActionOptions.Where)
         {
             var action = new Actions.Where(log, svc.GetRequiredService<IConsole>());
+
+            return await action.Run(parsedArgs);
+        }
+
+        if (parsedArgs.Action == ActionOptions.Info)
+        {
+            var action = new Actions.Info(log, svc.GetRequiredService<IConsole>());
 
             return await action.Run(parsedArgs);
         }

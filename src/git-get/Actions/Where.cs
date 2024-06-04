@@ -24,7 +24,7 @@ namespace GitGet.Actions
                 return 1;
             }
 
-            var cache = new RepositoryCache(_log, args.Cache.FileSystem, args.Cache);
+            var cache = new RepositoryCache(_log, args.Cache);
 
             var result = cache.Get(args.Origin);
             _console.Out.Write(result.CachePath.FullName);

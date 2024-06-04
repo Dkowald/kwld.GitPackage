@@ -9,7 +9,7 @@ static class TestRepository
     private static readonly IDirectoryInfo Path = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepositoryWorking");
 
-    private static readonly IDirectoryInfo BareRepoPath = new FileSystem()
+    public static readonly IDirectoryInfo BareRepoPath = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepository");
 
     private static Signature Sig =>

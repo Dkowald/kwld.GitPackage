@@ -45,7 +45,7 @@ internal class Get : IAction
         var cache = _cache.Get(package.Origin);
 
         //Clone
-        var repo = CloneIfMissing(cache);
+        var repo = _cache.CloneIfMissing(cache);
 
         //Check for ref.
         var targetRef = FetchReference(repo, package.Version);

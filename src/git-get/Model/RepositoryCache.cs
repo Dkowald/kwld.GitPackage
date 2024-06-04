@@ -1,5 +1,5 @@
 ﻿using GitGet.Utility;
-
+using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -10,42 +10,67 @@ namespace GitGet.Model;
 internal class RepositoryCache
 {
     public static readonly string DefaultCacheFolderName = ".gitpackages";
+    public static readonly string LocalHostPath = "local";
 
-    private readonly ILogger _appLog;
+    private readonly ILogger _log;
     private readonly IDirectoryInfo _cacheRoot;
 
-    public RepositoryCache(ILogger appLog, IFileSystem files, IDirectoryInfo? customRoot)
+    public RepositoryCache(ILogger log, IDirectoryInfo cacheRoot)
     {
-        _appLog = appLog;
+        _log = log;
+        _cacheRoot = cacheRoot;
 
-        if (customRoot is not null)
-        {
-            appLog.LogInformation("Using custom repository cache");
-            _cacheRoot = customRoot;
-        }
-        else
-        {
-            _cacheRoot = ResolveCache(files);
-        }
-
-
-        appLog.LogDebug("Using repository cache at {RepositoryCache}", _cacheRoot.FullName);
+        log.LogDebug("Using repository cache at {RepositoryCache}",
+            _cacheRoot.FullName);
     }
 
     public CacheEntry Get(Uri origin)
     {
         if (origin.IsFile)
         {
-            _appLog.LogInformation("Repository is Local folder, using 'local' as cache host name");
+            _log.LogDebug("Repository is Local folder, using 'local' as cache host name");
 
             var localRepo = _cacheRoot.FileSystem.DirectoryInfo.New(origin.LocalPath);
 
-            return new CacheEntry(origin, _cacheRoot.GetFolder("local", localRepo.Name));
+            return new CacheEntry(origin, _cacheRoot.GetFolder(LocalHostPath, localRepo.Name));
         }
 
         var relPath = $"{origin.Host}{origin.AbsolutePath}".Replace('\\', '/');
         var path = _cacheRoot.GetFolder(relPath);
         return new(origin, path);
+    }
+
+    public IEnumerable<CacheEntry> List()
+    {
+        var repoPaths = _cacheRoot
+            .GetDirectories("refs", SearchOption.AllDirectories)
+            .Select(x => x.Parent!);
+
+        var entries = repoPaths.Select(TryResolveEntry)
+            .Where(x => x is not null)
+            .Select(x => x!);
+
+        return entries;
+    }
+
+    public Repository CloneIfMissing(CacheEntry cache)
+    {
+        if (!cache.CachePath.Exists)
+        {
+            _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
+
+            cache.CachePath.EnsureExists();
+            Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName,
+                new CloneOptions { IsBare = true });
+        }
+        else
+        {
+            _log.LogDebug("Cached repository {origin} found", cache.Origin);
+        }
+
+        var repo = new Repository(cache.CachePath.FullName);
+
+        return repo;
     }
 
     public class CacheEntry(Uri origin, IDirectoryInfo cachePath)
@@ -61,7 +86,7 @@ internal class RepositoryCache
 
         if (home is null)
         {
-            _appLog.LogWarning("No home directory found!, using current directory");
+            _log.LogWarning("No home directory found!, using current directory");
         }
 
         home ??= files.Current();
@@ -69,5 +94,37 @@ internal class RepositoryCache
         var cache = home.GetFolder(DefaultCacheFolderName);
 
         return cache;
+    }
+
+    private CacheEntry? TryResolveEntry(IDirectoryInfo repoPath)
+    {
+        if (!Repository.IsValid(repoPath.FullName))
+        {
+            _log.LogWarning("Cache folder {cache} is NOT a valid repository",
+                repoPath.FullName);
+            return null;
+        }
+
+        using var config = new Repository(repoPath.FullName).Config;
+
+        var origin = config
+            .Get<string>("remote.origin.url", ConfigurationLevel.Local)
+            ?.Value;
+        if (origin is null)
+        {
+            _log.LogError("Repository cache {cache} doesnt have origin remote", repoPath.FullName);
+            return null;
+        }
+
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var originUri))
+        {
+            _log.LogError("Cache {cache} origin url is not a uri",
+                repoPath.FullName);
+            return null;
+        }
+
+        var entry = new CacheEntry(originUri, repoPath);
+
+        return entry;
     }
 }
