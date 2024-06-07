@@ -12,12 +12,10 @@ namespace GitGet.Actions;
 internal class Get : IAction
 {
     private readonly ILogger _log;
-    private readonly RepositoryCache _cache;
-
-    public Get(ILogger log, RepositoryCache cache)
+    
+    public Get(ILogger log)
     {
         _log = log;
-        _cache = cache;
     }
 
     public async Task<int> Run(Args args)
@@ -26,11 +24,6 @@ internal class Get : IAction
 
         if (package is null) return 1;
 
-        return await Run(package);
-    }
-
-    public async Task<int> Run(GitPackageStatusFile package)
-    {
         _log.LogInformation("Package sync for '{outPath}'", package.BackingFile.DirectoryName);
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
@@ -42,10 +35,10 @@ internal class Get : IAction
             return 0;
         }
 
-        var cache = _cache.Get(package.Origin);
-
         //Clone
-        var repo = _cache.CloneIfMissing(cache);
+        var cache = new RepositoryCache(_log, args.Cache);
+        var entry = cache.Get(package.Origin);
+        var repo = cache.CloneIfMissing(entry);
 
         //Check for ref.
         var targetRef = FetchReference(repo, package.Version);
@@ -57,7 +50,6 @@ internal class Get : IAction
 
         //Check if already have.
         var commit = targetRef.Target.Peel<Commit>();
-
         if (package.Commit == commit.Sha)
         {
             _log.LogInformation("Required commit already extracted");

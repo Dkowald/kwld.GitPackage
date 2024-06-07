@@ -7,6 +7,8 @@ namespace GitPackage.Tests.Usage;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class Where
 {
+    public static string RepoUrl = "https://github.com/rsafier/DotNetGlob.git";
+
     [Fact]
     public async Task CheckInfoAboutCachedRepo()
     {
@@ -16,8 +18,8 @@ public class Where
         {
                 "where",
                 $"--cache:{cache.FullName}",
-                "--origin:https://github.com/rsafier/DotNetGlob.git",
-                "--log-level:w"
+                $"--origin:{RepoUrl}",
+            "--log-level:w"
             };
 
         var expected = cache.GetFolder("github.com/rsafier/DotNetGlob.git");

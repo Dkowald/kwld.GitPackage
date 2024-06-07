@@ -1,4 +1,5 @@
-﻿using GitGet.Utility;
+﻿using GitGet.Actions;
+using GitGet.Utility;
 
 using GitPackage.Cli.Model;
 
@@ -53,12 +54,19 @@ internal class Args
 
         var arg0 = inputArgs.First();
 
-        if (arg0.Same("init"))
+        if (arg0.Same(nameof(Actions.Init)))
         { action = ActionOptions.Init; }
-        else if (arg0.Same("info"))
+
+        else if (arg0.Same(nameof(Actions.Info)))
         { action = ActionOptions.Info; }
-        else if (arg0.Same("where"))
+
+        else if (arg0.Same(nameof(Actions.Where)))
         { action = ActionOptions.Where; }
+
+        else if (arg0.Same(nameof(Actions.About))){
+            action = ActionOptions.About;
+        }
+
         else
         {
             action = ActionOptions.Get;

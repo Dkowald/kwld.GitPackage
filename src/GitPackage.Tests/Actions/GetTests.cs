@@ -16,5 +16,4 @@ public class GetTests
 
         //Need target to report when it does network activity.
     }
-
 }

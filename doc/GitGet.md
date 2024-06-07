@@ -39,16 +39,33 @@ Uses provided options and 'target-path/.gitpackages' for configuration.
 If 'target-path/.gitpackages' already contains a commit,
 no action performed (except with --force)
 
+If commit is missing, triggers the get flow:
+
+- clone to local cache if needed.
+- if [version] is branch, fetch latest from origin.
+- if [version] is tag, and it's not found locally, fetch latest from origin.
+- check can find commit for [version] in the repository (fail if not found)
+- delete all files in target folder, replace with repository files.
+- update .gitpackages to include the used commit.
+
 > init
 
 Writes options to corresponding 'target-path/.gitpackage' 
 without performing any actual git actions.
 
+overwrites existing package file with changes (if needed).
+
+> about
+
+Reports version info, and cli summary.
+
 > info
 
-Reports tool usage, and summary of current cached repositories.
+Reports summary of current cached repositories.
 
-If 'target-path/.gitpackage' also reports its details.
+Also uses other options, allong with 
+'target-path/.gitpackage' (if found) 
+to report.
 
 > where
 
@@ -58,7 +75,14 @@ This can be used to perform normal git actions on a local cached
 repository
 
 ```pwsh
+#checkout worktree for cached repository
+
+$url = 'https://github.com/rsafier/DotNetGlob.git'
+
 $repo = dotnet gitget where --origin:https://github.com/rsafier/DotNetGlob.git
+
+git worktree add ./
+
 ```
 
 
@@ -84,7 +108,7 @@ Alternatly, can be a explit git branch or tag ref
 Note: _Must_ be for origin remote when using explit branch ref.
 
 -filter:{globs}  
-A set of ';' delimited globs to select files. defaults to all.
+A set of ',' delimited globs to select files. defaults to all.
 
 glob entries are case-insensitive.
 
@@ -103,11 +127,13 @@ The cache is determined by:
 
 __--force:[force]__
 
-Force fetch and get.  
+Force re-get of files.
+
 By default if the 'target-path/.gitpackage' has a commit, 
 it is skipped when running git-get. 
+
 This option forces a re-evaluate of the commit. 
-If [version] is a branch ref, will also fetch latest from origin.
+If [version] is a branch ref, will also force a fetch from origin.
 
 [force] is one of:
 

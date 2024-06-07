@@ -6,7 +6,9 @@ internal class Config
 {
     private readonly List<string> _errors = new();
 
-    public static readonly string HomeRepository = "https://github.com/Dkowald/kwld.GitPackage";
+    public static readonly string HomeUrl = "https://github.com/Dkowald/kwld.GitPackage";
+
+    public static readonly string HomeRepositoryUrl = "https://github.com/Dkowald/kwld.GitPackage.git";
 
     public Config Read(string[] args)
     {

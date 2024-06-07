@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using GitGet.Tasks;
-using System.Text.RegularExpressions;
-using System.Linq;
-
-using GitPackage.Cli.Model;
+﻿using GitPackage.Cli.Model;
 
 namespace GitPackage.Tests.Model;
 
@@ -14,7 +9,7 @@ public class GetFilterTests
     public static readonly IEnumerable<object[]> Data = new TestCases[]
     {
         //edge
-        new("/readme.md;deploy/**/*.yaml", "data/deploy/objects/README.md", false),
+        new("/readme.md,deploy/**/*.yaml", "data/deploy/objects/README.md", false),
 
         //non anchored
         new("readme.md", "/readme.md", true),
@@ -40,7 +35,7 @@ public class GetFilterTests
         //one of
         new("/*.md", "/doc/other/deep/README.md", false),
         new("deep/*.md", "/doc/other/deep/README.md", true),
-        new("/*.md;deep/*.md", "/doc/other/deep/README.md", true),
+        new("/*.md,deep/*.md", "/doc/other/deep/README.md", true),
         
         //all
         new(null, "/x.md", true),

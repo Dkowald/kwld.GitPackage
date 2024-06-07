@@ -8,7 +8,7 @@
     <None Include=".github/**" />
     <None Include=".vscode/**" />
     <None Include="doc/**" />
-    <None Include="samples/*" />
+    <None Include="samples/**/*" Exclude="**/bin/**;**/obj/**"/>
   </ItemGroup>
 
   <ItemGroup>

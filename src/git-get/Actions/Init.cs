@@ -1,9 +1,8 @@
-﻿using GitGet.Actions;
-using GitGet.Model;
+﻿using GitGet.Model;
 
 using Microsoft.Extensions.Logging;
 
-namespace GitGet.Tasks;
+namespace GitGet.Actions;
 
 internal class Init : IAction
 {
@@ -13,10 +12,65 @@ internal class Init : IAction
         _log = log;
     }
 
-    public Task<int> Run(Args args)
+    public async Task<int> Run(Args args)
     {
-        //var statusFile = GitPackageStatusFile.Load(_log, args.TargetPath);
+        var cache = new RepositoryCache(_log, args.Cache);
 
-        return Task.FromResult(1);
+        //var entry = 
+        var package = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+        
+        var changed = false;
+
+        if (package is null)
+        {
+            if(args.Origin is null)
+            {
+                _log.LogError("Repository origin missing");
+                return 1;
+            }
+            if(args.Version is null)
+            {
+                _log.LogError("Missing version");
+                return 1;
+            }
+
+            var filter = args.Filter ?? new();
+
+            package = new(args.TargetPath, args.Origin, args.Version, filter);
+            _log.LogDebug("Create new package status file {GitPackageStatusFile}",
+                package.BackingFile.FullName);
+            changed = true;
+        }
+        else
+        {
+            if(args.Origin != null && package.Origin != args.Origin)
+            {
+                changed = true;
+                package.Origin = args.Origin;
+                _log.LogDebug("Updating package origin");
+            }
+
+            if(args.Filter != null && package.Filter != args.Filter)
+            {
+                changed = true;
+                package.Origin = args.Origin;
+                _log.LogDebug("Updating package origin");
+            }
+
+            if(args.Version != null && package.Filter != args.Filter)
+            {
+                changed = true;
+                package.Filter = args.Filter;
+                _log.LogDebug("Updating package filter");
+            }
+        }
+
+        if (changed)
+        {
+            _log.LogInformation("Writing updated package file");
+            package.Write(_log);
+        }
+
+        return 0;
     }
 }

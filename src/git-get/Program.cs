@@ -1,4 +1,5 @@
-﻿using GitGet.Model;
+﻿using GitGet.Actions;
+using GitGet.Model;
 using GitGet.Model.AppLogging;
 using GitGet.Services;
 
@@ -33,29 +34,25 @@ internal static class Program
 
         var cache = new RepositoryCache(log, parsedArgs.Cache);
 
-        if (parsedArgs.Action == ActionOptions.Get)
+        IAction? action = parsedArgs.Action switch
         {
-            var action = new Actions.Get(log, cache);
+            ActionOptions.Get =>
+                svc.GetRequiredService<Actions.Get>(),
+            ActionOptions.Init =>
+                svc.GetRequiredService<Actions.Init>(),
+            ActionOptions.About =>
+                svc.GetRequiredService<Actions.About>(),
+            ActionOptions.Info =>
+                svc.GetRequiredService<Actions.Info>(),
+            ActionOptions.Where =>
+                svc.GetRequiredService<Actions.Where>(),
 
-            return await action.Run(parsedArgs);
-        }
+            _ => throw new Exception($"Unknown action: {parsedArgs.Action}")
+        };
 
-        if (parsedArgs.Action == ActionOptions.Where)
-        {
-            var action = new Actions.Where(log, svc.GetRequiredService<IConsole>());
+        var exitCode = await action.Run(parsedArgs);
 
-            return await action.Run(parsedArgs);
-        }
-
-        if (parsedArgs.Action == ActionOptions.Info)
-        {
-            var action = new Actions.Info(log, svc.GetRequiredService<IConsole>());
-
-            return await action.Run(parsedArgs);
-        }
-
-        //todo: other actions.
-        return -1;
+        return exitCode;
     }
 
     private static ServiceCollection Container(LogLevel logLevel)
@@ -86,6 +83,9 @@ internal static class Program
 
         cont.AddTransient<Actions.Get>();
         cont.AddTransient<Actions.Where>();
+        cont.AddTransient<Actions.Info>();
+        cont.AddTransient<Actions.Init>();
+        cont.AddTransient<Actions.About>();
 
         return cont;
     }

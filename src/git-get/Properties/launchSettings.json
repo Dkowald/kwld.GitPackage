@@ -3,7 +3,7 @@
     "GitPackage.Cli": {
       "commandName": "Project",
       "workingDirectory": "./App_Data",
-      "commandLineArgs": "./Sample1 --cache:./.gitpackages --log-level:t --origin:https://github.com/Dkowald/kwld.CoreUtil.git --version:tag/v1.3.2 --filter:*.md"
+      "commandLineArgs": "about"
     }
   }
 }
