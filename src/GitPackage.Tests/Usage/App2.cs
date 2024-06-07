@@ -10,7 +10,9 @@ namespace GitPackage.Tests.Usage;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class App2 : IClassFixture<TestHost>
 {
-    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", "App2");
+    public const string Origin = "https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/";
+
+    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(App2));
 
     private readonly GitPackageStatusFile _nfsCsiYaml;
 
@@ -27,8 +29,8 @@ public class App2 : IClassFixture<TestHost>
         _appLogger = _host.Get<ILogger>();
 
         _nfsCsiYaml = new GitPackageStatusFile(_root.GetFolder("CSI/NFSFolders/data"),
-            new("https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/"),
-            new("branch/master"), new("/readme.md;deploy/**/*.yaml"));
+            new(Origin),
+            new("branch/master"), new("/readme.md,deploy/**/*.yaml"));
         
         _args = [
             _nfsCsiYaml.BackingFile.Directory!.FullName,

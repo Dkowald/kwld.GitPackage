@@ -31,7 +31,7 @@ namespace GitPackage.Tests.GitCommands
             using var repo = TestRepository.OpenTestRepository();
             var commit = new GitRef("tag/v0");
 
-            var glob = "Folder1/**/*.md;Folder2/**/*";
+            var glob = "Folder1/**/*.md,Folder2/**/*";
 
             var destRoot = OutRoot.GetFolder("Tag0Filtered")
                 .EnsureEmpty();

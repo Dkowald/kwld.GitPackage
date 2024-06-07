@@ -9,7 +9,7 @@ namespace GitPackage.Tests.Usage;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class Basic
 {
-    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", "Basic");
+    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(Basic));
     private IFileInfo StatusFile => _root.GetFile(nameof(GetUsingStatusFile), GitPackageStatusFile.StatusFileName);
 
     [Ordered, Fact]
@@ -27,7 +27,7 @@ public class Basic
         new GitPackageStatusFile(StatusFile, 
                 new("https://github.com/Dkowald/kwld.CoreUtil.git"),
                 new("tag/v1.3.2"),
-                new("/*.md;docs/*.md"))
+                new("/*.md,docs/*.md"))
         .Write(logger);
     }
     
