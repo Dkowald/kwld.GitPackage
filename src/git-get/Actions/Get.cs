@@ -130,11 +130,42 @@ internal class Get : IAction
 
         if (targetRef is null)
         {
-            _log.LogInformation("Ref '{gitRef}', not found, refreshing data from server", gitRef.Version);
+            _log.LogInformation("Ref '{gitRef}', not found, fetching data from server", gitRef.Version);
 
             //fetch.
             var refSpecs = repo.Network.Remotes["origin"].FetchRefSpecs.Select(x => x.Specification);
-            Commands.Fetch(repo, "origin", refSpecs, new() { TagFetchMode = TagFetchMode.All }, "");
+
+            var progress = new List<string>();
+            var transfer = new List<string>();
+            var progressStarted = false;
+            var transferStarted = false;
+
+            var options = new FetchOptions()
+            {
+                TagFetchMode = TagFetchMode.All,
+                Prune = true,
+                OnProgress = txt =>
+                {
+                    if (!progressStarted)
+                    {
+                        //todo: match with clone reporting.
+                        _log.LogDebug("Fetching objects to transfer");
+                        progressStarted = true;
+                    }
+                    progress.Add(txt);
+                    return true;
+                },
+                OnTransferProgress = x => {
+                    if (!transferStarted)
+                    {
+                        _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
+                        transferStarted = true;
+                    }
+                    return true; 
+                }
+            };
+
+            Commands.Fetch(repo, "origin", refSpecs, options, "");
         }
         else
         {

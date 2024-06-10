@@ -1,7 +1,21 @@
-﻿namespace GitPackage.Tests.Actions;
+﻿using Microsoft.Extensions.Logging.Testing;
+
+namespace GitPackage.Tests.Actions;
 
 public class GetTests
 {
+
+    [Fact]
+    public void ReportNetworkActivity()
+    {
+        var logs = new List<string>();
+        var log = new FakeLogger(logs.Add);
+
+        var target = new GitGet.Actions.Get(log);
+
+        target.Run();
+    }
+
     [Fact(Skip = "todo")]
     public void RepositoryRequiresCredentials()
     {

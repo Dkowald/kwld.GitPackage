@@ -1,12 +1,32 @@
 ﻿using GitGet.Model;
+
 using GitPackage.Tests.TestHelpers;
+
 using LibGit2Sharp;
+
 using Microsoft.Extensions.Logging.Testing;
 
 namespace GitPackage.Tests.Model;
 
 public class RepositoryCacheTests
 {
+    [Fact]
+    public void CloneIfMissing_() 
+    {
+        var cache = Files.AppData.GetFolder(nameof(RepositoryCache), "cache")
+            .ClearReadonly()
+            .EnsureEmpty();
+
+        var logs = new List<string>();
+        var log = new FakeLogger(logs.Add);
+        var target = new RepositoryCache(log, cache);
+
+        var repo = target.CloneIfMissing(TestRepository.BareRepoPath.AsUri());
+
+        var serverWork = logs.Where(x => x.Contains("Fetching"));
+        Assert.True(serverWork.Any());
+    }
+
     [Fact]
     public void Get_LocalRepo()
     {

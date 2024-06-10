@@ -53,6 +53,9 @@ internal class RepositoryCache
         return entries;
     }
 
+    public Repository CloneIfMissing(Uri origin)
+        => CloneIfMissing(Get(origin));
+
     public Repository CloneIfMissing(CacheEntry cache)
     {
         if (!cache.CachePath.Exists)
@@ -60,8 +63,36 @@ internal class RepositoryCache
             _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
 
             cache.CachePath.EnsureExists();
-            Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName,
-                new CloneOptions { IsBare = true });
+
+            var options = new CloneOptions(){ IsBare = true};
+
+            var progress = new List<string>();
+            var transfer = new List<string>();
+
+            var progressStarted = false;
+            options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
+            options.FetchOptions.OnProgress += txt => {
+                if (!progressStarted)
+                {
+                    _log.LogDebug($"Fetching objects to transfer");
+                    progressStarted = true;
+                }
+                progress.Add(txt);
+                return true;
+            };
+
+            var transferStarted = false;
+            options.FetchOptions.OnTransferProgress = x =>
+            {
+                if (!transferStarted)
+                {
+                    _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
+                    transferStarted = true;
+                }
+                return true;
+            };
+
+            Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
         }
         else
         {
