@@ -3,22 +3,63 @@
     <GitPack-Cache Condition="'$(GitPack-Cache)' == '' And '$(HOME)' != ''">$(HOME)\.gitpack</GitPack-Cache>
     <GitPack-Cache Condition="'$(GitPack-Cache)' == '' And '$(USERPROFILE)' != ''">$(USERPROFILE)\.gitpack</GitPack-Cache>
 
-    <GitPackageCli>$(MSBuildThisFileDirectory)/../cli/GitPackage.Cli.exe</GitPackageCli>
+    <GitPackageCli Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../cli/git-get.exe</GitPackageCli>
 
+    <GitPack-AutoRestore Condition="'$(GitPack-AutoRestore)' == ''">true</GitPack-AutoRestore>
+    
   </PropertyGroup>
 
   <UsingTask
     TaskName="GitPackage.GitPackageTask"
     AssemblyFile="$(MSBuildThisFileDirectory)..\lib\netstandard2.0\GitPackage.dll" />
 
-  <Target Name="_gpInit" BeforeTargets="Build" 
+  <!--<Target Name="gpAutoRestore"
+          BeforeTargets="Restore"
+          DependsOnTargets="GitPackRestore"
+          Condition="'$(GitPack-AutoRestore)' == 'true'">
+    <Message Text="Restored git packages" Importance="High" />
+  </Target>
+
+  <Target Name="gpAutoRestoreInVStudio"
+          BeforeTargets="ResolveProjectReferences"
+          DependsOnTargets="gpAutoRestore"
+          Condition="$(BuildingInsideVisualStudio) == 'true'">
+    --><!--
+		This will include GitPackage restore in visual-studio design time builds.
+		See: https://github.com/dotnet/project-system/blob/master/docs/design-time-builds.md
+	--><!--
+  </Target>-->
+  
+  <Target Name="gpUpdate" Inputs="@(GitPackage)" Outputs="%(GitPackage.Identity).commit" BeforeTargets="Build">
+    
+    <ItemGroup>
+      <TargetPath Include="%(GitPackage.RootDir)%(GitPackage.Directory)"/>
+      <Args Include="info" />
+      <Args Include="--origin:%(GitPackage.Origin)" />
+      <Args Include="--version:%(GitPackage.Version)" />
+      <Args Include="--filter:%(GitPackage.Filter)" />
+      <Args Include="--log-level:t" />
+    </ItemGroup>
+
+    <Message Text="Working %(GitPackage.RootDir)%(GitPackage.Directory)" Importance="High" />
+    
+    <MakeDir Directories="%(GitPackage.RootDir)%(GitPackage.Directory)"/>
+    
+    <Exec Command="$(GitPackageCli) @(Args, ' ')"
+          WorkingDirectory="%(GitPackage.RootDir)%(GitPackage.Directory)">
+    </Exec>
+    
+    <Message Text="Working on %(GitPackage.Identity) : @(Args, ' ')" Importance="High" />
+  </Target>
+
+  <!--<Target Name="_gpInit" BeforeTargets="Build" 
           Inputs="@(GitPackage)" 
           Outputs="%(GitPackage.Path)/.gitpackage">
 
     <GitPackageTask  Package="@(GitPackage)">
       <Output TaskParameter="Item" ItemName="gpPackages" />
     </GitPackageTask>
-  </Target>
+  </Target>-->
 
   <Target Name="Check" AfterTargets="_gpInit">
 

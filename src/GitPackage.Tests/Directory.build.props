@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <!-- use the build -->
+    <GitPackageCli Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackageCli>
+  </PropertyGroup>
+  <!-- Manually include the build project assets-->
+  <Import Project="../GitPackage/build/GitPackage.targets" />
+
+  <!--Test get using build -->
+  <ItemGroup>
+    <GitPackage Include="App_Data/FromBuild/.gitpackage">
+      <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
+      <Version>tag/v1.3.2</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>  
+  </ItemGroup>
+  
+</Project>

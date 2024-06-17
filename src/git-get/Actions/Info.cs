@@ -17,11 +17,36 @@ namespace GitGet.Actions
 
         public Task<int> Run(Args args)
         {
-            if (!args.Cache.Exists())
+            ReportPackageInfo(args);
+            _console.Out.WriteLine("---");
+
+            ReportCacheInfo(args);
+
+            return Task.FromResult(0);
+        }
+
+        private void ReportPackageInfo(Args args)
+        {
+            var statusFile = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+
+            _console.Out.WriteLine("## Status file details");
+            _console.Out.WriteLine($"Location: {args.TargetPath.FullName}");
+            
+            if (statusFile?.BackingFile.Exists() == true)
             {
-
+                _console.Out.WriteLine($"  Origin:  '{statusFile.Origin}'");
+                _console.Out.WriteLine($"  Version: '{statusFile.Version}'");
+                _console.Out.WriteLine($"  Filter:  '{statusFile.Filter}'");
+                _console.Out.WriteLine($"  Commit:  '{statusFile.Commit}'");
             }
+            else
+            {
+                _console.Out.WriteLine($"Status file '{GitPackageStatusFile.StatusFileName}' not found");
+            }
+        }
 
+        private void ReportCacheInfo(Args args)
+        {
             var cache = new RepositoryCache(_log, args.Cache);
 
             var items = cache.List();
@@ -33,25 +58,26 @@ namespace GitGet.Actions
                 x.CachePath
             }).GroupBy(x => x.Host);
 
-            foreach (var entry in entries) {
+            _console.Out.WriteLine("## Cache details");
+            _console.Out.WriteLine($"Location: {args.Cache}");
 
+            foreach (var entry in entries)
+            {
                 var lines = new List<string>
                 {
-                    "-------------",
+                    "---",
                     $"Host: {entry.Key}",
                 };
                 foreach (var item in entry)
                 {
-                    lines.Add($"Uri: {item.Origin}");
-                    lines.Add($"Cache: {item.CachePath}");
+                    lines.Add($"  Uri: {item.Origin}");
+                    lines.Add($"  Cache: {item.CachePath}");
                 }
 
                 foreach (var line in lines)
                 { _console.Out.WriteLine(line); }
             }
 
-            return Task.FromResult(0);
         }
-
     }
 }

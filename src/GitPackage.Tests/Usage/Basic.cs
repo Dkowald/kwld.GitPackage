@@ -1,7 +1,11 @@
 ﻿using GitGet;
 using GitGet.Model;
+using GitGet.Utility;
+
 using GitPackage.Tests.TestHelpers;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 namespace GitPackage.Tests.Usage;
@@ -10,53 +14,61 @@ namespace GitPackage.Tests.Usage;
 public class Basic
 {
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(Basic));
-    private IFileInfo StatusFile => _root.GetFile(nameof(GetUsingStatusFile), GitPackageStatusFile.StatusFileName);
+    private IFileInfo StatusFile => _root.GetFile(GitPackageStatusFile.StatusFileName);
+
+    private readonly string Origin = "https://github.com/Dkowald/kwld.CoreUtil.git";
 
     [Ordered, Fact]
-    public void ResetWorkFolder()
+    public void MakeNewWorkingFolder()
     {
         _root.EnsureExists()
-            .EnsureEmpty();
+            .EnsureEmptyWithoutDelete();
     }
-    
+
     [Ordered, Fact]
-    public void CreateTargetStatusFile()
+    public async Task InitTargetStatusFile()
     {
+        using var _ = new PushD(_root);
+
         var logger = Substitute.For<ILogger>();
-        
-        new GitPackageStatusFile(StatusFile, 
-                new("https://github.com/Dkowald/kwld.CoreUtil.git"),
-                new("tag/v1.3.2"),
-                new("/*.md,docs/*.md"))
-        .Write(logger);
+
+        var args = new[]
+        {
+            "init",
+            $"--origin:{Origin}",
+            "--version:tag/v1.3.2",
+            "--filter:/*.md,docs/*.md"
+        };
+
+        var exitCode = await Program.Main(args);
+
+        Assert.Equal(0, exitCode);
+        Assert.True(StatusFile.Exists());
     }
-    
+
     [Ordered, Fact]
     public async Task GetUsingStatusFile()
     {
         var args = new[]
         {
-            $"--cache:{Files.TestPackageCacheRoot.FullName}",
             "--log-level:t",
             "--force:all"
         };
 
         int result;
-        
-        using (new PushD(StatusFile.Directory!))
+
+        using (new PushD(_root))
             result = await Program.Main(args);
 
         Assert.Equal(0, result);
-        
+
         await VerifyDirectory(StatusFile.Directory!.FullName);
     }
 
     [Ordered, Fact]
     public async Task GetReadme()
     {
-        var cwd = _root.GetFolder(nameof(GetReadme));
-
-        using var _ = new PushD(cwd.EnsureExists());
+        using var _ = new PushD(_root);
 
         var args = new[]
         {
@@ -70,6 +82,6 @@ public class Basic
 
         Assert.Equal(0, result);
 
-        await VerifyDirectory(cwd.FullName);
+        await VerifyDirectory(_root.FullName);
     }
 }

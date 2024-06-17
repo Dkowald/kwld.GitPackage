@@ -20,7 +20,7 @@ internal class RepositoryCache
         _log = log;
         _cacheRoot = cacheRoot;
 
-        log.LogDebug("Using repository cache at {RepositoryCache}",
+        log.LogTrace("Using repository cache at {RepositoryCache}",
             _cacheRoot.FullName);
     }
 

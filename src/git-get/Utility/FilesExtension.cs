@@ -14,8 +14,10 @@ internal static class FilesExtension
         => root.GetFile(path).Exists;
 
     /// <summary>
-    /// The util EnsureEmpty fails if the
-    /// directory is in use. if is current directory.
+    /// The normal utility EnsureEmpty fails if the
+    /// directory is in use. e.g. if it is current directory.
+    /// This version provides same behaviour, 
+    /// but with slower, dont delete current dir.
     /// </summary>
     public static IDirectoryInfo EnsureEmptyWithoutDelete(this IDirectoryInfo folder)
     {
