@@ -1,5 +1,9 @@
-﻿using GitPackage.Cli.Model;
+﻿using GitGet.Model;
+
+using GitPackage.Cli.Model;
 using GitPackage.Tests.TestHelpers;
+
+using Microsoft.Extensions.Logging.Testing;
 
 namespace GitPackage.Tests.GitCommands
 {
@@ -48,7 +52,10 @@ namespace GitPackage.Tests.GitCommands
         [Fact]
         public async Task GetNoAnchorFiltered() 
         {
-            using var repo = TestRepository.OpenTestRepository();
+            //need cloned repo so have origin.
+            using var repo = new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
+                .CloneIfMissing(TestRepository.BareRepoPath.AsUri());
+
             var commit = new GitRef("branch/IncludeNestedSameNameFolder");
 
             var glob = "**/folder1/*.txt";

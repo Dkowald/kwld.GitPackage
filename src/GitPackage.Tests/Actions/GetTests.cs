@@ -25,9 +25,15 @@ public class GetTests
 
         var target = new Get(log);
 
-        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, cacheDir);
+        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, cacheDir)
+        {
+            Origin = TestRepository.BareRepoPath.AsUri(),
+            Version = new("branch/master")
+        };
 
-        await target.Run(args);
+        var exitCode = await target.Run(args);
+        
+        Assert.Equal(0, exitCode);
 
         Assert.True(logs.Any(x => x.Contains("Fetch")));
     }

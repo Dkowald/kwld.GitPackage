@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using kwld.CoreUtil;
+
 using LibGit2Sharp;
 
 namespace GitPackage.Tests.TestHelpers;
@@ -22,17 +24,21 @@ static class TestRepository
             Debug.WriteLine("Creating test repository");
             BareRepoPath.ClearReadonly().EnsureEmpty();
             Path.ClearReadonly().EnsureEmpty();
-            
-            var repo = new Repository(Repository.Init(Path.FullName));
 
-            Init(repo);
-            UpdateDeleteAndMove(repo);
-            IncludeNestedSameNameFolder(repo);
-            Repository.Clone(Path.FullName, BareRepoPath.FullName, new()
+            using (var repo = new Repository(Repository.Init(Path.FullName)))
             {
-                IsBare = true,
-                FetchOptions = { TagFetchMode = TagFetchMode.All}
-            });
+                Init(repo);
+                UpdateDeleteAndMove(repo);
+                IncludeNestedSameNameFolder(repo);
+            }
+
+            var bare = Path.GetFolder(".git");
+            
+            bare.MergeForce(BareRepoPath);
+            using var bareRepo = new Repository(BareRepoPath.FullName);
+            bareRepo.Config.Set("core.bare", true);
+
+            Path.ClearReadonly().EnsureDelete();
         }
 
         if (!Repository.IsValid(BareRepoPath.FullName))
