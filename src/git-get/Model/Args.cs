@@ -67,8 +67,7 @@ internal class Args
             action = ActionOptions.About;
         }
 
-        else
-        {
+        else {
             action = ActionOptions.Get;
             if (arg0.StartsWith("--"))
             {
@@ -78,14 +77,13 @@ internal class Args
             }
             else
             {
-                var isFile = files.Current().GetFile(arg0).Exists;
-                if (isFile)
-                {
-                    log.LogError("Target path should be a directory, not file");
-                    return null;
-                }
-                log.LogTrace("Target path set from action");
-                targetPath = files.Current().GetFolder(arg0);
+                var isFile = files.Current().GetFile(arg0);
+
+                targetPath = isFile.Exists? isFile.Directory : files.Current().GetFolder(arg0);
+
+                if (isFile.Exists)
+                { log.LogInformation("Target path is a file, using its directory"); }
+                else { log.LogTrace("Target path set from action"); }
             }
         }
 
