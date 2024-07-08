@@ -65,11 +65,10 @@ internal static class Program
         cont.AddLogging(log =>
         {
             log.AddDebug()
-                .AddConsole(x =>
-                {
-                    x.LogToStandardErrorThreshold = LogLevel.Error;
-                    x.FormatterName = nameof(AppLoggerFormatter);
-                });
+               .AddConsole(x => {
+                x.LogToStandardErrorThreshold = LogLevel.Error;
+                x.FormatterName = nameof(AppLoggerFormatter);
+               });
 
             log.AddConsoleFormatter<AppLoggerFormatter, SimpleConsoleFormatterOptions>();
 

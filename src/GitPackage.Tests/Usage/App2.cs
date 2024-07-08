@@ -14,7 +14,7 @@ public class App2 : IClassFixture<TestHost>
 
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(App2));
 
-    private readonly GitPackageStatusFile _nfsCsiYaml;
+    private readonly StatusFile _nfsCsiYaml;
 
     private readonly string[] _args;
 
@@ -28,12 +28,13 @@ public class App2 : IClassFixture<TestHost>
 
         _appLogger = _host.Get<ILogger>();
 
-        _nfsCsiYaml = new GitPackageStatusFile(_root.GetFolder("CSI/NFSFolders/data"),
+        _nfsCsiYaml = new StatusFile(
+            _root.GetFolder("Shared"),
             new(Origin),
             new("branch/master"), new("/readme.md,deploy/**/*.yaml"));
         
         _args = [
-            _nfsCsiYaml.BackingFile.Directory!.FullName,
+            _nfsCsiYaml.TargetPath.FullName,
             "--log-level:t"
         ];
     }
@@ -64,7 +65,7 @@ public class App2 : IClassFixture<TestHost>
 
         await Program.Main(_args);
 
-        var reload = GitPackageStatusFile.Load(_appLogger, _nfsCsiYaml.BackingFile);
+        var reload = StatusFile.LoadIfFound(_appLogger, _nfsCsiYaml.TargetPath);
 
         Assert.NotNull(reload);
         Assert.False(orgCommit == reload.Commit);

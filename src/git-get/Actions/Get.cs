@@ -24,7 +24,7 @@ internal class Get : IAction
 
         if (package is null) return 1;
 
-        _log.LogInformation("Package sync for '{outPath}'", package.BackingFile.DirectoryName);
+        _log.LogInformation("Package sync for '{outPath}'", package.TargetPath);
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
@@ -57,11 +57,11 @@ internal class Get : IAction
         }
 
         //reset out folder.
-        package.BackingFile.Directory!.EnsureEmptyWithoutDelete();
+        package.TargetPath.EnsureEmptyWithoutDelete();
         package.Write(_log);
 
         new GitCommands.Get(repo)
-            .Run(package.BackingFile.Directory!, package.Version, package.Filter);
+            .Run(package.TargetPath, package.Version, package.Filter);
 
         package.Commit = commit.Sha;
         package.Write(_log);
@@ -69,9 +69,9 @@ internal class Get : IAction
         return 0;
     }
 
-    private GitPackageStatusFile? TryBuildStatusFile(Args args)
+    private StatusFile? TryBuildStatusFile(Args args)
     {
-        var package = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+        var package = StatusFile.LoadIfFound(_log, args.TargetPath);
 
         if (package is null) package = TryCreatePackageFromArgs(args);
         else AssignArgsToPackage(args, package);
@@ -79,7 +79,7 @@ internal class Get : IAction
         return package;
     }
 
-    private GitPackageStatusFile? TryCreatePackageFromArgs(Args args)
+    private StatusFile? TryCreatePackageFromArgs(Args args)
     {
         if (args.Origin is null)
         {
@@ -177,7 +177,7 @@ internal class Get : IAction
         return targetRef;
     }
 
-    private void AssignArgsToPackage(Args args, GitPackageStatusFile package)
+    private void AssignArgsToPackage(Args args, StatusFile package)
     {
         var hasChanged = false;
         if (args.Origin is not null && args.Origin != package.Origin)

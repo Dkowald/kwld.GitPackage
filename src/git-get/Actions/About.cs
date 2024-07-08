@@ -28,9 +28,8 @@ internal class About : IAction
         using var rd = assem.GetManifestResourceStream(GetType(), "About.md")!;
         var txt2 = new StreamReader(rd).ReadToEnd();
 
-        txt2 = txt2.Replace("https://github.com/Dkowald/kwld.GitPackage", Config.HomeUrl)
-            .Replace(".gitget", GitPackageStatusFile.StatusFileName)
-            .Replace(".gitpackages", RepositoryCache.DefaultCacheFolderName)
+        txt2 = txt2
+            .Replace("https://github.com/Dkowald/kwld.GitPackage", Config.HomeUrl)
             .Replace("https://github.com/Dkowald/kwld.GitPackage.git", Config.HomeRepositoryUrl);
 
         Console.Out.Write(txt2);

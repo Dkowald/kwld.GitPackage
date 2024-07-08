@@ -58,7 +58,7 @@
 
   <ItemGroup>
     <None Include="App_Data/.gitpackages/**/*" />
-    <None Include="App_Data/**/.*" />
+    <None Include="**/.gitget/**" />
   </ItemGroup>
     
 </Project>

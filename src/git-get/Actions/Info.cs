@@ -27,12 +27,12 @@ namespace GitGet.Actions
 
         private void ReportPackageInfo(Args args)
         {
-            var statusFile = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+            var statusFile = StatusFile.LoadIfFound(_log, args.TargetPath);
 
             _console.Out.WriteLine("## Status file details");
             _console.Out.WriteLine($"Location: {args.TargetPath.FullName}");
             
-            if (statusFile?.BackingFile.Exists() == true)
+            if (statusFile is not null)
             {
                 _console.Out.WriteLine($"  Origin:  '{statusFile.Origin}'");
                 _console.Out.WriteLine($"  Version: '{statusFile.Version}'");
@@ -41,7 +41,7 @@ namespace GitGet.Actions
             }
             else
             {
-                _console.Out.WriteLine($"Status file '{GitPackageStatusFile.StatusFileName}' not found");
+                _console.Out.WriteLine($"Status file '{StatusFile.StatusFolder}/{StatusFile.ConfigFile}' not found");
             }
         }
 

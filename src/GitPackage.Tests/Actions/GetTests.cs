@@ -16,7 +16,7 @@ public class GetTests
         var logs = new List<string>();
         var log = new FakeLogger(logs.Add);
 
-        var outDir = Files.AppData.GetFolder(nameof(GetTests), "Clone");
+        var outDir = Files.AppData.GetFolder(nameof(GetTests), "OutDir");
         var cacheDir = Files.AppData.GetFolder(nameof(GetTests), "Cache");
 
         cacheDir.ClearReadonly().EnsureEmpty();

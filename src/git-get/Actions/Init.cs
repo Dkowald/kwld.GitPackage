@@ -17,7 +17,7 @@ internal class Init : IAction
         var cache = new RepositoryCache(_log, args.Cache);
 
         //var entry = 
-        var package = GitPackageStatusFile.LoadIfFound(_log, args.TargetPath);
+        var package = StatusFile.LoadIfFound(_log, args.TargetPath);
         
         var changed = false;
 
@@ -38,7 +38,7 @@ internal class Init : IAction
 
             package = new(args.TargetPath, args.Origin, args.Version, filter);
             _log.LogDebug("Create new package status file {GitPackageStatusFile}",
-                package.BackingFile.FullName);
+                package.TargetPath.FullName);
             changed = true;
         }
         else

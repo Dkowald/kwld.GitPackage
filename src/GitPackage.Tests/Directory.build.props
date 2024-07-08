@@ -8,11 +8,11 @@
 
   <!--Test get using build -->
   <ItemGroup>
-    <GitPackage Include="App_Data/FromBuild">
+    <!--<GitPackage Include="App_Data/FromBuild">
       <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
       <Version>tag/v1.3.2</Version>
       <Filter>/*.md</Filter>
-    </GitPackage>  
+    </GitPackage>-->  
   </ItemGroup>
   
 </Project>

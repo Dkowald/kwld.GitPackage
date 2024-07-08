@@ -1,7 +1,7 @@
 ﻿## dotnet gitget [Action] [Options]
  > A tool to get a set of files from a cloned repository
  > See [Source](https://github.com/Dkowald/kwld.GitPackage) for details  
- > Version: 99.0.0+3c271bfc907ac97a4d09891e27104f5422306f2e
+ > Version: 99.0
 -------
 
 ## Action
@@ -20,15 +20,6 @@
 * --force:[force]  - force re-get even if already have a commit for [b]ranch, [t]ag or [a]ll
 * --log-level:[LoggingLevel] - [t]race, [d]ebug, [i]nfo, [w]arn (default), [e]rror
 --------
-## .gitget Status File
-> Simple text file with key=value lines
-> when found its values are used as defaults for corresponding options
-
-Origin=[origin]  
-Version=[version]  
-Filter=[filter]  
-Commit=[commit]  
-> commit is set when files are retrieved. If it exists, then it is assumed the files have been collected already
 ## e.g.
 Get the readme and docs files for this project  
-> dotnet git-get --origin:https://github.com/Dkowald/kwld.GitPackage.git --filter:/*.md,doc/**/*
+> dotnet git-get --origin:https://github.com/Dkowald/kwld.GitPackage.git --filter:/\*.md,doc/**/*

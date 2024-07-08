@@ -5,35 +5,42 @@ using Microsoft.Extensions.Logging;
 namespace GitGet.Model;
 
 /// <summary>
-/// 
+/// Load / save config and status data for specified root folder.
 /// </summary>
 /// <remarks>
-/// TODO: consider represent the status file as html,
-/// so then I could just open it in browser to see info
+/// TODO: extract simpl .env file reader ability (can i use lib?)
 /// </remarks>
-internal record GitPackageStatusFile
+internal record StatusFile
 {
-    internal const string StatusFileName = ".gitget";
+    internal const string StatusFolder = ".gitget";
+    internal const string ConfigFile = "config";
+    internal const string CommitFile = "commit";
 
-    public static GitPackageStatusFile? LoadIfFound(ILogger appLog, IDirectoryInfo dataFolder)
+    public static StatusFile? LoadIfFound(ILogger appLog, IDirectoryInfo dataFolder)
     {
-        var file = dataFolder.GetFile(StatusFileName);
-        if (!file.Exists) return null;
-        return Load(appLog, file);
+        if (!dataFolder.Exists()) return null;
+
+        return Load(appLog, dataFolder);
     }
 
-    public static GitPackageStatusFile? Load(ILogger appLog, IFileInfo dataFile)
+    private static StatusFile? Load(ILogger appLog, IDirectoryInfo dataFolder)
     {
-        if (!dataFile.Exists)
+        if (!dataFolder.Exists)
         {
-            appLog.LogError("Status file missing: {StatusFile}", dataFile.FullName);
+            appLog.LogError("Status folder not found: {StatusFolder}", dataFolder.FullName);
             return null;
         }
 
         Uri? origin = null;
         GitRef? version = null;
         GetFilter? filter = null;
-        string? commit = null;
+        
+        var dataFile = dataFolder.GetFile(StatusFolder, ConfigFile);
+        if (!dataFile.Exists)
+        {
+            appLog.LogTrace($"{StatusFolder}/{ConfigFile} not found");
+            return null;
+        }
 
         foreach (var line in dataFile.ReadAllLines())
         {
@@ -74,57 +81,79 @@ internal record GitPackageStatusFile
                 filter = new(value);
                 continue;
             }
-
-            if (key.Same(nameof(Commit)))
-            {
-                commit = value.IsNullOrWhiteSpace() ? null : value;
-                continue;
-            }
         }
 
         if (origin is null || version is null || filter is null)
         {
-            appLog.LogError($"{StatusFileName} invalid");
+            appLog.LogError($"{StatusFolder}/{ConfigFile} invalid");
             return null;
         }
 
-        return new(dataFile, origin, version, filter)
+        var statusFile = dataFolder.GetFile(StatusFolder, CommitFile);
+        string? commit = null;
+        if(statusFile.Exists)
+            foreach(var line in statusFile.ReadAllLines())
+            {
+                if (line.IsNullOrWhiteSpace()) continue;
+                var idx = line.IndexOf('=');
+                if (idx < 0 || idx == line.Length - 1)
+                {
+                    appLog.LogError("Status File corrupt: {StatusFile}", dataFile.FullName);
+                    appLog.LogInformation("Deleting corrupted status file");
+                    dataFile.Delete();
+                }
+
+                var key = line[..idx++].Trim();
+                var value = line[idx..].Trim();
+
+                if (key.Same(nameof(Commit)))
+                {
+                    commit = value.IsNullOrWhiteSpace() ? null : value;
+                    continue;
+                }
+            }
+
+        return new(dataFolder, origin, version, filter)
         {
             Commit = commit
         };
     }
 
-    public GitPackageStatusFile(IDirectoryInfo targetFolder, Uri origin, GitRef version, GetFilter filter)
-        : this(targetFolder.GetFile(StatusFileName), origin, version, filter) { }
-
-    public GitPackageStatusFile(IFileInfo statusFile, Uri origin, GitRef version, GetFilter filter)
+    public StatusFile(IDirectoryInfo targetFolder, Uri origin, GitRef version, GetFilter filter)
     {
-        BackingFile = statusFile;
+        TargetPath = targetFolder;
+
         Origin = origin;
         Version = version;
         Filter = filter;
     }
 
-    public GitPackageStatusFile Write(ILogger log)
+    /// <summary>
+    /// Persist to backing data file(s)
+    /// </summary>
+    public StatusFile Write(ILogger log)
     {
         var content = new[]
         {
             $"{nameof(Origin)} = {Origin}",
             $"{nameof(Version)} = {Version.Version}",
             $"{nameof(Filter)} = {Filter}",
-            $"{nameof(Commit)} = {Commit}",
         };
 
-        log.LogDebug("Updating status file: {statusFile}", BackingFile.FullName);
+        var configFile = TargetPath.GetFile(StatusFolder, ConfigFile).EnsureDirectory();
+        log.LogDebug("Updating config file: {configFile}", configFile.FullName);
+        configFile.WriteAllLines(content);
 
-        BackingFile
-            .EnsureDirectory()
-            .WriteAllLines(content);
+        var statusFile = TargetPath.GetFile(StatusFolder, CommitFile).EnsureDirectory();
+        log.LogDebug("Updating status file: {statusFile}", statusFile.FullName);
+
+        if (Commit.IsNullOrWhiteSpace())
+            statusFile.EnsureDelete();
+        else
+            statusFile.WriteAllLines([$"{nameof(Commit)} = {Commit}"]);
 
         return this;
     }
-
-    public IFileInfo BackingFile { get; }
 
     /// <summary>
     /// Url to the source repository: e.g.
@@ -151,7 +180,7 @@ internal record GitPackageStatusFile
     /// <summary>
     /// Local path to place files.
     /// </summary>
-    public string Path => BackingFile.DirectoryName!;
+    public IDirectoryInfo TargetPath { get; init;}
 
     /// <summary>
     /// The commit used for current files, if files have been collected

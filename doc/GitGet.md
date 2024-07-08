@@ -162,6 +162,7 @@ Defaults to current directory (./).
 ## .gitget format
 
 The .gitget status file is a set of key-value pairs delimited by '/r/n'
+It uses the same format style as [.env](https://dotenvx.com/docs/env-file#format)  
 Each line is of the form 'key=value'
 
 |key|value|
@@ -171,10 +172,12 @@ Each line is of the form 'key=value'
 |filter| glob filter(s) to use |
 |commit| resolved git commit, set when files are extracted |
 
+> TODO: can i use .env.key as approach for git creds?
+
 ## .gitpackages
 
 The .gitpackages folder maintains a local cache of cloned repositories.
 
 Each repository is in a sub-folder made from the origin url.
 
-IF a local git-repository is use, it is stored un .gitpackages/local/
+If a local git-repository is use, it is stored un .gitpackages/local/

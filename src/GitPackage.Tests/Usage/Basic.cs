@@ -14,7 +14,7 @@ namespace GitPackage.Tests.Usage;
 public class Basic
 {
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(Basic));
-    private IFileInfo StatusFile => _root.GetFile(GitPackageStatusFile.StatusFileName);
+    private IDirectoryInfo StatusFolder => _root.GetFolder(StatusFile.StatusFolder);
 
     private readonly string Origin = "https://github.com/Dkowald/kwld.CoreUtil.git";
 
@@ -43,7 +43,7 @@ public class Basic
         var exitCode = await Program.Main(args);
 
         Assert.Equal(0, exitCode);
-        Assert.True(StatusFile.Exists());
+        Assert.True(StatusFolder.Exists());
     }
 
     [Ordered, Fact]
@@ -62,7 +62,7 @@ public class Basic
 
         Assert.Equal(0, result);
 
-        await VerifyDirectory(StatusFile.Directory!.FullName);
+        await VerifyDirectory(_root.FullName);
     }
 
     [Ordered, Fact]
