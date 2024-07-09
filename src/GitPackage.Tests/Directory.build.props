@@ -4,15 +4,53 @@
     <GitPackageCli Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackageCli>
   </PropertyGroup>
   <!-- Manually include the build project assets-->
-  <Import Project="../GitPackage/build/GitPackage.targets" />
+  <!--<Import Project="../GitPackage/build/GitPackage.targets" />-->
 
+	<!-- 
+	Build spped: FastUpToDate works if i change the proj.
+	but if i change the output .gitpackage it doesnt do a build.
+	skips git packages if output file is changed.
+	
+	https://github.com/dotnet/project-system/blob/main/docs/up-to-date-check.md
+	
+	Note: dont want the 2-file approach, solve it in build.
+	Only did this 2-file so could get build when fast-build on.
+	But changing the csproj forces build; so it would be ok as single file..
+	-->
+	
+	<Target Name="gpPrep" Inputs="@(GitPackage)"
+			Outputs="%(GitPackage.Identity)/.gitpackage"
+			BeforeTargets="Build">
+		<ItemGroup>
+			<UpToDateCheckInput Include="%(GitPackage.Identity)/.gitpackage" />
+			
+			<TargetPath Include="%(GitPackage.RootDir)%(GitPackage.Directory)"/>
+			<!--<Args Include="info" />-->
+			<Args Include="--origin:%(GitPackage.Origin)" />
+			<Args Include="--version:%(GitPackage.Version)" />
+			<Args Include="--filter:%(GitPackage.Filter)" />
+			<Args Include="--log-level:t" />
+		</ItemGroup>
+		<Message Text="Working %(GitPackage.RootDir)%(GitPackage.Directory)" Importance="High" />
+		<MakeDir Directories="%(GitPackage.RootDir)%(GitPackage.Directory)"/>
+
+		<!--<Exec Command="$(GitPackageCli) @(Args, ' ')"
+			  WorkingDirectory="%(GitPackage.RootDir)%(GitPackage.Directory)">
+		</Exec>-->
+
+		<Message Text="Working on %(GitPackage.Identity) : @(Args, ' ')" Importance="High" />
+	</Target>
+	
   <!--Test get using build -->
   <ItemGroup>
-    <!--<GitPackage Include="App_Data/FromBuild">
+    <GitPackage Include="App_Data/FromBuild">
       <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
       <Version>tag/v1.3.2</Version>
       <Filter>/*.md</Filter>
-    </GitPackage>-->  
+    </GitPackage>
+	  <UpToDateCheckOutput Include=""/>
   </ItemGroup>
+
+	<!--https://github.com/microsoft/VSProjectSystem/blob/master/doc/extensibility/custom_item_types.md-->
   
 </Project>

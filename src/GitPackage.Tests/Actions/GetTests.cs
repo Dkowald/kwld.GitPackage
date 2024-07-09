@@ -40,7 +40,7 @@ public class GetTests
         
         Assert.Equal(0, exitCode);
 
-        Assert.True(host.LogEntries.Any(x => x.Contains("Fetch")));
+        Assert.Contains(host.LogEntries, x => x.Contains("Fetch"));
     }
 
     [Fact(Skip = "todo")]
