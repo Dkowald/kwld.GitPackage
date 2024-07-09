@@ -13,19 +13,24 @@ public class GetTests
     [Fact]
     public async Task ReportNetworkActivity()
     {
-        var logs = new List<string>();
-        var log = new FakeLogger(logs.Add);
+        //pre-cache test repo
+        TestRepository.OpenTestRepository().Dispose();
+
+        //new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
+        //    .Purge(TestRepository.BareRepoPath.AsUri());
+        //    //.CloneIfMissing(TestRepository.BareRepoPath.AsUri());
+
+        //get master.
+        using var host = new TestHost();
 
         var outDir = Files.AppData.GetFolder(nameof(GetTests), "OutDir");
-        var cacheDir = Files.AppData.GetFolder(nameof(GetTests), "Cache");
-
-        cacheDir.ClearReadonly().EnsureEmpty();
+        
         outDir.ClearReadonly()
             .EnsureEmptyWithoutDelete();
 
-        var target = new Get(log);
+        var target = new Get(host.Get<ILogger>());
 
-        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, cacheDir)
+        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot)
         {
             Origin = TestRepository.BareRepoPath.AsUri(),
             Version = new("branch/master")
@@ -35,7 +40,7 @@ public class GetTests
         
         Assert.Equal(0, exitCode);
 
-        Assert.True(logs.Any(x => x.Contains("Fetch")));
+        Assert.True(host.LogEntries.Any(x => x.Contains("Fetch")));
     }
 
     [Fact(Skip = "todo")]

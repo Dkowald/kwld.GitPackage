@@ -24,6 +24,13 @@ internal class RepositoryCache
             _cacheRoot.FullName);
     }
 
+    public class CacheEntry(Uri origin, IDirectoryInfo cachePath)
+    {
+        public Uri Origin => origin;
+
+        public IDirectoryInfo CachePath => cachePath;
+    }
+
     public CacheEntry Get(Uri origin)
     {
         if (origin.IsFile)
@@ -104,11 +111,14 @@ internal class RepositoryCache
         return repo;
     }
 
-    public class CacheEntry(Uri origin, IDirectoryInfo cachePath)
+    public RepositoryCache Purge(Uri origin)
     {
-        public Uri Origin => origin;
-
-        public IDirectoryInfo CachePath => cachePath;
+        var entry = Get(origin);
+        if(entry.CachePath.Exists())
+        { 
+            entry.CachePath.ClearReadonly().EnsureDelete();
+        }
+        return this;
     }
 
     private IDirectoryInfo ResolveCache(IFileSystem files)

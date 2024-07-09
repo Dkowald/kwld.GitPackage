@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-
-using kwld.CoreUtil;
-
+﻿using GitGet.Utility;
 using LibGit2Sharp;
+using System.Diagnostics;
 
 namespace GitPackage.Tests.TestHelpers;
 

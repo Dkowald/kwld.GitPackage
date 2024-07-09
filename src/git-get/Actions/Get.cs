@@ -38,7 +38,8 @@ internal class Get : IAction
         //Clone
         var cache = new RepositoryCache(_log, args.Cache);
         var entry = cache.Get(package.Origin);
-        var repo = cache.CloneIfMissing(entry);
+        using var repo = cache.CloneIfMissing(entry);
+
 
         //Check for ref.
         var targetRef = FetchReference(repo, package.Version);
@@ -125,54 +126,58 @@ internal class Get : IAction
 
     private DirectReference? FetchReference(Repository repo, GitRef gitRef)
     {
-        //[24] = refs / remotes / origin / master => "5085a0c6173cdb2a3fde205330b327a8eb0a26c4"
-        var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
-
-        if (targetRef is null)
+        if (gitRef.IsTag)
         {
-            _log.LogInformation("Ref '{gitRef}', not found, fetching data from server", gitRef.Version);
-
-            //fetch.
-            var refSpecs = repo.Network.Remotes["origin"].FetchRefSpecs.Select(x => x.Specification);
-
-            var progress = new List<string>();
-            var transfer = new List<string>();
-            var progressStarted = false;
-            var transferStarted = false;
-
-            var options = new FetchOptions()
+            var tagRef = repo.Refs[gitRef];
+            if(tagRef != null)
             {
-                TagFetchMode = TagFetchMode.All,
-                Prune = true,
-                OnProgress = txt =>
-                {
-                    if (!progressStarted)
-                    {
-                        //todo: match with clone reporting.
-                        _log.LogDebug("Fetching objects to transfer");
-                        progressStarted = true;
-                    }
-                    progress.Add(txt);
-                    return true;
-                },
-                OnTransferProgress = x => {
-                    if (!transferStarted)
-                    {
-                        _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
-                        transferStarted = true;
-                    }
-                    return true; 
-                }
-            };
-
-            Commands.Fetch(repo, "origin", refSpecs, options, "");
+                _log.LogInformation("Ref '{gitRef}' found in cache", gitRef.Version);
+                return tagRef.ResolveToDirectReference();
+            }
+            else
+            {
+                _log.LogDebug("Tag {gitRef} not found in cache", gitRef.Version);
+            }
         }
-        else
+
+        _log.LogInformation("Fetching Ref '{gitRef}' from server", gitRef.Version);
+
+        //fetch.
+        var refSpecs = repo.Network.Remotes["origin"].FetchRefSpecs.Select(x => x.Specification);
+
+        var progress = new List<string>();
+        var transfer = new List<string>();
+        var progressStarted = false;
+        var transferStarted = false;
+
+        var options = new FetchOptions()
         {
-            _log.LogDebug("Cached repository contains target ref: {gitRef}", gitRef.Version);
-        }
+            TagFetchMode = TagFetchMode.All,
+            Prune = true,
+            OnProgress = txt =>
+            {
+                if (!progressStarted)
+                {
+                    //todo: match with clone reporting.
+                    _log.LogDebug("Fetching objects to transfer");
+                    progressStarted = true;
+                }
+                progress.Add(txt);
+                return true;
+            },
+            OnTransferProgress = x => {
+                if (!transferStarted)
+                {
+                    _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
+                    transferStarted = true;
+                }
+                return true; 
+            }
+        };
 
-        targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
+        Commands.Fetch(repo, "origin", refSpecs, options, "");
+        
+        var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
 
         return targetRef;
     }

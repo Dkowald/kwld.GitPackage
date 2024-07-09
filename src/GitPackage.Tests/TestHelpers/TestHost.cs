@@ -18,6 +18,10 @@ public class TestHost : IDisposable
                     .AddDebug()
                     .AddConsole();
 
+                cfg.AddFakeLogging(x => { 
+                    x.OutputSink = l => LogEntries.Add(l);
+                });
+
                 cfg.AddFilter("", LogLevel.Trace);
             })
             .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().CreateLogger(""));
@@ -29,6 +33,7 @@ public class TestHost : IDisposable
         key is null? _svc.GetRequiredService<T>() :
             _svc.GetRequiredKeyedService<T>(key);
 
+    public readonly List<string> LogEntries = new();
 
     public void Dispose()
     {

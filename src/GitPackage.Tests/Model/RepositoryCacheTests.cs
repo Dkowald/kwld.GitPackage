@@ -1,5 +1,5 @@
 ﻿using GitGet.Model;
-
+using GitGet.Utility;
 using GitPackage.Tests.TestHelpers;
 
 using LibGit2Sharp;

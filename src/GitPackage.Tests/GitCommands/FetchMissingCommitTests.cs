@@ -1,4 +1,4 @@
-﻿using GitPackage.Tests.TestHelpers;
+﻿using GitGet.Utility;
 using LibGit2Sharp;
 
 namespace GitPackage.Tests.GitCommands;
