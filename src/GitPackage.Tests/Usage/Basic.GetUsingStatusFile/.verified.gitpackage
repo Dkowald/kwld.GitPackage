@@ -1,0 +1,4 @@
+Origin = https://github.com/Dkowald/kwld.CoreUtil.git
+Version = tag/v1.3.1
+Filter = /readme.md
+Commit = bcd0c065479aff06d9399d29d8c6eece60bc121d

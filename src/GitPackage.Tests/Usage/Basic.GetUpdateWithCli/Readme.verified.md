@@ -1,9 +1,24 @@
 ﻿## Overview
 Core library holding various extensions to improve code development and readability.
 
-### Framework support 
-To leverage new language features, this now targets multiple frameworks.
+See [Docs](docs/Home.md) for details
 
+## Whats New
+- Add .net8.0 target
+- Add samples; using approach for local nuget package usage
+- Add extensions as implicit global usings.
+- Project moved to new name: **kwld.CoreUtil**
+
+## Features
+
+### Global Usings
+For easy use; all extensions are included as global usings (.net 6 +)  
+By default the standard __ImplicitUsings__ property determines if they are 
+  included or not.  
+The can also be manually controlled via the __ImplicitUsings_CoreUtil__ build property.
+
+### Framework support 
+To leverage new language features, this now targets multiple frameworks.  
 Some features are only available for newer frameworks.
 
 ### Helpers for file system.
@@ -45,8 +60,5 @@ A number of msbuild helpers, including:
 
 Download file as part of the build.
 
-
-See [wiki](https://github.com/Dkowald/kwd.CoreUtil/wiki/) for details
-
 ---
-^ [source](https://github.com/Dkowald/kwd.CoreUtil) | [nuget](https://www.nuget.org/packages/kwd.CoreUtil/)
+^ [source](https://github.com/Dkowald/kwld.CoreUtil) | [nuget](https://www.nuget.org/packages/kwld.CoreUtil/)

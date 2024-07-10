@@ -20,6 +20,8 @@ namespace GitPackage.Tests.Actions
 
             var args = Args.Load(new FileSystem(), log, LogLevel.Trace,
                 [$"--cache:{Files.TestPackageCacheRoot.FullName}"]);
+            
+            Assert.NotNull(args);
 
             //put test repo in cache
             var cache = new RepositoryCache(log, args.Cache);

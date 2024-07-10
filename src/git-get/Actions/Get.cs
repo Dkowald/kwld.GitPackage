@@ -20,7 +20,7 @@ internal class Get : IAction
 
     public async Task<int> Run(Args args)
     {
-        var package = TryBuildStatusFile(args);
+        var package = await TryBuildStatusFile(args);
 
         if (package is null) return 1;
 
@@ -59,20 +59,20 @@ internal class Get : IAction
 
         //reset out folder.
         package.TargetPath.EnsureEmptyWithoutDelete();
-        package.Write(_log);
+        await package.Write(_log);
 
         new GitCommands.Get(repo)
             .Run(package.TargetPath, package.Version, package.Filter);
 
         package.Commit = commit.Sha;
-        package.Write(_log);
+        await package.Write(_log);
 
         return 0;
     }
 
-    private StatusFile? TryBuildStatusFile(Args args)
+    private async Task<StatusFile?> TryBuildStatusFile(Args args)
     {
-        var package = StatusFile.LoadIfFound(_log, args.TargetPath);
+        var package = await StatusFile.TryLoad(_log, args.TargetPath);
 
         if (package is null) package = TryCreatePackageFromArgs(args);
         else AssignArgsToPackage(args, package);

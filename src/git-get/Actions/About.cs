@@ -26,7 +26,7 @@ internal class About : IAction
             ?.InformationalVersion!;
 
         using var rd = assem.GetManifestResourceStream(GetType(), "About.md")!;
-        var txt2 = new StreamReader(rd).ReadToEnd();
+        var txt2 = await new StreamReader(rd).ReadToEndAsync();
 
         txt2 = txt2
             .Replace("https://github.com/Dkowald/kwld.GitPackage", Config.HomeUrl)

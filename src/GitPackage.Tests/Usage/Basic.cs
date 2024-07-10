@@ -14,7 +14,7 @@ namespace GitPackage.Tests.Usage;
 public class Basic
 {
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(Basic));
-    private IDirectoryInfo StatusFolder => _root.GetFolder(StatusFile.StatusFolder);
+    private IFileInfo StatusFile => _root.GetFile(GitGet.Model.StatusFile.FileName);
 
     private readonly string Origin = "https://github.com/Dkowald/kwld.CoreUtil.git";
 
@@ -30,20 +30,18 @@ public class Basic
     {
         using var _ = new PushD(_root);
 
-        var logger = Substitute.For<ILogger>();
-
         var args = new[]
         {
             "init",
             $"--origin:{Origin}",
-            "--version:tag/v1.3.2",
-            "--filter:/*.md,docs/*.md"
+            "--version:tag/v1.3.1",
+            "--filter:/readme.md"
         };
 
         var exitCode = await Program.Main(args);
 
         Assert.Equal(0, exitCode);
-        Assert.True(StatusFolder.Exists());
+        Assert.True(StatusFile.Exists());
     }
 
     [Ordered, Fact]
@@ -66,15 +64,13 @@ public class Basic
     }
 
     [Ordered, Fact]
-    public async Task GetReadme()
+    public async Task GetUpdateWithCli()
     {
         using var _ = new PushD(_root);
 
         var args = new[]
         {
-            "--origin:https://github.com/libgit2/libgit2sharp.git",
-            "--version:branch/maint/v0.22",
-            "--filter:/readme.md",
+            "--version:tag/v1.3.2",
             "--log-level:d"
         };
 

@@ -45,7 +45,7 @@ public class App2 : IClassFixture<TestHost>
         _root.EnsureEmpty();
         _nfsCsiYaml.Version = new("tag/nfs-subdir-external-provisioner-4.0.17");
         _nfsCsiYaml.Commit = null;
-        _nfsCsiYaml.Write(_host.Get<ILogger>());
+        await _nfsCsiYaml.Write(_host.Get<ILogger>());
 
         await Program.Main(_args);
 
@@ -61,11 +61,11 @@ public class App2 : IClassFixture<TestHost>
 
         _nfsCsiYaml.Commit = null;
         _nfsCsiYaml.Version = new("branch/master");
-        _nfsCsiYaml.Write(_host.Get<ILogger>());
+        await _nfsCsiYaml.Write(_host.Get<ILogger>());
 
         await Program.Main(_args);
 
-        var reload = StatusFile.LoadIfFound(_appLogger, _nfsCsiYaml.TargetPath);
+        var reload = await StatusFile.TryLoad(_appLogger, _nfsCsiYaml.TargetPath);
 
         Assert.NotNull(reload);
         Assert.False(orgCommit == reload.Commit);

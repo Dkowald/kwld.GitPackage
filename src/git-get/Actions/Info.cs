@@ -15,19 +15,19 @@ namespace GitGet.Actions
             _console = console;
         }
 
-        public Task<int> Run(Args args)
+        public async Task<int> Run(Args args)
         {
-            ReportPackageInfo(args);
+            await ReportPackageInfo(args);
             _console.Out.WriteLine("---");
 
             ReportCacheInfo(args);
 
-            return Task.FromResult(0);
+            return 0;
         }
 
-        private void ReportPackageInfo(Args args)
+        private async Task ReportPackageInfo(Args args)
         {
-            var statusFile = StatusFile.LoadIfFound(_log, args.TargetPath);
+            var statusFile = await StatusFile.TryLoad(_log, args.TargetPath);
 
             _console.Out.WriteLine("## Status file details");
             _console.Out.WriteLine($"Location: {args.TargetPath.FullName}");
@@ -41,7 +41,7 @@ namespace GitGet.Actions
             }
             else
             {
-                _console.Out.WriteLine($"Status file '{StatusFile.StatusFolder}/{StatusFile.ConfigFile}' not found");
+                _console.Out.WriteLine($"Status file '{StatusFile.FileName}' not found");
             }
         }
 

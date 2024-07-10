@@ -2,6 +2,9 @@
   <PropertyGroup>
     <!-- use the build -->
     <GitPackageCli Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackageCli>
+
+    <CollectUpToDateCheckInputDesignTimeDependsOn>$(CollectUpToDateCheckInputDesignTimeDependsOn);_gpInputs</CollectUpToDateCheckInputDesignTimeDependsOn>
+    
   </PropertyGroup>
   <!-- Manually include the build project assets-->
   <!--<Import Project="../GitPackage/build/GitPackage.targets" />-->
@@ -22,8 +25,6 @@
 			Outputs="%(GitPackage.Identity)/.gitpackage"
 			BeforeTargets="Build">
 		<ItemGroup>
-			<UpToDateCheckInput Include="%(GitPackage.Identity)/.gitpackage" />
-			
 			<TargetPath Include="%(GitPackage.RootDir)%(GitPackage.Directory)"/>
 			<!--<Args Include="info" />-->
 			<Args Include="--origin:%(GitPackage.Origin)" />
@@ -31,24 +32,33 @@
 			<Args Include="--filter:%(GitPackage.Filter)" />
 			<Args Include="--log-level:t" />
 		</ItemGroup>
+    
 		<Message Text="Working %(GitPackage.RootDir)%(GitPackage.Directory)" Importance="High" />
+    
 		<MakeDir Directories="%(GitPackage.RootDir)%(GitPackage.Directory)"/>
-
+    
 		<!--<Exec Command="$(GitPackageCli) @(Args, ' ')"
 			  WorkingDirectory="%(GitPackage.RootDir)%(GitPackage.Directory)">
 		</Exec>-->
 
 		<Message Text="Working on %(GitPackage.Identity) : @(Args, ' ')" Importance="High" />
 	</Target>
-	
+
+  <!--Include git package status files as inputs for fast-build-->
+  <Target Name="_gpInputs">
+    <ItemGroup>
+      <UpToDateCheckInput Include="%(GitPackage.Identity)/.gitpackage"/>
+    </ItemGroup>
+  </Target>
+  
   <!--Test get using build -->
   <ItemGroup>
-    <GitPackage Include="App_Data/FromBuild">
+    <GitPackage Include="App_Data/FromBuild" >
       <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
       <Version>tag/v1.3.2</Version>
       <Filter>/*.md</Filter>
     </GitPackage>
-	  <UpToDateCheckOutput Include=""/>
+    <!--<UpToDateCheckInput Include="App_Data/FromBuild/.gitpackage" />-->
   </ItemGroup>
 
 	<!--https://github.com/microsoft/VSProjectSystem/blob/master/doc/extensibility/custom_item_types.md-->

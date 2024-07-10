@@ -1,5 +1,7 @@
 ﻿using GitPackage.Cli.Model;
 
+using LibGit2Sharp;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -12,46 +14,32 @@ namespace GitGet.Model;
 /// </remarks>
 internal record StatusFile
 {
-    internal const string StatusFolder = ".gitget";
-    internal const string ConfigFile = "config";
-    internal const string CommitFile = "commit";
-
-    public static StatusFile? LoadIfFound(ILogger appLog, IDirectoryInfo dataFolder)
+    internal const string FileName = ".gitpackage";
+    
+    public static async Task<StatusFile?> TryLoad(ILogger appLog, IDirectoryInfo dataFolder)
     {
-        if (!dataFolder.Exists()) return null;
+        var statusFile = dataFolder.GetFile(FileName);
 
-        return Load(appLog, dataFolder);
-    }
-
-    private static StatusFile? Load(ILogger appLog, IDirectoryInfo dataFolder)
-    {
-        if (!dataFolder.Exists)
-        {
-            appLog.LogError("Status folder not found: {StatusFolder}", dataFolder.FullName);
-            return null;
-        }
+        if (!statusFile.Exists()) return null;
 
         Uri? origin = null;
         GitRef? version = null;
         GetFilter? filter = null;
-        
-        var dataFile = dataFolder.GetFile(StatusFolder, ConfigFile);
-        if (!dataFile.Exists)
-        {
-            appLog.LogTrace($"{StatusFolder}/{ConfigFile} not found");
-            return null;
-        }
+        string? commit = null;
 
-        foreach (var line in dataFile.ReadAllLines())
+        var lineNumber = 0;
+        foreach (var line in await statusFile.ReadAllLinesAsync())
         {
+            lineNumber++;
             if (line.IsNullOrWhiteSpace()) continue;
 
             var idx = line.IndexOf('=');
             if (idx < 0 || idx == line.Length - 1)
             {
-                appLog.LogError("Status File corrupt: {StatusFile}", dataFile.FullName);
+                appLog.LogError("Status File corrupt: {StatusFile} #{LineNumber}", 
+                    statusFile.FullName, lineNumber);
                 appLog.LogInformation("Deleting corrupted status file");
-                dataFile.Delete();
+                statusFile.Delete();
             }
 
             var key = line[..idx++].Trim();
@@ -61,7 +49,8 @@ internal record StatusFile
             {
                 if (!Uri.TryCreate(value, UriKind.Absolute, out origin))
                 {
-                    appLog.LogError("corrupt file: origin invalid");
+                    appLog.LogError("corrupt file: origin '{Origin}' invalid #{LineNumber}",
+                        value, lineNumber);
                 }
                 continue;
             }
@@ -71,7 +60,7 @@ internal record StatusFile
                 (var error, version) = GitRef.TryRead(value);
                 if (version is null)
                 {
-                    appLog.LogError("corrupt file: invalid version: {error}", error);
+                    appLog.LogError("corrupt file: version: {error} #{LineNumber}", error, lineNumber);
                 }
                 continue;
             }
@@ -81,39 +70,21 @@ internal record StatusFile
                 filter = new(value);
                 continue;
             }
+
+            if (key.Same(nameof(Commit)))
+            {
+                commit = value.IsNullOrWhiteSpace() ? null : value;
+                continue;
+            }
         }
 
         if (origin is null || version is null || filter is null)
         {
-            appLog.LogError($"{StatusFolder}/{ConfigFile} invalid");
+            appLog.LogError("{StatusFile} invalid, missing required details", statusFile.FullName);
             return null;
         }
 
-        var statusFile = dataFolder.GetFile(StatusFolder, CommitFile);
-        string? commit = null;
-        if(statusFile.Exists)
-            foreach(var line in statusFile.ReadAllLines())
-            {
-                if (line.IsNullOrWhiteSpace()) continue;
-                var idx = line.IndexOf('=');
-                if (idx < 0 || idx == line.Length - 1)
-                {
-                    appLog.LogError("Status File corrupt: {StatusFile}", dataFile.FullName);
-                    appLog.LogInformation("Deleting corrupted status file");
-                    dataFile.Delete();
-                }
-
-                var key = line[..idx++].Trim();
-                var value = line[idx..].Trim();
-
-                if (key.Same(nameof(Commit)))
-                {
-                    commit = value.IsNullOrWhiteSpace() ? null : value;
-                    continue;
-                }
-            }
-
-        return new(dataFolder, origin, version, filter)
+        return new StatusFile(dataFolder, origin, version, filter)
         {
             Commit = commit
         };
@@ -131,7 +102,7 @@ internal record StatusFile
     /// <summary>
     /// Persist to backing data file(s)
     /// </summary>
-    public StatusFile Write(ILogger log)
+    public async Task<StatusFile> Write(ILogger log)
     {
         var content = new[]
         {
@@ -140,17 +111,12 @@ internal record StatusFile
             $"{nameof(Filter)} = {Filter}",
         };
 
-        var configFile = TargetPath.GetFile(StatusFolder, ConfigFile).EnsureDirectory();
+        var configFile = TargetPath.GetFile(FileName).EnsureDirectory();
         log.LogDebug("Updating config file: {configFile}", configFile.FullName);
-        configFile.WriteAllLines(content);
+        configFile.WriteAllLinesAsync(content);
 
-        var statusFile = TargetPath.GetFile(StatusFolder, CommitFile).EnsureDirectory();
-        log.LogDebug("Updating status file: {statusFile}", statusFile.FullName);
-
-        if (Commit.IsNullOrWhiteSpace())
-            statusFile.EnsureDelete();
-        else
-            statusFile.WriteAllLines([$"{nameof(Commit)} = {Commit}"]);
+        if (!Commit.IsNullOrWhiteSpace())
+            configFile.AppendAllLinesAsync([$"{nameof(Commit)} = {Commit}"]);
 
         return this;
     }

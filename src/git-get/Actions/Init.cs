@@ -16,8 +16,7 @@ internal class Init : IAction
     {
         var cache = new RepositoryCache(_log, args.Cache);
 
-        //var entry = 
-        var package = StatusFile.LoadIfFound(_log, args.TargetPath);
+        var package = await StatusFile.TryLoad(_log, args.TargetPath);
         
         var changed = false;
 
@@ -53,22 +52,22 @@ internal class Init : IAction
             if(args.Filter != null && package.Filter != args.Filter)
             {
                 changed = true;
-                package.Origin = args.Origin;
-                _log.LogDebug("Updating package origin");
+                package.Filter = args.Filter;
+                _log.LogDebug($"Updating package {nameof(StatusFile.Filter)}");
             }
 
-            if(args.Version != null && package.Filter != args.Filter)
+            if(args.Version != null && package.Version != args.Version)
             {
                 changed = true;
-                package.Filter = args.Filter;
-                _log.LogDebug("Updating package filter");
+                package.Version = args.Version;
+                _log.LogDebug("Updating package version");
             }
         }
 
         if (changed)
         {
             _log.LogInformation("Writing updated package file");
-            package.Write(_log);
+            await package.Write(_log);
         }
 
         return 0;
