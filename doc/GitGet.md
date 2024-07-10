@@ -107,11 +107,10 @@ Alternatly, can be a explit git branch or tag ref
 
 Note: _Must_ be for origin remote when using explit branch ref.
 
--filter:{globs}  
-A set of ',' delimited globs to select files. defaults to all.
-
-glob entries are case-insensitive.
-
+__--filter:[globs]__  
+A set of comma ',' delimited globs to select files.  
+Defaults to all: **/*.  
+glob entries are case-insensitive.  
 glob's are simple pattern match, using ** to match any-folder and * to match any char.
 
 __--cache:[cache-path]__ 

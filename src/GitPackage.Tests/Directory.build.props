@@ -5,7 +5,7 @@
 
     <GitPackage-LogLevel>w</GitPackage-LogLevel>
     
-    <!-- <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild> -->
+     <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild> 
   </PropertyGroup>
   
   <!--Test get using build -->

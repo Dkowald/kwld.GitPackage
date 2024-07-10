@@ -1,5 +1,7 @@
 ﻿using GitGet.Utility;
+
 using LibGit2Sharp;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -65,46 +67,52 @@ internal class RepositoryCache
 
     public Repository CloneIfMissing(CacheEntry cache)
     {
-        if (!cache.CachePath.Exists)
-        {
-            _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
-
-            cache.CachePath.EnsureExists();
-
-            var options = new CloneOptions(){ IsBare = true};
-
-            var progress = new List<string>();
-            var transfer = new List<string>();
-
-            var progressStarted = false;
-            options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
-            options.FetchOptions.OnProgress += txt => {
-                if (!progressStarted)
-                {
-                    _log.LogDebug($"Fetching objects to transfer");
-                    progressStarted = true;
-                }
-                progress.Add(txt);
-                return true;
-            };
-
-            var transferStarted = false;
-            options.FetchOptions.OnTransferProgress = x =>
-            {
-                if (!transferStarted)
-                {
-                    _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
-                    transferStarted = true;
-                }
-                return true;
-            };
-
-            Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
-        }
-        else
+        if (cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName))
         {
             _log.LogDebug("Cached repository {origin} found", cache.Origin);
+            return new Repository(cache.CachePath.FullName);
         }
+
+        if (cache.CachePath.Exists)
+        {
+            _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
+            cache.CachePath.ClearReadonly().EnsureDelete();
+        }
+
+        _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
+
+        cache.CachePath.EnsureExists();
+
+        var options = new CloneOptions() { IsBare = true };
+
+        var progress = new List<string>();
+        var transfer = new List<string>();
+
+        var progressStarted = false;
+        options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
+        options.FetchOptions.OnProgress += txt =>
+        {
+            if (!progressStarted)
+            {
+                _log.LogDebug($"Fetching objects to transfer");
+                progressStarted = true;
+            }
+            progress.Add(txt);
+            return true;
+        };
+
+        var transferStarted = false;
+        options.FetchOptions.OnTransferProgress = x =>
+        {
+            if (!transferStarted)
+            {
+                _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
+                transferStarted = true;
+            }
+            return true;
+        };
+
+        Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
 
         var repo = new Repository(cache.CachePath.FullName);
 
@@ -114,8 +122,8 @@ internal class RepositoryCache
     public RepositoryCache Purge(Uri origin)
     {
         var entry = Get(origin);
-        if(entry.CachePath.Exists())
-        { 
+        if (entry.CachePath.Exists())
+        {
             entry.CachePath.ClearReadonly().EnsureDelete();
         }
         return this;

@@ -73,10 +73,21 @@ internal record StatusFile
             }
         }
 
-        origin = args.Origin is null ? origin : args.Origin;
-        version = args.Version is null ? version : args.Version;
-        filter = args.Filter is null ? filter : args.Filter;
-        if (origin is null || version is null || filter is null)
+        var changed = false;
+        if(args.Origin != null && args.Origin != origin)
+        {origin = args.Origin; changed = true;}
+
+        if(args.Version != null && args.Version != version) 
+        { version = args.Version; changed = true;}
+        
+        if(args.Filter != null && args.Filter != filter) 
+        { filter = args.Filter; changed = true; }
+        
+        filter ??= new();
+
+        commit = changed ? null : commit;
+
+        if (origin is null || version is null)
         {
             log.LogError("{StatusFile} invalid, missing required details", statusFile.FullName);
             return null;

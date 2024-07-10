@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging.Testing;
+﻿using GitGet.Actions;
 using GitGet.Model;
-using Microsoft.Extensions.Logging;
-
-using GitGet.Actions;
-using GitPackage.Tests.TestHelpers;
 using GitGet.Utility;
+
+using GitPackage.Tests.TestHelpers;
+
+using Microsoft.Extensions.Logging;
 
 namespace GitPackage.Tests.Actions;
 
@@ -15,10 +15,6 @@ public class GetTests
     {
         //pre-cache test repo
         TestRepository.OpenTestRepository().Dispose();
-
-        //new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
-        //    .Purge(TestRepository.BareRepoPath.AsUri());
-        //    //.CloneIfMissing(TestRepository.BareRepoPath.AsUri());
 
         //get master.
         using var host = new TestHost();
