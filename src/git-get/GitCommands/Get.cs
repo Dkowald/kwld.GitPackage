@@ -9,7 +9,7 @@ namespace GitGet.GitCommands;
 /// </summary>
 internal class Get(Repository repository)
 {
-    public void Run(IDirectoryInfo target, GitRef commit, GetFilter filter)
+    public async Task<string>  Run(IDirectoryInfo target, GitRef commit, GetFilter filter)
     {
         var commitRef = repository.Refs[commit.Value]
             ?.ResolveToDirectReference()
@@ -22,15 +22,17 @@ internal class Get(Repository repository)
         {
 
             if (file.Item.TargetType != TreeEntryTargetType.Blob)
-                throw new Exception("can only handle blobs(not sure about link.");
+                throw new Exception("can only handle blobs.");
 
             var content = (Blob)file.Item.Target;
             var outFile = target.GetFile(file.Path[1..]);
 
             using var rd = content.GetContentStream();
             using var wr = outFile.EnsureDirectory().Create();
-            rd.CopyTo(wr); //todo: async it.
+            await rd.CopyToAsync(wr);
         }
+
+        return commitRef.Sha;
     }
 
     private record BlobEntry(string Path, TreeEntry Item);

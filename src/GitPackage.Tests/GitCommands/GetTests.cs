@@ -22,7 +22,7 @@ namespace GitPackage.Tests.GitCommands
 
             var target = new GitGet.GitCommands.Get(repo);
 
-            target.Run(destRoot, version, new());
+            await target.Run(destRoot, version, new());
 
             await VerifyDirectory(destRoot.FullName)
                 .UseFileName(nameof(GetByAnnotatedTag))
@@ -42,7 +42,7 @@ namespace GitPackage.Tests.GitCommands
 
             var target = new GitGet.GitCommands.Get(repo);
 
-            target.Run(destRoot, commit, new(glob));
+            await target.Run(destRoot, commit, new(glob));
 
             await VerifyDirectory(destRoot.FullName)
                 .UseFileName(nameof(GetFiltered))
@@ -65,7 +65,7 @@ namespace GitPackage.Tests.GitCommands
 
             var target = new GitGet.GitCommands.Get(repo);
 
-            target.Run(destRoot, commit, new(glob));
+            await target.Run(destRoot, commit, new(glob));
 
             await VerifyDirectory(destRoot.FullName)
                 .UseFileName(nameof(GetNoAnchorFiltered))

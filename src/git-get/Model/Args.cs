@@ -73,7 +73,7 @@ internal class Args
             {
                 idx = 0;
                 targetPath = files.Current();
-                log.LogInformation("No action provided, using get with current directory");
+                log.LogDebug("No action provided, using get with current directory");
             }
             else
             {

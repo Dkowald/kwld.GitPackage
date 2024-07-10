@@ -40,6 +40,12 @@ public class App2 : IClassFixture<TestHost>
     }
 
     [Ordered, Fact]
+    public void Init() 
+    {
+
+    }
+
+    [Ordered, Fact]
     public async Task GitGetTag()
     {
         _root.EnsureEmpty();

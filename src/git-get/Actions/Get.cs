@@ -20,18 +20,18 @@ internal class Get : IAction
 
     public async Task<int> Run(Args args)
     {
-        var package = await TryBuildStatusFile(args);
+        var package = await StatusFile.BuildWithArgumentOverides(_log, args);
 
         if (package is null) return 1;
 
-        _log.LogInformation("Package sync for '{outPath}'", package.TargetPath);
+        _log.LogInformation("GitPackage restore for '{outPath}'", package.TargetPath);
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
 
         if (!package.Commit.IsNullOrEmpty())
         {
-            _log.LogInformation("Package commit exist; no work to do");
+            _log.LogInformation("GitPackage commit exist; no work to do");
             return 0;
         }
 
@@ -39,7 +39,6 @@ internal class Get : IAction
         var cache = new RepositoryCache(_log, args.Cache);
         var entry = cache.Get(package.Origin);
         using var repo = cache.CloneIfMissing(entry);
-
 
         //Check for ref.
         var targetRef = FetchReference(repo, package.Version);
@@ -49,59 +48,19 @@ internal class Get : IAction
             return 1;
         }
 
-        //Check if already have.
-        var commit = targetRef.Target.Peel<Commit>();
-        if (package.Commit == commit.Sha)
-        {
-            _log.LogInformation("Required commit already extracted");
-            return 0;
-        }
-
         //reset out folder.
-        package.TargetPath.EnsureEmptyWithoutDelete();
-        await package.Write(_log);
+        _log.LogInformation("Clean {TargetPath}", args.TargetPath.FullName);
+        CleanTargetPath(args.TargetPath);
 
-        new GitCommands.Get(repo)
+        _log.LogInformation("Extracting files");
+        var commit = await new GitCommands.Get(repo)
             .Run(package.TargetPath, package.Version, package.Filter);
 
-        package.Commit = commit.Sha;
+        package.Commit = commit;
+        
         await package.Write(_log);
 
         return 0;
-    }
-
-    private async Task<StatusFile?> TryBuildStatusFile(Args args)
-    {
-        var package = await StatusFile.TryLoad(_log, args.TargetPath);
-
-        if (package is null) package = TryCreatePackageFromArgs(args);
-        else AssignArgsToPackage(args, package);
-
-        return package;
-    }
-
-    private StatusFile? TryCreatePackageFromArgs(Args args)
-    {
-        if (args.Origin is null)
-        {
-            _log.LogError("Origin not provided");
-            return null;
-        }
-
-        if (args.Version is null)
-        {
-            _log.LogError("Version not provided");
-            return null;
-        }
-
-        var filter = args.Filter;
-        if (filter is null)
-        {
-            _log.LogInformation("Using default select-all filter");
-            filter = new();
-        }
-
-        return new(args.TargetPath, args.Origin, args.Version, filter);
     }
 
     private Repository CloneIfMissing(RepositoryCache.CacheEntry cache)
@@ -182,44 +141,34 @@ internal class Get : IAction
         return targetRef;
     }
 
-    private void AssignArgsToPackage(Args args, StatusFile package)
+    private void CleanTargetPath(IDirectoryInfo targetPath)
     {
-        var hasChanged = false;
-        if (args.Origin is not null && args.Origin != package.Origin)
+        foreach(var item in targetPath.EnumerateFileSystemInfos())
         {
-            _log.LogInformation("Updating package origin");
-
-            package.Origin = args.Origin;
-            hasChanged = true;
-        }
-
-        if (args.Version is not null && args.Version != package.Version)
-        {
-            _log.LogInformation("Updating package version");
-            package.Version = args.Version;
-            hasChanged = true;
-        }
-
-        if (args.Filter is not null && args.Filter != package.Filter)
-        {
-            _log.LogInformation("Updating package file filter");
-            package.Filter = args.Filter;
-            hasChanged = true;
-        }
-
-        if (args.Force is not null)
-        {
-            if (args.Force == ForceOption.All ||
-                (args.Force == ForceOption.Branch && package.Version.IsBranch) ||
-                (args.Force == ForceOption.Tag && package.Version.IsTag)
-               )
+            if(item is IDirectoryInfo dir)
             {
-                _log.LogInformation("Forcing re-evaluate get files.");
-                hasChanged = true;
+                try
+                {
+                    dir.Delete(true);
+                }catch(Exception ex)
+                {
+                    throw new Exception($"Failed delete {dir.FullName}", ex);
+                }
+            }
+
+            if(item is IFileInfo file)
+            {
+                if (file.Name == StatusFile.FileName && file.DirectoryName == targetPath.FullName)
+                    continue;
+
+                try
+                {
+                    file.Delete();
+                }catch(Exception ex)
+                {
+                    throw new Exception($"Filed delete {file.FullName}", ex);
+                }
             }
         }
-
-        if (hasChanged)
-            package.Commit = null;
     }
 }

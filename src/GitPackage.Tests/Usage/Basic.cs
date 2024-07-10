@@ -19,7 +19,7 @@ public class Basic
     private readonly string Origin = "https://github.com/Dkowald/kwld.CoreUtil.git";
 
     [Ordered, Fact]
-    public void MakeNewWorkingFolder()
+    public void Init()
     {
         _root.EnsureExists()
             .EnsureEmptyWithoutDelete();
