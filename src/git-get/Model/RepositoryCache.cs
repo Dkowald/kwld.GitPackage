@@ -1,6 +1,9 @@
 ﻿using GitGet.Utility;
 
+using GitPackage.Cli.Model;
+
 using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 
 using Microsoft.Extensions.Logging;
 
@@ -62,10 +65,10 @@ internal class RepositoryCache
         return entries;
     }
 
-    public Repository CloneIfMissing(Uri origin)
-        => CloneIfMissing(Get(origin));
+    public Repository CloneIfMissing(Uri origin, CredentialsHandler? creds)
+        => CloneIfMissing(Get(origin), creds);
 
-    public Repository CloneIfMissing(CacheEntry cache)
+    public Repository CloneIfMissing(CacheEntry cache, CredentialsHandler? creds)
     {
         if (cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName))
         {
@@ -83,7 +86,10 @@ internal class RepositoryCache
 
         cache.CachePath.EnsureExists();
 
-        var options = new CloneOptions() { IsBare = true };
+        var options = new CloneOptions() 
+        { IsBare = true };
+
+        options.FetchOptions.CredentialsProvider = creds;
 
         var progress = new List<string>();
         var transfer = new List<string>();

@@ -26,7 +26,7 @@ namespace GitPackage.Tests.Actions
             //put test repo in cache
             var cache = new RepositoryCache(log, args.Cache);
             var entry = cache.Get(TestRepository.BareRepoPath.AsUri());
-            cache.CloneIfMissing(entry);
+            cache.CloneIfMissing(entry, null);
 
             Assert.NotNull(args);
 

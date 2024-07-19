@@ -1,4 +1,6 @@
-﻿using DotNet.Globbing;
+﻿using System;
+
+using DotNet.Globbing;
 
 namespace GitPackage.Cli.Model;
 
@@ -10,7 +12,7 @@ namespace GitPackage.Cli.Model;
 /// Consider making this behave like gitignore
 /// https://git-scm.com/docs/gitignore?ref=linuxandubuntu.com#_pattern_format
 /// </remarks>
-internal class GetFilter
+internal class GetFilter : IEquatable<GetFilter>
 {
     public const string NoFilter = "**/*";
 
@@ -40,6 +42,31 @@ internal class GetFilter
 
     public override string ToString()
         => string.Join(',', _filters.Select(x => Decode(x.ToString())));
+
+    #region Equal
+    public override bool Equals(object? obj) =>
+        obj is GetFilter f && Equals(f);
+
+    public bool Equals(GetFilter? rhs) {
+        if (rhs is null) return false;
+
+        var lhsFilters = _filters.Select(x => x.ToString())
+            .Order().ToArray();
+
+        var rhsFilters = rhs._filters.Select(x => x.ToString())
+            .Order().ToArray();
+
+        return lhsFilters.SequenceEqual(rhsFilters);
+    }
+
+    public override int GetHashCode() =>
+        _filters.Aggregate(0, (v, x) => HashCode.Combine(v, x.ToString()));
+
+    public static bool operator ==(GetFilter? lhs, GetFilter? rhs)
+        => lhs is not null ? lhs.Equals(rhs) : rhs is null;
+
+    public static bool operator !=(GetFilter? lhs, GetFilter? rhs) => !(lhs == rhs);
+    #endregion
 
     private string Encode(string glob)
         => glob.StartsWith('/') || glob.StartsWith("**/")

@@ -4,6 +4,7 @@ using GitGet.Utility;
 using GitPackage.Cli.Model;
 
 using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 
 using Microsoft.Extensions.Logging;
 
@@ -29,19 +30,29 @@ internal class Get : IAction
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
 
+        _log.LogDebug("  User: {user}", args.User ?? "");
+        _log.LogDebug("  Password: {pwd}", args.HasPassword ? "****" : "");
+        
         if (!package.Commit.IsNullOrEmpty())
         {
             _log.LogInformation("GitPackage commit exist; no work to do");
             return 0;
         }
 
+        //Creds.
+        CredentialsHandler? creds = args.HasPassword?
+            (_, _, _) => new UsernamePasswordCredentials {
+                Username = args.User,
+                Password = args.UsePassword()
+            } : null;
+
         //Clone
         var cache = new RepositoryCache(_log, args.Cache);
         var entry = cache.Get(package.Origin);
-        using var repo = cache.CloneIfMissing(entry);
+        using var repo = cache.CloneIfMissing(entry, creds);
 
         //Check for ref.
-        var targetRef = FetchReference(repo, package.Version);
+        var targetRef = FetchReference(repo, package.Version, creds);
         if (targetRef is null)
         {
             _log.LogError("Unable to resolve git ref {gitRef}", package.Version.Version);
@@ -63,27 +74,63 @@ internal class Get : IAction
         return 0;
     }
 
-    private Repository CloneIfMissing(RepositoryCache.CacheEntry cache)
+    private Repository CloneIfMissing(RepositoryCache.CacheEntry cache, CredentialsHandler? creds)
     {
-        if (!cache.CachePath.Exists)
-        {
-            _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
-
-            cache.CachePath.EnsureExists();
-            Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName,
-                new CloneOptions { IsBare = true });
-        }
-        else
+        if (cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName))
         {
             _log.LogDebug("Cached repository {origin} found", cache.Origin);
+            return new Repository(cache.CachePath.FullName);
         }
+
+        if (cache.CachePath.Exists)
+        {
+            _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
+            cache.CachePath.ClearReadonly().EnsureDelete();
+        }
+
+        _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
+
+        cache.CachePath.EnsureExists();
+
+        var options = new CloneOptions() { IsBare = true };
+
+        var progress = new List<string>();
+        var transfer = new List<string>();
+
+        options.FetchOptions.CredentialsProvider = creds;
+        options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
+
+        var progressStarted = false;
+        options.FetchOptions.OnProgress += txt =>
+        {
+            if (!progressStarted)
+            {
+                _log.LogDebug($"Fetching objects to transfer");
+                progressStarted = true;
+            }
+            progress.Add(txt);
+            return true;
+        };
+
+        var transferStarted = false;
+        options.FetchOptions.OnTransferProgress = x =>
+        {
+            if (!transferStarted)
+            {
+                _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
+                transferStarted = true;
+            }
+            return true;
+        };
+
+        Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
 
         var repo = new Repository(cache.CachePath.FullName);
 
         return repo;
     }
 
-    private DirectReference? FetchReference(Repository repo, GitRef gitRef)
+    private DirectReference? FetchReference(Repository repo, GitRef gitRef, CredentialsHandler? creds)
     {
         if (gitRef.IsTag)
         {
@@ -113,6 +160,7 @@ internal class Get : IAction
         {
             TagFetchMode = TagFetchMode.All,
             Prune = true,
+            CredentialsProvider = creds,
             OnProgress = txt =>
             {
                 if (!progressStarted)
@@ -133,7 +181,7 @@ internal class Get : IAction
                 return true; 
             }
         };
-
+        
         Commands.Fetch(repo, "origin", refSpecs, options, "");
         
         var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();

@@ -1,4 +1,6 @@
-﻿using GitGet.Actions;
+﻿using System.Security;
+
+using GitGet.Actions;
 using GitGet.Utility;
 
 using GitPackage.Cli.Model;
@@ -16,6 +18,8 @@ internal class Args
     private const string CacheKey = "--cache:";
     private const string ForceKey = "--force:";
     private const string TargetPathKey = "--target-path:";
+    private const string UsernameKey = "--user:";
+    private const string PasswordKey = "--password:";
 
     public static readonly string DefaultCacheFolderName = ".gitpackages";
 
@@ -43,7 +47,9 @@ internal class Args
         GetFilter? filter = null;
         IDirectoryInfo? cache = null;
         ForceOption? force = null;
-
+        string? user = null;
+        string? password = null;
+        
         if (inputArgs.Length == 0)
         {
             log.LogTrace("No arguments; get using the current folder.");
@@ -199,6 +205,20 @@ internal class Args
 
             if (next.StartsWith(LogLevelKey)) continue;
 
+            if (next.StartsWith(PasswordKey))
+            {
+                var value = next[PasswordKey.Length..];
+                password = value;
+                continue;
+            }
+
+            if (next.StartsWith(UsernameKey))
+            {
+                var value = next[UsernameKey.Length..];
+                user = value;
+                continue;
+            }
+
             log.LogError("Unknown option: {option}", next);
             return null;
         }
@@ -213,10 +233,12 @@ internal class Args
 
         return new(logLevel, action.Value, targetPath, cache)
         {
+            _password = password,
             Origin = origin,
             Version = version,
             Filter = filter,
-            Force = force
+            Force = force,
+            User = user
         };
     }
 
@@ -243,6 +265,13 @@ internal class Args
     public IDirectoryInfo Cache { get; init; }
 
     public ForceOption? Force { get; init; }
+
+    public string? User { get; init; }
+
+    //so its more difficult to accidently use. 
+    private string? _password;
+    public bool HasPassword => _password != null;    
+    internal string? UsePassword() => _password;
 
     private static IDirectoryInfo DefaultCache(IFileSystem files, ILogger log)
     {

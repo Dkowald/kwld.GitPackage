@@ -1,11 +1,16 @@
 <Project>
+  <!-- Manually include the build project assets -->
+  <Import Project="../GitPackage/build/GitPackage.targets" />
+
   <PropertyGroup>
     <!-- use the latest build -->
     <GitPackage-Tool Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackage-Tool>
 
-    <GitPackage-LogLevel>w</GitPackage-LogLevel>
-    
-     <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild> 
+    <!--More diag-->
+    <GitPackage-LogLevel>i</GitPackage-LogLevel>
+
+    <!-- disable design-time build -->
+    <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild> 
   </PropertyGroup>
   
   <!--Test get using build -->

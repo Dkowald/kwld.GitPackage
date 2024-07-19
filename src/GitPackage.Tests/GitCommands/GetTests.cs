@@ -54,7 +54,7 @@ namespace GitPackage.Tests.GitCommands
         {
             //need cloned repo so have origin.
             using var repo = new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
-                .CloneIfMissing(TestRepository.BareRepoPath.AsUri());
+                .CloneIfMissing(TestRepository.BareRepoPath.AsUri(), null);
 
             var commit = new GitRef("branch/IncludeNestedSameNameFolder");
 

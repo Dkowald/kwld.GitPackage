@@ -1,9 +1,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <GitPackage-Tool Condition="'$(GitPackage-Tool)' == ''" >$(MSBuildThisFileDirectory)/../cli/git-get.exe </GitPackage-Tool>
+    
     <GitPackage-LogLevel Condition="'$(GitPackage-LogLevel)' == ''" >i</GitPackage-LogLevel>
     
-    <GitPackage-DesignTimeBuild Condition="$(GitPackage-DesignTimeBuild) == ''" >true</GitPackage-DesignTimeBuild>
+    <GitPackage-DesignTimeBuild Condition="$(GitPackage-DesignTimeBuild) == ''" >false</GitPackage-DesignTimeBuild>
 
     <!--<GitPackage-Cache Condition="'$(GitPackage-Cache)' == '' And '$(HOME)' != ''">$(HOME)/.gitpackages</GitPackage-Cache>
     <GitPackage-Cache Condition="'$(GitPackage-Cache)' == '' And '$(USERPROFILE)' != ''">$(USERPROFILE)/.gitpackages</GitPackage-Cache>-->
@@ -16,7 +17,7 @@
 </PropertyGroup>
 
   <!--Run tool-->
-  <Target Name="gpRestore" Inputs="@(GitPackage)"
+  <Target Name="gpRestore" Inputs="@(GitReference)"
 			Outputs="%(GitPackage.Identity)/.gitpackage"
       BeforeTargets="Build">
     <ItemGroup>

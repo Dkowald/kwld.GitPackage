@@ -21,7 +21,7 @@ public class RepositoryCacheTests
         var log = new FakeLogger(logs.Add);
         var target = new RepositoryCache(log, cache);
 
-        var repo = target.CloneIfMissing(TestRepository.BareRepoPath.AsUri());
+        var repo = target.CloneIfMissing(TestRepository.BareRepoPath.AsUri(), null);
 
         var serverWork = logs.Where(x => x.Contains("Fetching"));
         Assert.True(serverWork.Any());

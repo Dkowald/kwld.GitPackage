@@ -3,35 +3,42 @@
 A wrapper around the git-get tool to include files from 
 an external repository
 
-## Items
+## Task Items
 
-### GitReference
-
-- Identity: path to .gitpackage file
+### GitPackage
+Includes files from an external git repository
+- Identity: folder to contain the files
 - Origin: git repository origin url.
 - Verison: git ref to fetch from
 - Filter: glob filter(s) for source files
-
-## Targets
-
-### GitPackRestore
-
-Process __GetReference__ items, getting files for those that
-dont have a commit in the .gitpackage file.
-
-### GitPackUpdate
-
-For any GitReference using a branch as a version.
-Fetch latest for the repository, and update the files (if needed).
+- User: username for sprivate repo.
+- Password: password for private repo
 
 ## Properties
 
-> $(GitGet-CachePath)
+- $(GitPackage-Tool)
 
+Path to git-get.exe. 
+Defaults to in-built version.
+
+- $(GitPackage-CachePath)  
 Optional to over-ride the default git-get cache.
 
-> $(GitPack-AutoRestore)
+- $(GitPackage-DesignTimeBuild)  
+bool toggle to enable restore git packages as part of design time build.  
+false by default.
 
-When true __GitPackRestore__ is used in design time build.
+- $(GitPackage-LogLevel)  
+override the default log level.
 
-So, changes to .gitpackage file(s) are automaticy re-synced
+## Build Targets
+
+### gpRestore
+
+Process __GetPackage__ items, getting files for those that
+dont have a commit in the .gitpackage file.
+
+### gpDesignTimeRestore
+Design time build target.  
+Runs gpRestore as part of Visual studio design builds.
+

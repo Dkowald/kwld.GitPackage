@@ -7,9 +7,11 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <UserSecretsId>8c90dc28-1cf1-4dac-b2eb-0e29bf85141d</UserSecretsId>
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="8.5.0" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />

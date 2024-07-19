@@ -4,12 +4,37 @@ using GitGet.Utility;
 
 using GitPackage.Tests.TestHelpers;
 
+using LibGit2Sharp;
+
 using Microsoft.Extensions.Logging;
+
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace GitPackage.Tests.Actions;
 
 public class GetTests
 {
+    readonly IDirectoryInfo Root = Files.AppData.GetFolder(nameof(GetTests));
+
+    [Fact]
+    public void CloneSecureRepo()
+    {
+        var origin = new Uri("https://github.com/Dkowald/kwld.GitPackage.git");
+
+        var dir = Files.AppData.GetFolder(nameof(GetTests), nameof(CloneSecureRepo));
+        dir.ClearReadonly().EnsureDelete().Create();
+
+        var options = new CloneOptions();
+
+        options.FetchOptions.CredentialsProvider = (string url, string user, SupportedCredentialTypes t) => new UsernamePasswordCredentials()
+        {
+            Username= "GitGetAccess",
+            Password= "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"
+        };
+
+        Repository.Clone(origin.ToString(), dir.FullName, options);
+    }
+
     [Fact]
     public async Task ReportNetworkActivity()
     {

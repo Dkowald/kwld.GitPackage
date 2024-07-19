@@ -158,6 +158,12 @@ Explicit define target path.
 Alternately used as the action.  
 Defaults to current directory (./).
 
+__--user:[username]__  
+User name for private / secured Git access.
+
+__--password:[password]__  
+Pasword for private / secured Git access.
+
 ## .gitget format
 
 The .gitget status file is a set of key-value pairs delimited by '/r/n'
@@ -170,8 +176,6 @@ Each line is of the form 'key=value'
 |version| git ref to use|
 |filter| glob filter(s) to use |
 |commit| resolved git commit, set when files are extracted |
-
-> TODO: can i use .env.key as approach for git creds?
 
 ## .gitpackages
 

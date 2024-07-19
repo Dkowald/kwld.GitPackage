@@ -1,6 +1,0 @@
-<Project>
-
-  <!-- Manually include the build project assets -->
-  <Import Project="../GitPackage/build/GitPackage.targets" />
-
-</Project>
