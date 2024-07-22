@@ -29,8 +29,8 @@ internal class About : IAction
         var txt2 = await new StreamReader(rd).ReadToEndAsync();
 
         txt2 = txt2
-            .Replace("https://github.com/Dkowald/kwld.GitPackage", Config.HomeUrl)
-            .Replace("https://github.com/Dkowald/kwld.GitPackage.git", Config.HomeRepositoryUrl);
+            .Replace("https://github.com/Dkowald/kwld.GitPackage", Const.HomeUrl)
+            .Replace("https://github.com/Dkowald/kwld.GitPackage.git", Const.HomeRepositoryUrl);
 
         Console.Out.Write(txt2);
         return 0;

@@ -32,7 +32,14 @@ internal class Get : IAction
 
         _log.LogDebug("  User: {user}", args.User ?? "");
         _log.LogDebug("  Password: {pwd}", args.HasPassword ? "****" : "");
-        
+
+        var force = IsForce(args, package.Version);
+        if (force)
+        {
+            package.Commit = null;
+            _log.LogDebug("Force refresh from server."); 
+        }
+
         if (!package.Commit.IsNullOrEmpty())
         {
             _log.LogInformation("GitPackage commit exist; no work to do");
@@ -52,7 +59,7 @@ internal class Get : IAction
         using var repo = cache.CloneIfMissing(entry, creds);
 
         //Check for ref.
-        var targetRef = FetchReference(repo, package.Version, creds);
+        var targetRef = FetchReference(repo, package.Version, force, creds);
         if (targetRef is null)
         {
             _log.LogError("Unable to resolve git ref {gitRef}", package.Version.Version);
@@ -130,9 +137,9 @@ internal class Get : IAction
         return repo;
     }
 
-    private DirectReference? FetchReference(Repository repo, GitRef gitRef, CredentialsHandler? creds)
+    private DirectReference? FetchReference(Repository repo, GitRef gitRef, bool force, CredentialsHandler? creds)
     {
-        if (gitRef.IsTag)
+        if (gitRef.IsTag && !force)
         {
             var tagRef = repo.Refs[gitRef];
             if(tagRef != null)
@@ -218,5 +225,24 @@ internal class Get : IAction
                 }
             }
         }
+    }
+
+    private bool IsForce(Args args, GitRef targetRef)
+    {
+        if (args.Force == ForceOption.All) return true;
+
+        if(targetRef.IsBranch && args.Force == ForceOption.Branch)
+        {
+            _log.LogInformation("Forcing branch re-get");
+            return true;
+        }
+
+        if (targetRef.IsTag && args.Force == ForceOption.Tag)
+        {
+            _log.LogInformation("Forcing tag re-get");
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-using DotNet.Globbing;
+﻿using DotNet.Globbing;
 
 namespace GitPackage.Cli.Model;
 
@@ -21,6 +19,7 @@ internal class GetFilter : IEquatable<GetFilter>
     /// <summary>
     /// Create glob filter, defaults to no filter glob.
     /// </summary>
+    /// <param name="globs">series of comma seperated globs</param>
     public GetFilter(string globs = NoFilter)
     {
         var options = GlobOptions.Default;

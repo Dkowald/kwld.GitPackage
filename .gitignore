@@ -8,3 +8,4 @@ App_Data/
 
 *.received.*
 /src/*.user
+/src/_ReSharper.Caches/

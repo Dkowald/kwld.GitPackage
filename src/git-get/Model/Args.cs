@@ -26,7 +26,7 @@ internal class Args
     public static LogLevel ReadLogLevel(string[] args)
     {
         var entry = args.LastOrDefault(x => x.StartsWith(LogLevelKey))?[LogLevelKey.Length..]
-            ?? "w";
+            ?? "i";
 
         if (entry.Same("c")) return LogLevel.Critical;
         if (entry.Same("e")) return LogLevel.Error;

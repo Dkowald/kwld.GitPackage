@@ -1,7 +1,5 @@
 ﻿using GitPackage.Cli.Model;
 
-using LibGit2Sharp;
-
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -9,13 +7,52 @@ namespace GitGet.Model;
 /// <summary>
 /// Load / save config and status data for specified root folder.
 /// </summary>
-/// <remarks>
-/// TODO: extract simpl .env file reader ability (can i use lib?)
-/// </remarks>
 internal record StatusFile
 {
-    internal const string FileName = ".gitpackage";
+    internal const string FileName = ".gitget";
     
+    public static async Task<StatusFile?> TryLoadWithOverrides(ILogger log, Args args)
+    {
+        var stored = await TryLoad(log, args.TargetPath);
+        
+        Uri? origin = null;
+        GitRef? version = null;
+        GetFilter? filter = null;
+        string? commit = stored?.Commit;
+
+        bool changed = false;
+        
+        origin = args.Origin ?? stored?.Origin;
+        changed |= origin != stored?.Origin;
+        if (origin is null)
+        {
+            log.LogError("Cannot resolve Origin from status file or arguments");
+            return null;
+        }
+
+        version = args.Version ?? stored?.Version;
+        changed |= version != stored?.Version;
+        if (version is null)
+        {
+            log.LogError("Cannot resolve Version from status file or arguments");
+            return null;
+        }
+
+        filter = args.Filter ?? stored?.Filter;
+        changed |= filter != stored?.Filter;
+        if (filter is null)
+        {
+            log.LogWarning("No filter found from status file or arguments, using default");
+            filter = new();
+            changed = true;
+        }
+
+        if (changed) commit = null;
+
+        return new(args.TargetPath, origin, version, filter)
+        { Commit = commit };
+    }
+
     public static async Task<StatusFile?> BuildWithArgumentOverides(ILogger log, Args args)
     {
         var statusFile = args.TargetPath.GetFile(FileName);
