@@ -16,7 +16,7 @@ namespace GitGet.Actions
             _console = console;
         }
 
-        public async Task<int> Run(Args args)
+        public async Task<int> Run(Args args) 
         {
             if (args.Origin is null)
             {

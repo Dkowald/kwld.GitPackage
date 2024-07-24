@@ -33,10 +33,12 @@ public class TestHost : IDisposable
         key is null? _svc.GetRequiredService<T>() :
             _svc.GetRequiredKeyedService<T>(key);
 
-    public readonly List<string> LogEntries = new();
+    public readonly List<string> LogEntries = [];
 
     public void Dispose()
     {
         _svc.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

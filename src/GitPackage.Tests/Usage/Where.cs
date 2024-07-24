@@ -7,7 +7,7 @@ namespace GitPackage.Tests.Usage;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class Where
 {
-    public static string RepoUrl = "https://github.com/rsafier/DotNetGlob.git";
+    public const string RepoUrl = "https://github.com/rsafier/DotNetGlob.git";
 
     [Fact]
     public async Task CheckInfoAboutCachedRepo()

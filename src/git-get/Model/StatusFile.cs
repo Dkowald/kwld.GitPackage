@@ -7,7 +7,7 @@ namespace GitGet.Model;
 /// <summary>
 /// Load / save config and status data for specified root folder.
 /// </summary>
-internal record StatusFile
+internal class StatusFile : IEquatable<StatusFile>
 {
     internal const string FileName = ".gitget";
     
@@ -15,9 +15,9 @@ internal record StatusFile
     {
         var stored = await TryLoad(log, args.TargetPath);
         
-        Uri? origin = null;
-        GitRef? version = null;
-        GetFilter? filter = null;
+        Uri? origin;
+        GitRef? version;
+        GetFilter? filter;
         string? commit = stored?.Commit;
 
         bool changed = false;
@@ -53,7 +53,7 @@ internal record StatusFile
         { Commit = commit };
     }
 
-    public static async Task<StatusFile?> BuildWithArgumentOverides(ILogger log, Args args)
+    public static async Task<StatusFile?> LoadWithArgumentOverides(ILogger log, Args args)
     {
         var statusFile = args.TargetPath.GetFile(FileName);
 
@@ -126,7 +126,10 @@ internal record StatusFile
 
         if (origin is null || version is null)
         {
-            log.LogError("{StatusFile} invalid, missing required details", statusFile.FullName);
+            if(origin == null)
+                log.LogError("{StatusFile} invalid, missing required details: origin", statusFile.FullName);
+            if (version == null)
+                log.LogError("{StatusFile} invalid, missing required details: version", statusFile.FullName);
             return null;
         }
 
@@ -272,4 +275,22 @@ internal record StatusFile
     /// The commit used for current files, if files have been collected
     /// </summary>
     public string? Commit { get; set; }
+
+    #region Equality
+
+    public override bool Equals(object? obj)
+        => Equals(obj as StatusFile);
+
+    public bool Equals(StatusFile? other)
+    {
+        if (other is null) return false;
+
+        return
+        Origin == other.Origin &&
+        Version == other.Version &&
+        Filter == other.Filter &&
+        TargetPath.FullName == other.TargetPath.FullName &&
+        Commit == other.Commit;
+    }
+    #endregion
 }

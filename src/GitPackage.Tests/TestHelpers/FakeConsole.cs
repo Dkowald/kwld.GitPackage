@@ -4,8 +4,8 @@ namespace GitPackage.Tests.TestHelpers
 {
     public class FakeConsole : IConsole
     {
-        private StringWriter _out = new();
-        private StringWriter _error = new();
+        private readonly StringWriter _out = new();
+        private readonly StringWriter _error = new();
 
         public string StdOut
         {

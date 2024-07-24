@@ -9,6 +9,16 @@
     <IsTestProject>true</IsTestProject>
     <UserSecretsId>8c90dc28-1cf1-4dac-b2eb-0e29bf85141d</UserSecretsId>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- use the local git-get build -->
+    <GitPackage-Tool Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackage-Tool>
+    <GitPackage-LogLevel>d</GitPackage-LogLevel>
+    <!-- disable design-time build -->
+    <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild>
+  </PropertyGroup>
+  <!-- Manually include the build project assets -->
+  <Import Project="../GitPackage/build/GitPackage.targets" />
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
@@ -26,21 +36,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="kwld.CoreUtil" Version="1.3.2" />
-    <PackageReference Include="kwld.Xunit.Ordering" Version="1.0.0-preview1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-
     <PackageReference Include="InMemoryLogger" Version="1.0.66" />
+    <PackageReference Include="kwld.CoreUtil" Version="1.3.2" />
+    <PackageReference Include="kwld.Xunit.Ordering" Version="1.0.0-preview1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,13 +52,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!--Include readme's for used projects-->
+    <GitPackage 
+      Include="App_Data/external/LibGit2Sharp" 
+      Origin ="https://github.com/libgit2/libgit2sharp.git"
+      Version="branch/master" Filter="/*.md"/>
+
+    <GitPackage 
+      Include="App_Data/external/DotNet.Glob"
+      Origin ="https://github.com/dazinator/DotNet.Glob.git"
+      Version="tag/3.1.3" Filter="/*.md"/> 
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="App_Assets/**/*" Exclude="App_Assets/Assets.cs" />
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

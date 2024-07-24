@@ -14,8 +14,6 @@ internal class Init : IAction
 
     public async Task<int> Run(Args args)
     {
-        var cache = new RepositoryCache(_log, args.Cache);
-
         var package = await StatusFile.TryLoad(_log, args.TargetPath);
         
         var changed = false;

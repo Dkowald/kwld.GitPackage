@@ -1,5 +1,0 @@
-Include = https://github.com/Dkowald/kwld.CoreUtil.git
-Version = tag/v1.3.2
-Path = ./external/kwld.utils/
-Filter = **/*.md
-other = XXXX

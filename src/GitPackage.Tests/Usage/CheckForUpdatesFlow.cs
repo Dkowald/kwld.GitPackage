@@ -3,6 +3,7 @@ using GitGet.Model;
 using GitGet.Utility;
 
 using GitPackage.Tests.TestHelpers;
+using GitPackage.Tests.Util;
 
 using LibGit2Sharp;
 
@@ -50,8 +51,8 @@ public class CheckForUpdatesFlow
 
     [Ordered, Fact]
     public async Task GetOriginal() 
-    {   
-        using var _ = new PushD(Working);
+    {
+        using var _ = Working.PushD();
 
         var args = new[]
         {
@@ -83,7 +84,7 @@ public class CheckForUpdatesFlow
     [Ordered, Fact]
     public async Task GetWithoutUptate()
     {
-        using var _ = new PushD(Working);
+        using var _ = Working.PushD();
 
         var args = new[]
         {
@@ -101,7 +102,7 @@ public class CheckForUpdatesFlow
     [Ordered, Fact]
     public async Task GetWithUpdate()
     {
-        using var _ = new PushD(Working);
+        using var _ = Working.PushD();
 
         var args = new[]
         {

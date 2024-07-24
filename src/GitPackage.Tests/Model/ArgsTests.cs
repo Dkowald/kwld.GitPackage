@@ -11,7 +11,7 @@ public class ArgsTests
     {
         var files = new FileSystem();
         var log = new FakeLogger();
-        var args = new string[] { };
+        var args = Array.Empty<string>();
                 
         var orgHome = Environment.GetEnvironmentVariable("HOME");
         try

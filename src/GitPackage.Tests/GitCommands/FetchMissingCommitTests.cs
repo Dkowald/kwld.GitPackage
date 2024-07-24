@@ -5,7 +5,7 @@ namespace GitPackage.Tests.GitCommands;
 
 public class FetchMissingCommitTests
 {
-    private IDirectoryInfo _origin;
+    private readonly IDirectoryInfo _origin;
 
     public FetchMissingCommitTests()
     {

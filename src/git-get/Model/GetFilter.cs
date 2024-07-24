@@ -71,6 +71,6 @@ internal class GetFilter : IEquatable<GetFilter>
         => glob.StartsWith('/') || glob.StartsWith("**/")
             ? glob : $"**/{glob}";
 
-    private string Decode(string glob)
+    private static string Decode(string glob)
         => glob.StartsWith("**/") ? glob[3..] : glob;
 }

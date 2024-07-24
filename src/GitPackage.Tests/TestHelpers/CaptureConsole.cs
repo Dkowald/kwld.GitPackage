@@ -42,5 +42,7 @@ public class CaptureConsole : IDisposable
         { AutoFlush = true });
 
         IsRedirecting = false;
+
+        GC.SuppressFinalize(this);
     }
 }

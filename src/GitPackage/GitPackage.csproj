@@ -33,11 +33,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <!--<ProjectReference Include="..\GitPackage.Cli\GitPackage.Cli.csproj" Targets="Pack">
-      <PrivateAssets>all</PrivateAssets>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>-->
-
     <None Include="../git-get/bin/$(Configuration)/net8.0/publish/**/*" Exclude="**/*.pdb">
       <Link>cli/%(RecursiveDir)%(FileName)%(Extension)</Link>
       <Pack>true</Pack>

@@ -3,6 +3,7 @@ using GitGet.Model;
 using GitGet.Utility;
 
 using GitPackage.Tests.TestHelpers;
+using GitPackage.Tests.Util;
 
 using Microsoft.Extensions.Logging;
 
@@ -21,14 +22,13 @@ public class Basic
     [Ordered, Fact]
     public void Init()
     {
-        _root.EnsureExists()
-            .EnsureEmptyWithoutDelete();
+        _root.EnsureEmpty();
     }
 
     [Ordered, Fact]
     public async Task InitTargetStatusFile()
     {
-        using var _ = new PushD(_root);
+        using var _ = _root.PushD();
 
         var args = new[]
         {
@@ -55,7 +55,7 @@ public class Basic
 
         int result;
 
-        using (new PushD(_root))
+        using (_root.PushD())
             result = await Program.Main(args);
 
         Assert.Equal(0, result);
@@ -66,7 +66,7 @@ public class Basic
     [Ordered, Fact]
     public async Task GetUpdateWithCli()
     {
-        using var _ = new PushD(_root);
+        using var _ = _root.PushD();
 
         var args = new[]
         {

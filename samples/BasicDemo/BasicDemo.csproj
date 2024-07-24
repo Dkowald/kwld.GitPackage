@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <GitPackage-DesignTimeBuild>true</GitPackage-DesignTimeBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,10 +13,60 @@
   </ItemGroup>
 
   <ItemGroup>
-    <GitPackage Include="https://github.com/Dkowald/kwld.CoreUtil.git">
+    <!-- Demo: get google common protos-->
+    <!-- https://protobuf.dev/reference/protobuf/google.protobuf/-->
+     <GitPackage Include="protos/lib/google" 
+     Origin ="https://github.com/protocolbuffers/protobuf.git"
+     Version="branch/main"
+     Filter ="src/google/protobuf/*.proto,src/google/protobuf/util/*.proto" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <GitPackage Include="credits/kwld.utils">
+      <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
       <Version>tag/v1.3.2</Version>
-      <Path>./external/kwld.utils/</Path>
-      <Filter>**/*.md</Filter>
+      <Filter>/*</Filter>
     </GitPackage>
+
+    <GitPackage Include="credits/DotNet.Glob">
+      <Origin>https://github.com/dazinator/DotNet.Glob.git</Origin>
+      <Version>tag/3.1.3</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="credits/LibGit2Sharp">
+      <Origin>https://github.com/libgit2/libgit2sharp.git</Origin>
+      <Version>branch/master</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--credist for testing libs-->
+    <GitPackage Include="credits/Testing/NSubstitute">
+      <Origin>https://github.com/nsubstitute/NSubstitute.git</Origin>
+      <Version>tag/v5.1.0</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="credits/Testing/Verify">
+      <Origin>https://github.com/VerifyTests/Verify.git</Origin>
+      <Version>branch/main</Version>
+      <Filter>/readme.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="credits/Testing/InMemoryLogger">
+      <Origin>https://github.com/horsdal/InMemoryLogger.git</Origin>
+      <Version>branch/master</Version>
+      <Filter>/readme.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="credits/Testing/Ordering">
+      <Origin>https://github.com/Dkowald/kwld.Xunit.Ordering.git</Origin>
+      <Version>branch/main</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+
   </ItemGroup>
 </Project>

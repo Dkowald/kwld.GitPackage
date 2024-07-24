@@ -64,6 +64,6 @@ public class RepositoryCacheTests
 
         var result = target.List().ToArray();
 
-        Assert.True(result.Any());
+        Assert.Empty(result);
     }
 }

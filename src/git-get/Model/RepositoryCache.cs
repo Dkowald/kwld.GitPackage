@@ -135,22 +135,6 @@ internal class RepositoryCache
         return this;
     }
 
-    private IDirectoryInfo ResolveCache(IFileSystem files)
-    {
-        var home = files.TryGetHome();
-
-        if (home is null)
-        {
-            _log.LogWarning("No home directory found!, using current directory");
-        }
-
-        home ??= files.Current();
-
-        var cache = home.GetFolder(DefaultCacheFolderName);
-
-        return cache;
-    }
-
     private CacheEntry? TryResolveEntry(IDirectoryInfo repoPath)
     {
         if (!Repository.IsValid(repoPath.FullName))

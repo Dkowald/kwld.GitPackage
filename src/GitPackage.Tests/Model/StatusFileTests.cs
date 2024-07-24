@@ -9,7 +9,7 @@ namespace GitPackage.Tests.Model;
 public class StatusFileTests
 {
     [Fact]
-    public async Task TryLoadWithOverrides_()
+    public async Task LoadWithArgumentOverides_()
     {
         var files = new MockFileSystem();
 
@@ -28,7 +28,7 @@ public class StatusFileTests
             Origin = new("http://updatedurl")
         };
 
-        var result = await StatusFile.TryLoadWithOverrides(new FakeLogger(), args);
+        var result = await StatusFile.LoadWithArgumentOverides(new FakeLogger(), args);
 
         Assert.NotNull(result);
         
@@ -37,9 +37,38 @@ public class StatusFileTests
         Assert.Null(result.Commit);
     }
 
-    [Fact(Skip = "Todo")]
-    public void LoadNoStatusFile()
+    [Fact]
+    public async Task Write_Read()
     {
+        var log = new FakeLogger();
 
+        var files = new MockFileSystem();
+
+        var dir = files.Current();
+
+        var original = new StatusFile(dir, new("http://somewhere"), new("tag/1"), new())
+        {
+            Commit = "zzzzzzzz1"
+        };
+
+        await original.Write(log);
+
+        var result = await StatusFile.TryLoad(log, files.Current());
+
+        Assert.NotNull(result);
+
+        Assert.Equal(original, result);
+    }
+
+    [Fact]
+    public async Task TryLoad_NoFile()
+    {
+        var log = new FakeLogger();
+
+        var files = new MockFileSystem();
+
+        var result = await StatusFile.TryLoad(log, files.Current());
+
+        Assert.Null(result);
     }
 }

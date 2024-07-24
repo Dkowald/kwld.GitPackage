@@ -50,6 +50,8 @@ internal static class Program
             _ => throw new Exception($"Unknown action: {parsedArgs.Action}")
         };
 
+        log.LogTrace("Running action: {action}", parsedArgs.Action);
+
         var exitCode = await action.Run(parsedArgs);
 
         return exitCode;

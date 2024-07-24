@@ -21,9 +21,10 @@ internal class Get : IAction
 
     public async Task<int> Run(Args args)
     {
-        var package = await StatusFile.BuildWithArgumentOverides(_log, args);
+        var package = await StatusFile.LoadWithArgumentOverides(_log, args);
 
-        if (package is null) return 1;
+        if (package is null) 
+        { return 1; }
 
         _log.LogInformation("GitPackage restore for '{outPath}'", package.TargetPath);
         _log.LogDebug("  Repo: {origin}", package.Origin);
@@ -79,62 +80,6 @@ internal class Get : IAction
         await package.Write(_log);
 
         return 0;
-    }
-
-    private Repository CloneIfMissing(RepositoryCache.CacheEntry cache, CredentialsHandler? creds)
-    {
-        if (cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName))
-        {
-            _log.LogDebug("Cached repository {origin} found", cache.Origin);
-            return new Repository(cache.CachePath.FullName);
-        }
-
-        if (cache.CachePath.Exists)
-        {
-            _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
-            cache.CachePath.ClearReadonly().EnsureDelete();
-        }
-
-        _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
-
-        cache.CachePath.EnsureExists();
-
-        var options = new CloneOptions() { IsBare = true };
-
-        var progress = new List<string>();
-        var transfer = new List<string>();
-
-        options.FetchOptions.CredentialsProvider = creds;
-        options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
-
-        var progressStarted = false;
-        options.FetchOptions.OnProgress += txt =>
-        {
-            if (!progressStarted)
-            {
-                _log.LogDebug($"Fetching objects to transfer");
-                progressStarted = true;
-            }
-            progress.Add(txt);
-            return true;
-        };
-
-        var transferStarted = false;
-        options.FetchOptions.OnTransferProgress = x =>
-        {
-            if (!transferStarted)
-            {
-                _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
-                transferStarted = true;
-            }
-            return true;
-        };
-
-        Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
-
-        var repo = new Repository(cache.CachePath.FullName);
-
-        return repo;
     }
 
     private DirectReference? FetchReference(Repository repo, GitRef gitRef, bool force, CredentialsHandler? creds)
@@ -196,7 +141,7 @@ internal class Get : IAction
         return targetRef;
     }
 
-    private void CleanTargetPath(IDirectoryInfo targetPath)
+    private static void CleanTargetPath(IDirectoryInfo targetPath)
     {
         foreach(var item in targetPath.EnumerateFileSystemInfos())
         {

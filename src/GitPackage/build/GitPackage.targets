@@ -12,12 +12,11 @@
     <CollectUpToDateCheckInputDesignTimeDependsOn>
       $(CollectUpToDateCheckInputDesignTimeDependsOn);_gpInputs
     </CollectUpToDateCheckInputDesignTimeDependsOn>
-
   
 </PropertyGroup>
 
   <!--Run tool-->
-  <Target Name="gpRestore" Inputs="@(GitReference)"
+  <Target Name="gpRestore" Inputs="@(GitPackage)"
 			Outputs="%(GitPackage.Identity)/.gitpackage"
       BeforeTargets="Build">
     <ItemGroup>
@@ -48,14 +47,13 @@
 	  -->
   </Target>
 
-
   <!--
   Include git package status files as inputs for fast-build
   https://github.com/dotnet/project-system/blob/main/docs/up-to-date-check.md
   -->
   <Target Name="_gpInputs">
     <ItemGroup>
-      <UpToDateCheckInput Include="%(GitPackage.Identity)/.gitpackage"/>
+      <UpToDateCheckInput Include="%(GitPackage.Identity)/.gitget"/>
     </ItemGroup>
   </Target>
 

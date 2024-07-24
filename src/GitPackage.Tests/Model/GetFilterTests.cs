@@ -59,4 +59,10 @@ public class GetFilterTests
 
         Assert.Equal(data.IsMatch, reload.IsMatch(data.Input));
     }
+
+    [Fact(Skip="todo: include ability to filter those that match")]
+    public void FilterIgnored()
+    {
+
+    }
 }
