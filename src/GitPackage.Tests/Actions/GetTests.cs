@@ -1,9 +1,12 @@
-﻿using GitGet.Actions;
+﻿using System.IO.Abstractions.TestingHelpers;
+
+using GitGet.Actions;
 using GitGet.Model;
 using GitGet.Utility;
 
 using GitPackage.Tests.TestHelpers;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -43,13 +46,28 @@ public class GetTests
         Assert.Contains(host.LogEntries, x => x.Contains("Fetch"));
     }
 
-    [Fact(Skip = "todo")]
-    public void NoFetchIfHaveRef()
+    [Fact]
+    public async Task NoFetchIfHaveRef()
     {
-        //if status file has a commit.
-        //assume all done; do no work.
+        using var host = new TestHost(x =>
+        {
+            x.AddSingleton<Get>();
+        });
 
-        //Need target to report when it does network activity.
+        var dir = new MockFileSystem().Current();
+
+        var data = new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), new())
+        { Commit = "already-have-commit"}.Write(host.Get<ILogger>());
+
+        var target = host.Get<Get>();
+
+        var args = new Args(LogLevel.Debug, ActionOptions.Get, dir, dir);
+
+        var exitCode = await target.Run(args);
+
+        var noWork = host.LogEntries.Any(x => x.Contains("no work"));
+
+        Assert.True(noWork);
     }
 
     [Fact(Skip = "todo")]
@@ -62,6 +80,12 @@ public class GetTests
 
     [Fact(Skip ="todo: add ability to re-root, so use with mono-repositories is easier.")]
     public void ReRoot()
+    {
+
+    }
+
+    [Fact(Skip = "should create dir, and report as info.")]
+    public void TargetPathNotExist()
     {
 
     }

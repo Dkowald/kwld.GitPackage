@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>../../samples/packages</PackageOutputPath>
     <EmbedUntrackedSources>True</EmbedUntrackedSources>
@@ -20,19 +20,11 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <InternalsVisibleTo Include="$(MSBuildProjectName).Tests" />    
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="build\**" target="build" Pack="true" PackagePath="%(Identity)" />
   </ItemGroup>
   
   <ItemGroup>
+    <None Include="./Readme.md" Pack="true" PackagePath="" />
     <None Include="../git-get/bin/$(Configuration)/net8.0/publish/**/*" Exclude="**/*.pdb">
       <Link>cli/%(RecursiveDir)%(FileName)%(Extension)</Link>
       <Pack>true</Pack>

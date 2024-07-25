@@ -9,7 +9,7 @@ public class TestHost : IDisposable
 {
     private readonly ServiceProvider _svc;
 
-    public TestHost()
+    public TestHost(Action<IServiceCollection>? cfg = null)
     {
         var cont = new ServiceCollection()
             .AddLogging(cfg =>
@@ -25,6 +25,8 @@ public class TestHost : IDisposable
                 cfg.AddFilter("", LogLevel.Trace);
             })
             .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().CreateLogger(""));
+
+        cfg?.Invoke(cont);
 
         _svc = cont.BuildServiceProvider();
     }

@@ -281,6 +281,9 @@ internal class StatusFile : IEquatable<StatusFile>
     public override bool Equals(object? obj)
         => Equals(obj as StatusFile);
 
+    public override int GetHashCode() =>
+        HashCode.Combine(Origin, Version, Filter, TargetPath);
+
     public bool Equals(StatusFile? other)
     {
         if (other is null) return false;
@@ -292,5 +295,6 @@ internal class StatusFile : IEquatable<StatusFile>
         TargetPath.FullName == other.TargetPath.FullName &&
         Commit == other.Commit;
     }
+
     #endregion
 }

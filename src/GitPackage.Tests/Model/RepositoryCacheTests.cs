@@ -57,6 +57,7 @@ public class RepositoryCacheTests
 
         if (!cacheTest.CachePath.Exists)
         {
+            //make sure i have at-least the test repo.
             Repository.Clone(
                 TestRepository.BareRepoPath.AsUri().ToString(),
                 cacheTest.CachePath.FullName, new() { IsBare = true});
@@ -64,6 +65,6 @@ public class RepositoryCacheTests
 
         var result = target.List().ToArray();
 
-        Assert.Empty(result);
+        Assert.NotEmpty(result);
     }
 }

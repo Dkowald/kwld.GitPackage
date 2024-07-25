@@ -8,9 +8,14 @@ using Microsoft.Extensions.Logging;
 namespace GitPackage.Tests.Usage;
 
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
-public class App2 : IClassFixture<TestHost>
+public class App2 : IClassFixture<App2.State>
 {
     public const string Origin = "https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/";
+
+    public class State
+    {
+        public TestHost? Host { get; set; }
+    }
 
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(App2));
 
@@ -22,9 +27,11 @@ public class App2 : IClassFixture<TestHost>
 
     private readonly ILogger _appLogger;
 
-    public App2(TestHost state)
+    public App2(State state)
     {
-        _host = state;
+        state.Host ??= new();
+
+        _host = state.Host;
 
         _appLogger = _host.Get<ILogger>();
 

@@ -1,19 +1,26 @@
-﻿__GitPackage CLI__
+﻿__git-get__
 
-A tool for re-using git repositories as source packages.
+A cli tool for re-using git repositories as source packages.
 
-__Options__
+See [Repo](https://github.com/Dkowald/kwld.GitPackage/blob/wip/layout/doc/Home.md) for more info.
 
-Check version
-> --version or -v
+__e.g__
 
-Main interface is via a JSON object:
+``` pwsh
+#install
+dotnet tool install git-get --global
 
-> GitPackage inline-JSON
+#get docs for this repository
+$origin = "https://github.com/Dkowald/kwld.GitPackage.git"
+$version = "branch/main"
+$filter = "/*.md,doc/**/*.md"
 
-JSON can be provided using inpu file via 
-> -f options
-> GitPackage -f myinput.json
+git-get ./GitPackage --origin:$origin --version:$version --filter:$filter
 
+#re-fresh git package
+git-get ./GitPackage --force:branch
 
+#review local cached repositories
+git-get info
 
+```

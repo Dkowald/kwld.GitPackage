@@ -1,0 +1,59 @@
+Tooling to include raw files from git repositories via CLI and MSBuild.
+
+See [Repo](https://github.com/Dkowald/kwld.GitPackage/blob/wip/layout/doc/Home.md) for more info.
+
+#### GitPackage
+
+MSBuild wrapper around git-get to include git source files in a project
+
+__e.g__  MSBuild to create a local clone and extract files from a repository.
+``` xml
+<ItemGroup>
+ <PackageReference Include="GitPackage" Version="99.0.0" />
+</ItemGroup>
+
+<ItemGroup>
+  <!--Get doc files for this repo -->
+  <GitPackage Include="Gitpackage/"
+    Origin="https://github.com/Dkowald/kwld.GitPackage.git"
+    Version = 'branch/main'
+    Filter = '/*.md,doc/**/*.md'>
+  </GitPackage>
+</ItemGroup>
+```
+
+--------
+#### GitGet
+CLI to create a local clone and extract files from a repository.
+
+__E.g__
+
+Install and get docs for this repository.
+
+``` pwsh
+
+# Install cli tool
+dotnet tool install gitget
+
+#write gitpackage file
+echo `
+Url=https://github.com/Dkowald/kwld.GitPackage `
+Version=branch/main `
+Filter=doc/**/*.md `
+> .gitpackage
+
+#clone and extract files in curent folder.
+dotnet gitget
+```
+
+__Url__  
+
+Specifies the target repository.   
+This repository is cloned locally to a cache %HOME%/.gitpackage
+
+__Version__ 
+
+Specifies the particular commit to use; can be '_branch/_'or '_tag/_' 
+
+__Filter__  
+Glob patter to limit files. Can be multiple globs seperated by ';'
