@@ -21,7 +21,7 @@ internal class Get : IAction
 
     public async Task<int> Run(Args args)
     {
-        var package = await StatusFile.LoadWithArgumentOverides(_log, args);
+        var (package, _) = await StatusFile.LoadWithArgumentOverides(_log, args);
 
         if (package is null) 
         { return 1; }
@@ -72,10 +72,12 @@ internal class Get : IAction
         CleanTargetPath(args.TargetPath);
 
         _log.LogInformation("Extracting files");
-        var commit = await new GitCommands.Get(repo)
+        var info = await new GitCommands.Get(repo)
             .Run(package.TargetPath, package.Version, package.Filter);
 
-        package.Commit = commit;
+        package.Commit = info.Commit;
+
+        _log.LogInformation("Found {count} files", info.Extracted);
         
         await package.Write(_log);
 
@@ -143,6 +145,8 @@ internal class Get : IAction
 
     private static void CleanTargetPath(IDirectoryInfo targetPath)
     {
+        if (!targetPath.Exists()) return;
+
         foreach(var item in targetPath.EnumerateFileSystemInfos())
         {
             if(item is IDirectoryInfo dir)

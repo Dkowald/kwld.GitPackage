@@ -88,7 +88,7 @@ internal class Args
                 targetPath = isFile.Exists? isFile.Directory : files.Current().GetFolder(arg0);
 
                 if (isFile.Exists)
-                { log.LogInformation("Target path is a file, using its directory"); }
+                { log.LogWarning("Target path is a file, using its containing directory"); }
                 else { log.LogTrace("Target path set from action"); }
             }
         }
@@ -223,11 +223,7 @@ internal class Args
             return null;
         }
 
-        if (targetPath is null)
-        {
-            log.LogInformation("Setting target path to current");
-            targetPath = files.Current();
-        }
+        targetPath ??= files.Current();
 
         cache ??= DefaultCache(files, log);
 
@@ -284,8 +280,6 @@ internal class Args
         }
 
         var cache = home.GetFolder(DefaultCacheFolderName);
-
-        log.LogDebug("Cache path: '{cache}'", cache.FullName);
 
         return cache;
     }

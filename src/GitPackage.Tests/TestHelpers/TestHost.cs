@@ -1,4 +1,6 @@
-﻿using InMemLogger;
+﻿using GitGet.Services;
+
+using InMemLogger;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,6 +10,8 @@ namespace GitPackage.Tests.TestHelpers;
 public class TestHost : IDisposable
 {
     private readonly ServiceProvider _svc;
+
+    private readonly FakeConsole _console = new();
 
     public TestHost(Action<IServiceCollection>? cfg = null)
     {
@@ -26,6 +30,8 @@ public class TestHost : IDisposable
             })
             .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().CreateLogger(""));
 
+        cont.AddSingleton<IConsole>(_console);
+
         cfg?.Invoke(cont);
 
         _svc = cont.BuildServiceProvider();
@@ -36,6 +42,10 @@ public class TestHost : IDisposable
             _svc.GetRequiredKeyedService<T>(key);
 
     public readonly List<string> LogEntries = [];
+
+    public string StdOut => _console.StdOut;
+
+    public string StdError => _console.StdError;
 
     public void Dispose()
     {

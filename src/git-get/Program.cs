@@ -32,8 +32,6 @@ internal static class Program
             return 1;
         }
 
-        var cache = new RepositoryCache(log, parsedArgs.Cache);
-
         IAction? action = parsedArgs.Action switch
         {
             ActionOptions.Get =>
@@ -50,7 +48,8 @@ internal static class Program
             _ => throw new Exception($"Unknown action: {parsedArgs.Action}")
         };
 
-        log.LogTrace("Running action: {action}", parsedArgs.Action);
+        if(action is not Where)
+            log.LogTrace("Running action: {action}", parsedArgs.Action);
 
         var exitCode = await action.Run(parsedArgs);
 

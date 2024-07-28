@@ -11,7 +11,7 @@ internal class StatusFile : IEquatable<StatusFile>
 {
     internal const string FileName = ".gitget";
     
-    public static async Task<StatusFile?> TryLoadWithOverrides(ILogger log, Args args)
+    public static async Task<(StatusFile? File, bool Changed)> TryLoadWithOverrides(ILogger log, Args args)
     {
         var stored = await TryLoad(log, args.TargetPath);
         
@@ -27,7 +27,7 @@ internal class StatusFile : IEquatable<StatusFile>
         if (origin is null)
         {
             log.LogError("Cannot resolve Origin from status file or arguments");
-            return null;
+            return (null, false);
         }
 
         version = args.Version ?? stored?.Version;
@@ -35,7 +35,7 @@ internal class StatusFile : IEquatable<StatusFile>
         if (version is null)
         {
             log.LogError("Cannot resolve Version from status file or arguments");
-            return null;
+            return (null, false);
         }
 
         filter = args.Filter ?? stored?.Filter;
@@ -48,12 +48,14 @@ internal class StatusFile : IEquatable<StatusFile>
         }
 
         if (changed) commit = null;
-
-        return new(args.TargetPath, origin, version, filter)
+        
+        var data = new StatusFile(args.TargetPath, origin, version, filter)
         { Commit = commit };
+
+        return (data, changed);
     }
 
-    public static async Task<StatusFile?> LoadWithArgumentOverides(ILogger log, Args args)
+    public static async Task<(StatusFile? File, bool Changed)> LoadWithArgumentOverides(ILogger log, Args args)
     {
         var statusFile = args.TargetPath.GetFile(FileName);
 
@@ -130,7 +132,7 @@ internal class StatusFile : IEquatable<StatusFile>
                 log.LogError("{StatusFile} invalid, missing required details: origin", statusFile.FullName);
             if (version == null)
                 log.LogError("{StatusFile} invalid, missing required details: version", statusFile.FullName);
-            return null;
+            return (null, false);
         }
 
         var result = new StatusFile(args.TargetPath, origin, version, filter)
@@ -138,7 +140,7 @@ internal class StatusFile : IEquatable<StatusFile>
             Commit = commit
         };
 
-        return result;
+        return (result, changed);
     }
 
     public static async Task<StatusFile?> TryLoad(ILogger appLog, IDirectoryInfo dataFolder)

@@ -5,6 +5,7 @@ using GitGet.Model;
 
 using GitPackage.Tests.TestHelpers;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 
@@ -15,6 +16,9 @@ public class WhereTests
     [Fact]
     public async Task UrlOnly()
     {
+        using var host = new TestHost(x =>
+        { x.AddSingleton<Where>(); });
+
         var files = new MockFileSystem();
 
         var prjDir = files.DirectoryInfo.New("c://prj");
@@ -26,16 +30,17 @@ public class WhereTests
             Origin = new("http://someurl/repo.git")
         };
         
-        var con = new FakeConsole();
-
-        var target = new Where(new FakeLogger(), con);
+        var target = host.Get<Where>();
 
         var expectedPath = "c:\\cache\\someurl\\repo.git";
 
         var exitCode = await target.Run(args);
 
+        //should be no log entries, so url returned can be used directly
+        Assert.Empty(host.LogEntries);
+
         Assert.Equal(0, exitCode);
 
-        Assert.Equal(expectedPath, con.StdOut);
+        Assert.Equal(expectedPath, host.StdOut);
     }
 }

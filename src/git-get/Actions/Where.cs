@@ -1,7 +1,12 @@
 ﻿using GitGet.Model;
 using GitGet.Services;
 
+using InMemLogger;
+
+using LibGit2Sharp;
+
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GitGet.Actions
 {
@@ -24,7 +29,10 @@ namespace GitGet.Actions
                 return 1;
             }
 
-            var cache = new RepositoryCache(_log, args.Cache);
+            //TODO: swap to NullLogger for .net 9
+            var noLogging = new InMemoryLogger();
+
+            var cache = new RepositoryCache(noLogging, args.Cache);
 
             var result = cache.Get(args.Origin);
             await _console.Out.WriteAsync(result.CachePath.FullName);

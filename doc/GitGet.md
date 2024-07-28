@@ -1,11 +1,11 @@
 ﻿# Overview
 
-GitGet is a tool to sync a set of git repository files 
+git-get is a tool to sync a set of git repository files 
 with a local folder.
 
 It behaves like a git checkout, but the files are NOT in a git work-directory.
 
-GitGet clones files to a local cache. 
+git-get clones repositories to a local cache. 
 Repositories are pulled with _--bare_ and stored in a (configurable) 
 local cache folder.
 
@@ -13,6 +13,9 @@ The target folder includes a '.gitget' file to track options used, including res
 ## Basic usage.
 
 ``` pwsh
+#install
+dotnet tool install git-get --global
+
 #read .gitget in current directory, and get files if need.
 dotnet git-get
 ```
@@ -31,7 +34,7 @@ target-path is the default action
 
 ## action
 
-> target-path
+### target-path
 
 Gets files from the repository.  
 Uses provided options and 'target-path/.gitget' for configuration.
@@ -48,18 +51,18 @@ If commit is missing, triggers the get flow:
 - delete all files in target folder, replace with repository files.
 - update .gitget to include the used commit.
 
-> init
+### init
 
 Writes options to corresponding 'target-path/.gitget' 
 without performing any actual git actions.
 
 overwrites existing package file with changes (if needed).
 
-> about
+### about
 
 Reports version info, and cli summary.
 
-> info
+### info
 
 Reports summary of current cached repositories.
 
@@ -67,11 +70,11 @@ Also uses other options, allong with
 'target-path/.gitget' (if found) 
 to report.
 
-> where
+### where
 
 Reports where the local cache clone is (will be) located.
 
-This can be used to perform normal git actions on a local cached 
+This can be used to perform regular git actions on a local cached 
 repository
 
 ```pwsh
@@ -81,6 +84,7 @@ $url = 'https://github.com/rsafier/DotNetGlob.git'
 
 $repo = dotnet gitget where --origin:https://github.com/rsafier/DotNetGlob.git
 
+pushd $repo
 git worktree add ./
 
 ```

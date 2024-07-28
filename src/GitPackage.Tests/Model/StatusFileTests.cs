@@ -29,12 +29,14 @@ public class StatusFileTests
         };
 
         var result = await StatusFile.LoadWithArgumentOverides(new FakeLogger(), args);
-
-        Assert.NotNull(result);
         
-        Assert.Equal(current.Filter, result.Filter);
-        Assert.Equal(args.Origin, result.Origin);
-        Assert.Null(result.Commit);
+        var package = result.File;
+
+        Assert.NotNull(package);
+        
+        Assert.Equal(current.Filter, package.Filter);
+        Assert.Equal(args.Origin, package.Origin);
+        Assert.Null(package.Commit);
     }
 
     [Fact]

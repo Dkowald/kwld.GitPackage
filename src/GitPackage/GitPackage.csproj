@@ -17,6 +17,8 @@
     <PackageReleaseNotes>
       Reboot
     </PackageReleaseNotes>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   
   <ItemGroup>

@@ -16,11 +16,11 @@ public class Where
 
         var args = new[]
         {
-                "where",
-                $"--cache:{cache.FullName}",
-                $"--origin:{RepoUrl}",
-            "--log-level:w"
-            };
+            "where",
+            $"--cache:{cache.FullName}",
+            $"--origin:{RepoUrl}",
+            "--log-level:t"
+        };
 
         var expected = cache.GetFolder("github.com/rsafier/DotNetGlob.git");
 
@@ -30,6 +30,6 @@ public class Where
 
         var repoPath = con.Flush().StdOut;
 
-        Assert.Contains(expected.FullName, repoPath);
+        Assert.Equal(expected.FullName, repoPath);
     }
 }

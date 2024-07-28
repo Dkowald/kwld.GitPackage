@@ -16,7 +16,12 @@ namespace GitPackage.Tests.TestHelpers
             }
         }
 
-        public string? StdError { get; private set; }
+        public string StdError { 
+            get{
+                _error.Flush();
+                return _error.GetStringBuilder().ToString();
+            }
+        }
 
         public TextWriter Out => _out;
 
