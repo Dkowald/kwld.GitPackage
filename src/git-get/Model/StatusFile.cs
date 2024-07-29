@@ -18,6 +18,7 @@ internal class StatusFile : IEquatable<StatusFile>
         Uri? origin;
         GitRef? version;
         GetFilter? filter;
+        string? getRoot;
         string? commit = stored?.Commit;
 
         bool changed = false;
@@ -47,6 +48,15 @@ internal class StatusFile : IEquatable<StatusFile>
             changed = true;
         }
 
+        getRoot = args.GetRoot ?? stored?.GetRoot;
+        changed |= getRoot != stored?.GetRoot;
+        if (getRoot is null)
+        {
+            log.LogWarning("No root found from status file or arguments, using default");
+            getRoot = "/";
+            changed = true;
+        }
+
         if (changed) commit = null;
         
         var data = new StatusFile(args.TargetPath, origin, version, filter)
@@ -62,6 +72,7 @@ internal class StatusFile : IEquatable<StatusFile>
         Uri? origin = null;
         GitRef? version = null;
         GetFilter? filter = null;
+        string? getRoot = null;
         string? commit = null;
 
         if (statusFile.Exists)
@@ -109,6 +120,12 @@ internal class StatusFile : IEquatable<StatusFile>
                     commit = value.IsNullOrWhiteSpace() ? null : value;
                     continue;
                 }
+
+                if (key.Same(nameof(GetRoot)))
+                {
+                    getRoot = value.IsNullOrWhiteSpace() ? null : value;
+                    continue;
+                }
             }
         }
 
@@ -121,6 +138,9 @@ internal class StatusFile : IEquatable<StatusFile>
         
         if(args.Filter != null && args.Filter != filter) 
         { filter = args.Filter; changed = true; }
+
+        if(args.GetRoot != null && args.GetRoot != getRoot)
+        { getRoot = args.GetRoot; changed = true; }
         
         filter ??= new();
 
@@ -137,6 +157,7 @@ internal class StatusFile : IEquatable<StatusFile>
 
         var result = new StatusFile(args.TargetPath, origin, version, filter)
         {
+            GetRoot = getRoot,
             Commit = commit
         };
 
@@ -267,6 +288,11 @@ internal class StatusFile : IEquatable<StatusFile>
     /// Defaults to 
     /// </summary>
     public GetFilter Filter { get; set; } = new();
+
+    /// <summary>
+    /// Sub path in repository tree to use as root.
+    /// </summary>
+    public string GetRoot { get; set; } = "/";
 
     /// <summary>
     /// Local path to place files.

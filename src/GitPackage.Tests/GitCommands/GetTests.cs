@@ -13,6 +13,24 @@ namespace GitPackage.Tests.GitCommands
             new FileSystem().Project().GetFolder("App_Data", "GitGet");
 
         [Fact]
+        public async Task Run_GetSubPath()
+        {
+            using var repo = TestRepository.OpenTestRepository();
+
+            var target = new GitGet.GitCommands.Get(repo);
+
+            var destRoot = OutRoot.GetFolder("GetSubPath").EnsureEmpty();
+
+            var version = new GitRef("tag/CheckoutAll");
+
+            await target.Run(destRoot, version, new(), "/Folder2");
+
+            await VerifyDirectory(destRoot.FullName)
+                .UseFileName(nameof(Run_GetSubPath))
+                .UseDirectory("Snapshot");
+        }
+
+        [Fact]
         public async Task GetByAnnotatedTag()
         {
             using var repo = TestRepository.OpenTestRepository();

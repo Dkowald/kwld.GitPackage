@@ -15,6 +15,7 @@ internal class Args
     private const string OrignKey = "--origin:";
     private const string VersionKey = "--version:";
     private const string FilterKey = "--filter:";
+    private const string GetRootKey = "--get-root:";
     private const string CacheKey = "--cache:";
     private const string ForceKey = "--force:";
     private const string TargetPathKey = "--target-path:";
@@ -45,6 +46,7 @@ internal class Args
         Uri? origin = null;
         GitRef? version = null;
         GetFilter? filter = null;
+        string? root = null;
         IDirectoryInfo? cache = null;
         ForceOption? force = null;
         string? user = null;
@@ -72,7 +74,6 @@ internal class Args
         else if (arg0.Same(nameof(Actions.About))){
             action = ActionOptions.About;
         }
-
         else {
             action = ActionOptions.Get;
             if (arg0.StartsWith("--"))
@@ -149,6 +150,26 @@ internal class Args
                 {
                     log.LogError("Invalid filter : {filter}", value);
                     log.LogInformation(ex, $"Failed create {nameof(GetFilter)}");
+                }
+                continue;
+            }
+
+            if (next.StartsWith(GetRootKey))
+            {
+                if (root is not null)
+                {
+                    log.LogError("Filter already provided");
+                    return null;
+                }
+                var value = next[GetRootKey.Length..];
+                try
+                {
+                    root = value;
+                }
+                catch (Exception ex)
+                {
+                    log.LogError("Invalid get-root: {get-root}", value);
+                    log.LogInformation(ex, $"Failed create {nameof(GetRoot)}");
                 }
                 continue;
             }
@@ -233,6 +254,7 @@ internal class Args
             Origin = origin,
             Version = version,
             Filter = filter,
+            GetRoot = root ?? "/",
             Force = force,
             User = user
         };
@@ -257,6 +279,8 @@ internal class Args
     public GitRef? Version { get; init; }
 
     public GetFilter? Filter { get; init; }
+
+    public string GetRoot { get; init; } = "/";
 
     public IDirectoryInfo Cache { get; init; }
 

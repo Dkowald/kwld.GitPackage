@@ -9,14 +9,19 @@ namespace GitGet.GitCommands;
 /// </summary>
 internal class Get(Repository repository)
 {
-    public async Task<(string Commit, int Extracted)>  Run(IDirectoryInfo target, GitRef commit, GetFilter filter)
+    public async Task<(string Commit, int Extracted)>  Run(IDirectoryInfo target, GitRef commit, 
+        GetFilter filter, string? subPath = null)
     {
         var commitRef = repository.Refs[commit.Value]
             ?.ResolveToDirectReference()
             ?.Target.Peel<Commit>()
             ?? throw new Exception($"Commit {commit} not found");
 
-        var rootTree = commitRef.Tree;
+        var rootTree = TryFindRoot(commitRef.Tree, subPath);
+        if(rootTree == null)
+        {
+            throw new Exception($"Subpath {subPath} not found");
+        }
 
         int count = 0;
         foreach (var file in ReadTree(rootTree, filter))
@@ -61,5 +66,26 @@ internal class Get(Repository repository)
                     yield return new(path, item);
             }
         }
+    }
+
+    private Tree? TryFindRoot(Tree trueRoot, string? subPath) 
+    {
+        if (string.IsNullOrEmpty(subPath)) return trueRoot;
+
+        var parts = subPath.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        var current = trueRoot;
+        foreach(var part in parts)
+        {
+            var entry = current.OfType<TreeEntry>()
+                .FirstOrDefault(x => x.Name.Same(part));
+
+            current = entry?.Target != null ?repository.Lookup<Tree>(entry.Target.Sha) : null;
+
+            if (current == null) break;
+        }
+        
+        return current;
+
     }
 }

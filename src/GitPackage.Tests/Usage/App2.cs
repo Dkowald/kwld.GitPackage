@@ -48,9 +48,7 @@ public class App2 : IClassFixture<App2.State>
 
     [Ordered, Fact]
     public void Init() 
-    {
-
-    }
+    {}
 
     [Ordered, Fact]
     public async Task GitGetTag()

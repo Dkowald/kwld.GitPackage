@@ -35,7 +35,7 @@ internal static class Program
         IAction? action = parsedArgs.Action switch
         {
             ActionOptions.Get =>
-                svc.GetRequiredService<Actions.Get>(),
+                svc.GetRequiredService<Actions.GetAction>(),
             ActionOptions.Init =>
                 svc.GetRequiredService<Actions.Init>(),
             ActionOptions.About =>
@@ -81,7 +81,7 @@ internal static class Program
 
         cont.AddSingleton<IConsole, ConsoleService>();
 
-        cont.AddTransient<Actions.Get>();
+        cont.AddTransient<Actions.GetAction>();
         cont.AddTransient<Actions.Where>();
         cont.AddTransient<Actions.Info>();
         cont.AddTransient<Actions.Init>();

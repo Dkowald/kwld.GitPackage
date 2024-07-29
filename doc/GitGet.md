@@ -117,6 +117,16 @@ Defaults to all: **/*.
 glob entries are case-insensitive.  
 glob's are simple pattern match, using ** to match any-folder and * to match any char.
 
+#### --get-root:[get-root]
+A sub-path withing the origin repository tree to 
+collect files from. Only repository files withing this path will be 
+extracted. 
+
+This is useful with deep structured repositories, where all the required files 
+reside in a particular sub-folder.
+
+Defaults to root: '/'
+
 #### --cache:[cache-path]
 
 Alternate path for local cached repositories.

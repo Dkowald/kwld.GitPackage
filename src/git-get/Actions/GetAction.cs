@@ -10,11 +10,11 @@ using Microsoft.Extensions.Logging;
 
 namespace GitGet.Actions;
 
-internal class Get : IAction
+internal class GetAction : IAction
 {
     private readonly ILogger _log;
     
-    public Get(ILogger log)
+    public GetAction(ILogger log)
     {
         _log = log;
     }
@@ -30,6 +30,7 @@ internal class Get : IAction
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
+        _log.LogDebug("  GetRoot: {get-root}", package.GetRoot);
 
         _log.LogDebug("  User: {user}", args.User ?? "");
         _log.LogDebug("  Password: {pwd}", args.HasPassword ? "****" : "");
@@ -73,7 +74,7 @@ internal class Get : IAction
 
         _log.LogInformation("Extracting files");
         var info = await new GitCommands.Get(repo)
-            .Run(package.TargetPath, package.Version, package.Filter);
+            .Run(package.TargetPath, package.Version, package.Filter, package.GetRoot);
 
         package.Commit = info.Commit;
 

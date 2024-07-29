@@ -80,4 +80,49 @@ public class Basic
 
         await VerifyDirectory(_root.FullName);
     }
+
+    //todo: move to its own sample.
+    [Ordered, Fact]
+    public async Task GetCommonProtos() 
+    {
+        var targetFolder = Files.AppData.GetFolder("CommonProtos");
+
+        var origin = "https://github.com/protocolbuffers/protobuf.git";
+        var version = "branch/main";
+        var filter = "/src/google/**/*.proto";
+
+        var args = new[]
+        {
+            $"{targetFolder.FullName}",
+            $"--origin:{origin}",
+            $"--version:{version}",
+            $"--filter:{filter}"
+        };
+
+        await Program.Main(args);
+
+        //await VerifyDirectory(targetFolder.FullName);
+    }
+
+    [Ordered, Fact]
+    public async Task GetCommonProtosWithRoot()
+    {
+        var targetFolder = Files.AppData.GetFolder("CommonProtos");
+
+        var origin = "https://github.com/protocolbuffers/protobuf.git";
+        var version = "branch/main";
+        var filter = "/src/google/**/*.proto";
+
+        var args = new[]
+        {
+            $"{targetFolder.FullName}",
+            $"--origin:{origin}",
+            $"--version:{version}",
+            $"--filter:{filter}",
+            $"--get-root:/src",
+            "--log-level:t"
+        };
+
+        await Program.Main(args);
+    }
 }
