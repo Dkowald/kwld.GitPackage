@@ -60,108 +60,9 @@ internal class StatusFile : IEquatable<StatusFile>
         if (changed) commit = null;
         
         var data = new StatusFile(args.TargetPath, origin, version, filter)
-        { Commit = commit };
+        { Commit = commit, GetRoot = getRoot };
 
         return (data, changed);
-    }
-
-    public static async Task<(StatusFile? File, bool Changed)> LoadWithArgumentOverides(ILogger log, Args args)
-    {
-        var statusFile = args.TargetPath.GetFile(FileName);
-
-        Uri? origin = null;
-        GitRef? version = null;
-        GetFilter? filter = null;
-        string? getRoot = null;
-        string? commit = null;
-
-        if (statusFile.Exists)
-        {
-            var lineNumber = 0;
-            foreach(var line in await statusFile.ReadAllLinesAsync())
-            {
-                lineNumber++;
-                if (line.IsNullOrWhiteSpace()) continue;
-
-                var idx = line.IndexOf('=');
-                if (idx < 0 || idx == line.Length - 1)
-                {
-                    log.LogError("Status File corrupt: {StatusFile} #{LineNumber}",
-                        statusFile.FullName, lineNumber);
-                    continue;
-                }
-
-                var key = line[..idx++].Trim();
-                var value = line[idx..].Trim();
-
-                if (key.Same(nameof(Origin)))
-                {
-                    if (!Uri.TryCreate(value, UriKind.Absolute, out origin))
-                    {log.LogError("corrupt file: origin '{Origin}' invalid #{LineNumber}", value, lineNumber); }
-                    continue;
-                }
-
-                if (key.Same(nameof(Version)))
-                {
-                    (var error, version) = GitRef.TryRead(value);
-                    if (version is null)
-                    {log.LogError("corrupt file: version: {error} #{LineNumber}", error, lineNumber);}
-                    continue;
-                }
-
-                if (key.Same(nameof(Filter)))
-                {
-                    filter = new(value);
-                    continue;
-                }
-
-                if (key.Same(nameof(Commit)))
-                {
-                    commit = value.IsNullOrWhiteSpace() ? null : value;
-                    continue;
-                }
-
-                if (key.Same(nameof(GetRoot)))
-                {
-                    getRoot = value.IsNullOrWhiteSpace() ? null : value;
-                    continue;
-                }
-            }
-        }
-
-        var changed = false;
-        if(args.Origin != null && args.Origin != origin)
-        {origin = args.Origin; changed = true;}
-
-        if(args.Version != null && args.Version != version) 
-        { version = args.Version; changed = true;}
-        
-        if(args.Filter != null && args.Filter != filter) 
-        { filter = args.Filter; changed = true; }
-
-        if(args.GetRoot != null && args.GetRoot != getRoot)
-        { getRoot = args.GetRoot; changed = true; }
-        
-        filter ??= new();
-
-        commit = changed ? null : commit;
-
-        if (origin is null || version is null)
-        {
-            if(origin == null)
-                log.LogError("{StatusFile} invalid, missing required details: origin", statusFile.FullName);
-            if (version == null)
-                log.LogError("{StatusFile} invalid, missing required details: version", statusFile.FullName);
-            return (null, false);
-        }
-
-        var result = new StatusFile(args.TargetPath, origin, version, filter)
-        {
-            GetRoot = getRoot,
-            Commit = commit
-        };
-
-        return (result, changed);
     }
 
     public static async Task<StatusFile?> TryLoad(ILogger appLog, IDirectoryInfo dataFolder)
@@ -173,6 +74,7 @@ internal class StatusFile : IEquatable<StatusFile>
         Uri? origin = null;
         GitRef? version = null;
         GetFilter? filter = null;
+        string? getRoot = null;
         string? commit = null;
 
         var lineNumber = 0;
@@ -217,6 +119,12 @@ internal class StatusFile : IEquatable<StatusFile>
                 continue;
             }
 
+            if (key.Same(nameof(GetRoot)))
+            {
+                getRoot = value.IsNullOrWhiteSpace() ? null : value;
+                continue;
+            }
+
             if (key.Same(nameof(Commit)))
             {
                 commit = value.IsNullOrWhiteSpace() ? null : value;
@@ -232,7 +140,8 @@ internal class StatusFile : IEquatable<StatusFile>
 
         return new StatusFile(dataFolder, origin, version, filter)
         {
-            Commit = commit
+            Commit = commit,
+            GetRoot = getRoot ?? "/"
         };
     }
 
@@ -255,6 +164,7 @@ internal class StatusFile : IEquatable<StatusFile>
             $"{nameof(Origin)} = {Origin}",
             $"{nameof(Version)} = {Version.Version}",
             $"{nameof(Filter)} = {Filter}",
+            $"{nameof(GetRoot)} = {GetRoot}"
         };
 
         var configFile = TargetPath.GetFile(FileName).EnsureDirectory();
@@ -321,6 +231,7 @@ internal class StatusFile : IEquatable<StatusFile>
         Version == other.Version &&
         Filter == other.Filter &&
         TargetPath.FullName == other.TargetPath.FullName &&
+        GetRoot == other.GetRoot &&
         Commit == other.Commit;
     }
 

@@ -2,6 +2,8 @@
 
 using GitGet.Model;
 
+using GitPackage.Tests.TestHelpers;
+
 using Microsoft.Extensions.Logging.Testing;
 
 namespace GitPackage.Tests.Model;
@@ -9,7 +11,7 @@ namespace GitPackage.Tests.Model;
 public class StatusFileTests
 {
     [Fact]
-    public async Task LoadWithArgumentOverides_()
+    public async Task TryLoadWithOverrides_()
     {
         var files = new MockFileSystem();
 
@@ -17,7 +19,8 @@ public class StatusFileTests
 
         var current = await new StatusFile(workDir, new("http://someurl"), new("tag/1"), new("*.md"))
         {
-            Commit = "commit"
+            Commit = "commit",
+            GetRoot = "/some/where"
         }.Write(new FakeLogger());
 
         var args = new Args(
@@ -25,10 +28,10 @@ public class StatusFileTests
             GitGet.Actions.ActionOptions.About,
             files.Current(), files.Current())
         {
-            Origin = new("http://updatedurl")
+            Origin = new("http://updatedurl"),
         };
 
-        var result = await StatusFile.LoadWithArgumentOverides(new FakeLogger(), args);
+        var result = await StatusFile.TryLoadWithOverrides(new FakeLogger(), args);
         
         var package = result.File;
 
@@ -44,22 +47,26 @@ public class StatusFileTests
     {
         var log = new FakeLogger();
 
-        var files = new MockFileSystem();
+        var dir = Files.AppData.GetFolder(nameof(StatusFileTests), nameof(Write_Read))
+            .EnsureEmpty();
 
-        var dir = files.Current();
-
-        var original = new StatusFile(dir, new("http://somewhere"), new("tag/1"), new())
+        var original = new StatusFile(dir, 
+            new("http://somewhere"), 
+            new("tag/1"), new())
         {
-            Commit = "zzzzzzzz1"
+            Commit = "zzzzzzzz1",
+            GetRoot = "/aplace"
         };
 
         await original.Write(log);
 
-        var result = await StatusFile.TryLoad(log, files.Current());
+        var result = await StatusFile.TryLoad(log, dir);
 
         Assert.NotNull(result);
 
         Assert.Equal(original, result);
+
+        await VerifyFile(dir.GetFile(StatusFile.FileName).FullName);
     }
 
     [Fact]

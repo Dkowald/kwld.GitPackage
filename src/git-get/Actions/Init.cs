@@ -14,7 +14,7 @@ internal class Init : IAction
 
     public async Task<int> Run(Args args)
     {
-        var (file, changed) = await StatusFile.LoadWithArgumentOverides(_log, args);
+        var (file, changed) = await StatusFile.TryLoadWithOverrides(_log, args);
 
         if (file == null) return 1;
 

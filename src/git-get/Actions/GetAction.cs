@@ -21,7 +21,7 @@ internal class GetAction : IAction
 
     public async Task<int> Run(Args args)
     {
-        var (package, _) = await StatusFile.LoadWithArgumentOverides(_log, args);
+        var (package, _) = await StatusFile.TryLoadWithOverrides(_log, args);
 
         if (package is null) 
         { return 1; }
