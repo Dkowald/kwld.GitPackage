@@ -25,7 +25,7 @@ public class Where
         var expected = cache.GetFolder("github.com/rsafier/DotNetGlob.git");
 
         using var con = new CaptureConsole();
-        var result = await Program.Main(args);
+        await Program.Main(args);
         con.Flush();
 
         var repoPath = con.Flush().StdOut;

@@ -23,7 +23,9 @@ git get $dir --origin:$origin --version:$version --filter:$filter --force:all
 #re-run, but now I want different version
 git get $dir --version:branch/master
 
-git-get ./df
+#but all i want is the deploy yaml
+git get $dir --get-root:/deploy
+
 #nothing to do next time
 git get $dir
 

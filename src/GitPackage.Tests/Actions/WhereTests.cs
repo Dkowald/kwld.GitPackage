@@ -7,7 +7,6 @@ using GitPackage.Tests.TestHelpers;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Testing;
 
 namespace GitPackage.Tests.Actions;
 

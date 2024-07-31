@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <!-- use the local git-get build -->
-    <GitPackage-Tool Condition="'$(GitPackageCli)' == ''" >$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackage-Tool>
+    <GitPackage-Tool Condition="'$(GitPackageCli)' == ''">$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackage-Tool>
     <GitPackage-LogLevel>d</GitPackage-LogLevel>
     <!-- disable design-time build -->
     <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild>
@@ -53,15 +53,9 @@
 
   <ItemGroup>
     <!--Include readme's for used projects-->
-    <GitPackage 
-      Include="App_Data/external/LibGit2Sharp" 
-      Origin ="https://github.com/libgit2/libgit2sharp.git"
-      Version="branch/master" Filter="/*.md"/>
+    <GitPackage Include="App_Data/external/LibGit2Sharp" Origin="https://github.com/libgit2/libgit2sharp.git" Version="branch/master" Filter="/*.md" />
 
-    <GitPackage 
-      Include="App_Data/external/DotNet.Glob"
-      Origin ="https://github.com/dazinator/DotNet.Glob.git"
-      Version="tag/3.1.3" Filter="/*.md"/> 
+    <GitPackage Include="App_Data/external/DotNet.Glob" Origin="https://github.com/dazinator/DotNet.Glob.git" Version="tag/3.1.3" Filter="/*.md" /> 
   </ItemGroup>
 
   <ItemGroup>

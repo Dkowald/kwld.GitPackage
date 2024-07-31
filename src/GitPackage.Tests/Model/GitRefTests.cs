@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using GitPackage.Cli.Model;
+using GitGet.Model;
 
 namespace GitPackage.Tests.Model
 {

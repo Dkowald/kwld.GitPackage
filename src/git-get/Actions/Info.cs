@@ -37,6 +37,7 @@ namespace GitGet.Actions
                 _console.Out.WriteLine($"  Origin:  '{statusFile.Origin}'");
                 _console.Out.WriteLine($"  Version: '{statusFile.Version}'");
                 _console.Out.WriteLine($"  Filter:  '{statusFile.Filter}'");
+                _console.Out.WriteLine($"  GetRoot:  '{statusFile.GetRoot}'");
                 _console.Out.WriteLine($"  Commit:  '{statusFile.Commit}'");
             }
             else

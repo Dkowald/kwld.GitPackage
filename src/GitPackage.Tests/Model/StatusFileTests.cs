@@ -20,7 +20,7 @@ public class StatusFileTests
         var current = await new StatusFile(workDir, new("http://someurl"), new("tag/1"), new("*.md"))
         {
             Commit = "commit",
-            GetRoot = "/some/where"
+            GetRoot = new("/some/where")
         }.Write(new FakeLogger());
 
         var args = new Args(
@@ -55,7 +55,7 @@ public class StatusFileTests
             new("tag/1"), new())
         {
             Commit = "zzzzzzzz1",
-            GetRoot = "/aplace"
+            GetRoot = new("/aplace")
         };
 
         await original.Write(log);
@@ -64,7 +64,7 @@ public class StatusFileTests
 
         Assert.NotNull(result);
 
-        Assert.Equal(original, result);
+        Assert.True(original.Same(result));
 
         await VerifyFile(dir.GetFile(StatusFile.FileName).FullName);
     }

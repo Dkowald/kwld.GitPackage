@@ -1,5 +1,4 @@
-﻿using GitPackage.Cli.Model;
-
+﻿using GitGet.Model;
 using LibGit2Sharp;
 
 namespace GitGet.GitCommands;
@@ -77,8 +76,8 @@ internal class Get(Repository repository)
         var current = trueRoot;
         foreach(var part in parts)
         {
-            var entry = current.OfType<TreeEntry>()
-                .FirstOrDefault(x => x.Name.Same(part));
+            var entry = current
+                .FirstOrDefault(x => x is not null && x.Name.Same(part));
 
             current = entry?.Target != null ?repository.Lookup<Tree>(entry.Target.Sha) : null;
 

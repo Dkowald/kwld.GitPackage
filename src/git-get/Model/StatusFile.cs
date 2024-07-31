@@ -1,13 +1,11 @@
-﻿using GitPackage.Cli.Model;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
 
 /// <summary>
 /// Load / save config and status data for specified root folder.
 /// </summary>
-internal class StatusFile : IEquatable<StatusFile>
+internal class StatusFile
 {
     internal const string FileName = ".gitget";
     
@@ -18,7 +16,7 @@ internal class StatusFile : IEquatable<StatusFile>
         Uri? origin;
         GitRef? version;
         GetFilter? filter;
-        string? getRoot;
+        RootPath? getRoot;
         string? commit = stored?.Commit;
 
         bool changed = false;
@@ -48,15 +46,9 @@ internal class StatusFile : IEquatable<StatusFile>
             changed = true;
         }
 
-        getRoot = args.GetRoot ?? stored?.GetRoot;
+        getRoot = args.GetRoot;
         changed |= getRoot != stored?.GetRoot;
-        if (getRoot is null)
-        {
-            log.LogWarning("No root found from status file or arguments, using default");
-            getRoot = "/";
-            changed = true;
-        }
-
+        
         if (changed) commit = null;
         
         var data = new StatusFile(args.TargetPath, origin, version, filter)
@@ -128,7 +120,6 @@ internal class StatusFile : IEquatable<StatusFile>
             if (key.Same(nameof(Commit)))
             {
                 commit = value.IsNullOrWhiteSpace() ? null : value;
-                continue;
             }
         }
 
@@ -141,7 +132,7 @@ internal class StatusFile : IEquatable<StatusFile>
         return new StatusFile(dataFolder, origin, version, filter)
         {
             Commit = commit,
-            GetRoot = getRoot ?? "/"
+            GetRoot = RootPath.TryParse(getRoot) ?? RootPath.Default
         };
     }
 
@@ -197,12 +188,12 @@ internal class StatusFile : IEquatable<StatusFile>
     /// Optional glob filter on source files.
     /// Defaults to 
     /// </summary>
-    public GetFilter Filter { get; set; } = new();
+    public GetFilter Filter { get; set; }
 
     /// <summary>
     /// Sub path in repository tree to use as root.
     /// </summary>
-    public string GetRoot { get; set; } = "/";
+    public RootPath GetRoot { get; set; } = RootPath.Default;
 
     /// <summary>
     /// Local path to place files.
@@ -214,26 +205,16 @@ internal class StatusFile : IEquatable<StatusFile>
     /// </summary>
     public string? Commit { get; set; }
 
-    #region Equality
-
-    public override bool Equals(object? obj)
-        => Equals(obj as StatusFile);
-
-    public override int GetHashCode() =>
-        HashCode.Combine(Origin, Version, Filter, TargetPath);
-
-    public bool Equals(StatusFile? other)
+    public bool Same(StatusFile? rhs)
     {
-        if (other is null) return false;
+        if (rhs is null) return false;
 
         return
-        Origin == other.Origin &&
-        Version == other.Version &&
-        Filter == other.Filter &&
-        TargetPath.FullName == other.TargetPath.FullName &&
-        GetRoot == other.GetRoot &&
-        Commit == other.Commit;
+            Origin == rhs.Origin &&
+            Version == rhs.Version &&
+            Filter == rhs.Filter &&
+            TargetPath.FullName == rhs.TargetPath.FullName &&
+            GetRoot == rhs.GetRoot &&
+            Commit == rhs.Commit;
     }
-
-    #endregion
 }

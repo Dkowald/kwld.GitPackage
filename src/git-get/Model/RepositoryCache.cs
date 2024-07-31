@@ -1,7 +1,4 @@
 ﻿using GitGet.Utility;
-
-using GitPackage.Cli.Model;
-
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
@@ -86,24 +83,19 @@ internal class RepositoryCache
 
         cache.CachePath.EnsureExists();
 
-        var options = new CloneOptions() 
-        { IsBare = true };
+        var options = new CloneOptions { IsBare = true };
 
         options.FetchOptions.CredentialsProvider = creds;
 
-        var progress = new List<string>();
-        var transfer = new List<string>();
-
         var progressStarted = false;
         options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
-        options.FetchOptions.OnProgress += txt =>
+        options.FetchOptions.OnProgress += _ =>
         {
             if (!progressStarted)
             {
                 _log.LogDebug($"Fetching objects to transfer");
                 progressStarted = true;
             }
-            progress.Add(txt);
             return true;
         };
 

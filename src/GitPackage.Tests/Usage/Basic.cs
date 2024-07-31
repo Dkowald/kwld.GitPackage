@@ -1,13 +1,6 @@
 ﻿using GitGet;
-using GitGet.Model;
-using GitGet.Utility;
 
 using GitPackage.Tests.TestHelpers;
-using GitPackage.Tests.Util;
-
-using Microsoft.Extensions.Logging;
-
-using NSubstitute;
 
 namespace GitPackage.Tests.Usage;
 
@@ -17,7 +10,7 @@ public class Basic
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(Basic));
     private IFileInfo StatusFile => _root.GetFile(GitGet.Model.StatusFile.FileName);
 
-    private readonly string Origin = "https://github.com/Dkowald/kwld.CoreUtil.git";
+    private readonly string _origin = "https://github.com/Dkowald/kwld.CoreUtil.git";
 
     [Ordered, Fact]
     public void Init()
@@ -28,12 +21,11 @@ public class Basic
     [Ordered, Fact]
     public async Task InitTargetStatusFile()
     {
-        using var _ = _root.PushD();
-
         var args = new[]
         {
             "init",
-            $"--origin:{Origin}",
+            $"--target-path:{_root.FullName}",
+            $"--origin:{_origin}",
             "--version:tag/v1.3.1",
             "--filter:/readme.md"
         };
@@ -49,14 +41,12 @@ public class Basic
     {
         var args = new[]
         {
+            $"{_root.FullName}",
             "--log-level:t",
             "--force:all"
         };
 
-        int result;
-
-        using (_root.PushD())
-            result = await Program.Main(args);
+        var result = await Program.Main(args);
 
         Assert.Equal(0, result);
 
@@ -66,10 +56,9 @@ public class Basic
     [Ordered, Fact]
     public async Task GetUpdateWithCli()
     {
-        using var _ = _root.PushD();
-
         var args = new[]
         {
+            $"{_root.FullName}",
             "--version:tag/v1.3.2",
             "--log-level:d"
         };

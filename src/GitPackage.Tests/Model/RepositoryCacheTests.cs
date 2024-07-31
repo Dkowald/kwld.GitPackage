@@ -7,8 +7,6 @@ using LibGit2Sharp;
 
 using Microsoft.Extensions.Logging.Testing;
 
-using VerifyTests;
-
 namespace GitPackage.Tests.Model;
 
 public class RepositoryCacheTests
@@ -25,9 +23,8 @@ public class RepositoryCacheTests
         var target = new RepositoryCache(log, cache);
 
         var url = TestRepository.BareRepoPath.AsUri();
-        url = new Uri("https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner.git");
-
-        var repo = target.CloneIfMissing(url, null);
+        
+        target.CloneIfMissing(url, null);
 
         var serverWork = logs.Where(x => x.Contains("Fetching"));
         Assert.True(serverWork.Any());

@@ -32,18 +32,18 @@ internal static class Program
             return 1;
         }
 
-        IAction? action = parsedArgs.Action switch
+        IAction action = parsedArgs.Action switch
         {
             ActionOptions.Get =>
-                svc.GetRequiredService<Actions.GetAction>(),
+                svc.GetRequiredService<GetAction>(),
             ActionOptions.Init =>
-                svc.GetRequiredService<Actions.Init>(),
+                svc.GetRequiredService<Init>(),
             ActionOptions.About =>
-                svc.GetRequiredService<Actions.About>(),
+                svc.GetRequiredService<About>(),
             ActionOptions.Info =>
-                svc.GetRequiredService<Actions.Info>(),
+                svc.GetRequiredService<Info>(),
             ActionOptions.Where =>
-                svc.GetRequiredService<Actions.Where>(),
+                svc.GetRequiredService<Where>(),
 
             _ => throw new Exception($"Unknown action: {parsedArgs.Action}")
         };
@@ -81,11 +81,11 @@ internal static class Program
 
         cont.AddSingleton<IConsole, ConsoleService>();
 
-        cont.AddTransient<Actions.GetAction>();
-        cont.AddTransient<Actions.Where>();
-        cont.AddTransient<Actions.Info>();
-        cont.AddTransient<Actions.Init>();
-        cont.AddTransient<Actions.About>();
+        cont.AddTransient<GetAction>();
+        cont.AddTransient<Where>();
+        cont.AddTransient<Info>();
+        cont.AddTransient<Init>();
+        cont.AddTransient<About>();
 
         return cont;
     }

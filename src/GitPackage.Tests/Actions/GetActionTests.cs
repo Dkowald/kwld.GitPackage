@@ -15,8 +15,6 @@ namespace GitPackage.Tests.Actions;
 
 public class GetActionTests
 {
-    readonly IDirectoryInfo Root = Files.AppData.GetFolder(nameof(GetActionTests));
-
     [Fact]
     public async Task ReportNetworkActivity()
     {
@@ -31,7 +29,7 @@ public class GetActionTests
         outDir.ClearReadonly()
             .EnsureEmptyWithoutDelete();
 
-        var target = new GitGet.Actions.GetAction(host.Get<ILogger>());
+        var target = new GetAction(host.Get<ILogger>());
 
         var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot)
         {
@@ -56,14 +54,14 @@ public class GetActionTests
 
         var dir = new MockFileSystem().Current();
 
-        var data = new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), new())
-        { Commit = "already-have-commit"}.Write(host.Get<ILogger>());
+        await new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), new())
+            { Commit = "already-have-commit"}.Write(host.Get<ILogger>());
 
         var target = host.Get<GetAction>();
 
         var args = new Args(LogLevel.Debug, ActionOptions.Get, dir, dir);
 
-        var exitCode = await target.Run(args);
+        await target.Run(args);
 
         var noWork = host.LogEntries.Any(x => x.Contains("no work"));
 

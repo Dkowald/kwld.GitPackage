@@ -1,10 +1,5 @@
-﻿using System.Security;
-
-using GitGet.Actions;
+﻿using GitGet.Actions;
 using GitGet.Utility;
-
-using GitPackage.Cli.Model;
-
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
@@ -41,12 +36,12 @@ internal class Args
 
     public static Args? Load(IFileSystem files, ILogger log, LogLevel logLevel, string[] inputArgs)
     {
-        ActionOptions? action = null;
+        ActionOptions? action;
         IDirectoryInfo? targetPath = null;
         Uri? origin = null;
         GitRef? version = null;
         GetFilter? filter = null;
-        string? root = null;
+        RootPath? root = null;
         IDirectoryInfo? cache = null;
         ForceOption? force = null;
         string? user = null;
@@ -62,16 +57,16 @@ internal class Args
 
         var arg0 = inputArgs.First();
 
-        if (arg0.Same(nameof(Actions.Init)))
+        if (arg0.Same(nameof(Init)))
         { action = ActionOptions.Init; }
 
-        else if (arg0.Same(nameof(Actions.Info)))
+        else if (arg0.Same(nameof(Info)))
         { action = ActionOptions.Info; }
 
-        else if (arg0.Same(nameof(Actions.Where)))
+        else if (arg0.Same(nameof(Where)))
         { action = ActionOptions.Where; }
 
-        else if (arg0.Same(nameof(Actions.About))){
+        else if (arg0.Same(nameof(About))){
             action = ActionOptions.About;
         }
         else {
@@ -158,13 +153,13 @@ internal class Args
             {
                 if (root is not null)
                 {
-                    log.LogError("Filter already provided");
+                    log.LogError("GetRoot already provided");
                     return null;
                 }
                 var value = next[GetRootKey.Length..];
                 try
                 {
-                    root = value;
+                    root = new(value);
                 }
                 catch (Exception ex)
                 {
@@ -254,7 +249,7 @@ internal class Args
             Origin = origin,
             Version = version,
             Filter = filter,
-            GetRoot = root ?? "/",
+            GetRoot = root ?? RootPath.Default,
             Force = force,
             User = user
         };
@@ -280,7 +275,7 @@ internal class Args
 
     public GetFilter? Filter { get; init; }
 
-    public string GetRoot { get; init; } = "/";
+    public RootPath GetRoot { get; init; } = RootPath.Default;
 
     public IDirectoryInfo Cache { get; init; }
 

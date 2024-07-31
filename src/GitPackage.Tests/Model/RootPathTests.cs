@@ -1,0 +1,17 @@
+﻿using GitGet.Model;
+
+namespace GitPackage.Tests.Model
+{
+    public class RootPathTests
+    {
+        [Fact]
+        public void ctor_AutoPrefix()
+        {
+            var autoFixed = new RootPath("apath");
+
+            var expected = RootPath.TryParse("/apath");
+
+            Assert.Equal(expected, autoFixed);
+        }
+    }
+}

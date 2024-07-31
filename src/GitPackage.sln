@@ -5,6 +5,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitPackage.Tests", "GitPackage.Tests\GitPackage.Tests.csproj", "{CDD835EB-1753-4839-9F63-EA70BF5BDE9F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitPackage", "GitPackage\GitPackage.csproj", "{79325498-9D5A-44AA-8D89-206E6E5E2880}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3424402A-D6B1-4815-B1D4-7FADEAFF5328} = {3424402A-D6B1-4815-B1D4-7FADEAFF5328}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "..\Repository.csproj", "{2073D97C-2529-4787-953A-50A1A0928305}"
 EndProject
@@ -42,6 +45,4 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A63C9F3B-DCC2-40ED-8925-1FAB867DB73C}
 	EndGlobalSection
-EndGlobal
-ion
 EndGlobal

@@ -16,17 +16,17 @@ public class TestHost : IDisposable
     public TestHost(Action<IServiceCollection>? cfg = null)
     {
         var cont = new ServiceCollection()
-            .AddLogging(cfg =>
+            .AddLogging(x =>
             {
-                cfg.AddInMemory()
-                    .AddDebug()
-                    .AddConsole();
+                x.AddInMemory()
+                 .AddDebug()
+                 .AddConsole();
 
-                cfg.AddFakeLogging(x => { 
-                    x.OutputSink = l => LogEntries.Add(l);
+                x.AddFakeLogging(fakeCfg => {
+                    fakeCfg.OutputSink = l => LogEntries.Add(l);
                 });
 
-                cfg.AddFilter("", LogLevel.Trace);
+                x.AddFilter("", LogLevel.Trace);
             })
             .AddSingleton(x => x.GetRequiredService<ILoggerFactory>().CreateLogger(""));
 

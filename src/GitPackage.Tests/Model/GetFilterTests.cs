@@ -1,4 +1,4 @@
-﻿using GitPackage.Cli.Model;
+﻿using GitGet.Model;
 
 namespace GitPackage.Tests.Model;
 

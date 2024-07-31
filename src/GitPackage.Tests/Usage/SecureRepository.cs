@@ -3,7 +3,6 @@
 using GitGet;
 
 using GitPackage.Tests.TestHelpers;
-using GitPackage.Tests.Util;
 
 using Microsoft.Extensions.Configuration;
 
@@ -14,9 +13,8 @@ public class SecureRepository
     [Fact]
     public async Task Get() 
     {
-        using var _ = Files.AppData.GetFolder(nameof(SecureRepository))
-            .EnsureExists()
-            .PushD();
+        var dir = Files.AppData.GetFolder(nameof(SecureRepository))
+            .EnsureExists();
 
         var cfg = new ConfigurationBuilder()
             .AddUserSecrets<SecureRepository>()
@@ -29,12 +27,13 @@ public class SecureRepository
             return;
         }
         
-        var args = new string[] {
+        var args = new[] {
+            dir.FullName,
             $"--origin:{url}",
             $"--password:{cfg["SecureRepository:Password"]}",
             $"--user:{cfg["SecureRepository:User"]}",
-            $"--version:branch/main",
-            $"--filter:/readme.md",
+            "--version:branch/main",
+            "--filter:/readme.md",
             "--log-level:i"
         };
 

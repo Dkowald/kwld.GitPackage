@@ -3,10 +3,7 @@ using GitGet.Services;
 
 using InMemLogger;
 
-using LibGit2Sharp;
-
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GitGet.Actions
 {

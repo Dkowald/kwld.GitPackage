@@ -1,8 +1,4 @@
 ﻿using GitGet.Model;
-using GitGet.Utility;
-
-using GitPackage.Cli.Model;
-
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
@@ -95,10 +91,8 @@ internal class GetAction : IAction
                 _log.LogInformation("Ref '{gitRef}' found in cache", gitRef.Version);
                 return tagRef.ResolveToDirectReference();
             }
-            else
-            {
-                _log.LogDebug("Tag {gitRef} not found in cache", gitRef.Version);
-            }
+
+            _log.LogDebug("Tag {gitRef} not found in cache", gitRef.Version);
         }
 
         _log.LogInformation("Fetching Ref '{gitRef}' from server", gitRef.Version);
@@ -106,8 +100,6 @@ internal class GetAction : IAction
         //fetch.
         var refSpecs = repo.Network.Remotes["origin"].FetchRefSpecs.Select(x => x.Specification);
 
-        var progress = new List<string>();
-        var transfer = new List<string>();
         var progressStarted = false;
         var transferStarted = false;
 
@@ -116,7 +108,7 @@ internal class GetAction : IAction
             TagFetchMode = TagFetchMode.All,
             Prune = true,
             CredentialsProvider = creds,
-            OnProgress = txt =>
+            OnProgress = _ =>
             {
                 if (!progressStarted)
                 {
@@ -124,7 +116,6 @@ internal class GetAction : IAction
                     _log.LogDebug("Fetching objects to transfer");
                     progressStarted = true;
                 }
-                progress.Add(txt);
                 return true;
             },
             OnTransferProgress = x => {

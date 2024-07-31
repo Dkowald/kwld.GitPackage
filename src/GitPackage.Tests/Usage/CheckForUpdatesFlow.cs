@@ -3,7 +3,6 @@ using GitGet.Model;
 using GitGet.Utility;
 
 using GitPackage.Tests.TestHelpers;
-using GitPackage.Tests.Util;
 
 using LibGit2Sharp;
 
@@ -12,101 +11,98 @@ namespace GitPackage.Tests.Usage;
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class CheckForUpdatesFlow
 {
-    private readonly IDirectoryInfo Root = Files.AppData.GetFolder("Usage", nameof(CheckForUpdatesFlow));
-    private readonly Signature Sig = new("test", "Test@com.au", DateTimeOffset.UtcNow);
+    private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(CheckForUpdatesFlow));
+    private readonly Signature _sig = new("test", "Test@com.au", DateTimeOffset.UtcNow);
 
-    readonly IDirectoryInfo Origin;
-    readonly IDirectoryInfo Cache;
-    readonly IDirectoryInfo Working;
+    readonly IDirectoryInfo _origin;
+    readonly IDirectoryInfo _cache;
+    readonly IDirectoryInfo _working;
 
     public CheckForUpdatesFlow()
     {
-        Origin = Root.GetFolder("Origin");
+        _origin = _root.GetFolder("Origin");
 
-        Cache = Root.GetFolder(RepositoryCache.DefaultCacheFolderName);
+        _cache = _root.GetFolder(RepositoryCache.DefaultCacheFolderName);
 
-        Working = Root.GetFolder("Working").EnsureExists();
+        _working = _root.GetFolder("Working").EnsureExists();
     }
 
     [Ordered, Fact]
     public void Reset()
     {
-        Origin.ClearReadonly().EnsureEmpty();
-        Cache.ClearReadonly().EnsureDelete();
-        Working.EnsureDelete();
+        _origin.ClearReadonly().EnsureEmpty();
+        _cache.ClearReadonly().EnsureDelete();
+        _working.EnsureDelete();
     }
 
     [Ordered, Fact]
     public void CreateOriginRepo() 
     {
-        Repository.Init(Origin.FullName);
-        using var repo = new Repository(Origin.FullName);
+        Repository.Init(_origin.FullName);
+        using var repo = new Repository(_origin.FullName);
 
-        Origin.GetFile("Readme.md").WriteAllLines(["Initial commit"]);
+        _origin.GetFile("Readme.md").WriteAllLines(["Initial commit"]);
         repo.Index.Add("Readme.md");
         repo.Index.Write();
 
-        repo.Commit("Init", Sig, Sig);
+        repo.Commit("Init", _sig, _sig);
     }
 
     [Ordered, Fact]
     public async Task GetOriginal() 
     {
-        using var _ = Working.PushD();
-
         var args = new[]
         {
-            $"--cache:{Cache.FullName}",
+            $"{_working.FullName}",
+            $"--cache:{_cache.FullName}",
 
-            $"--origin:{Origin.AsUri()}",
-            $"--version:branch/master",
+            $"--origin:{_origin.AsUri()}",
+            "--version:branch/master"
         };
 
         var exitCode = await Program.Main(args);
 
         Assert.Equal(0, exitCode);
 
-        await VerifyDirectory(Working.FullName, pattern: "*.md");
+        await VerifyDirectory(_working.FullName, pattern: "*.md");
     }
 
     [Ordered, Fact]
     public void UpdateOriginRepo() 
     {
-        Origin.GetFile("Readme.md").AppendAllLines(["Updated"]);
+        _origin.GetFile("Readme.md").AppendAllLines(["Updated"]);
 
-        using var repo = new Repository(Origin.FullName);
+        using var repo = new Repository(_origin.FullName);
         
         repo.Index.Add("Readme.md");
         repo.Index.Write();
-        repo.Commit("Updated", Sig, Sig);
+        repo.Commit("Updated", _sig, _sig);
     }
 
     [Ordered, Fact]
     public async Task GetWithoutUptate()
     {
-        using var _ = Working.PushD();
-
         var args = new[]
         {
-            $"--cache:{Cache.FullName}",
+            _working.FullName,
+            $"--cache:{_cache.FullName}",
         };
 
         var exitCode = await Program.Main(args);
 
         Assert.Equal(0, exitCode);
 
-        await VerifyDirectory(Working.FullName, pattern: "*.md")
+        await VerifyDirectory(_working.FullName, pattern: "*.md")
             .UseMethodName(nameof(GetOriginal));
     }
 
     [Ordered, Fact]
     public async Task GetWithUpdate()
     {
-        using var _ = Working.PushD();
-
         var args = new[]
         {
-            $"--cache:{Cache.FullName}",
+            _working.FullName,
+            $"--cache:{_cache.FullName}",
             "--force:all"
         };
 
@@ -114,6 +110,6 @@ public class CheckForUpdatesFlow
 
         Assert.Equal(0, exitCode);
 
-        await VerifyDirectory(Working.FullName, pattern: "*.md");
+        await VerifyDirectory(_working.FullName, pattern: "*.md");
     }
 }

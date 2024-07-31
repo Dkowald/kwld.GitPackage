@@ -1,12 +1,8 @@
 ﻿using GitGet.Model.AppLogging;
-using GitPackage.Tests.TestHelpers;
-using Microsoft.Extensions.DependencyInjection;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Time.Testing;
-
-//using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace GitPackage.Tests.Model.AppLogging;
 

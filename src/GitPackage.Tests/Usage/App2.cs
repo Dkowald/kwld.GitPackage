@@ -1,8 +1,8 @@
 ﻿using GitGet;
 using GitGet.Model;
-using GitPackage.Cli;
-using GitPackage.Cli.Model;
+
 using GitPackage.Tests.TestHelpers;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitPackage.Tests.Usage;

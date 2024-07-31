@@ -1,6 +1,6 @@
 ﻿using DotNet.Globbing;
 
-namespace GitPackage.Cli.Model;
+namespace GitGet.Model;
 
 /// <summary>
 /// A set of glob filter(s) to select files.

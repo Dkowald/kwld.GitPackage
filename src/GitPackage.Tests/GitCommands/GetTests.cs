@@ -1,6 +1,4 @@
 ﻿using GitGet.Model;
-
-using GitPackage.Cli.Model;
 using GitPackage.Tests.TestHelpers;
 
 using Microsoft.Extensions.Logging.Testing;
@@ -9,7 +7,7 @@ namespace GitPackage.Tests.GitCommands
 {
     public class GetTests
     {
-        private readonly IDirectoryInfo OutRoot = 
+        private readonly IDirectoryInfo _outRoot = 
             new FileSystem().Project().GetFolder("App_Data", "GitGet");
 
         [Fact]
@@ -19,7 +17,7 @@ namespace GitPackage.Tests.GitCommands
 
             var target = new GitGet.GitCommands.Get(repo);
 
-            var destRoot = OutRoot.GetFolder("GetSubPath").EnsureEmpty();
+            var destRoot = _outRoot.GetFolder("GetSubPath").EnsureEmpty();
 
             var version = new GitRef("tag/CheckoutAll");
 
@@ -35,7 +33,7 @@ namespace GitPackage.Tests.GitCommands
         {
             using var repo = TestRepository.OpenTestRepository();
             var version = new GitRef("tag/CheckoutAll");
-            var destRoot = OutRoot.GetFolder("Tag0")
+            var destRoot = _outRoot.GetFolder("Tag0")
                 .EnsureEmpty();
 
             var target = new GitGet.GitCommands.Get(repo);
@@ -55,7 +53,7 @@ namespace GitPackage.Tests.GitCommands
 
             var glob = "Folder1/**/*.md,Folder2/**/*";
 
-            var destRoot = OutRoot.GetFolder("Tag0Filtered")
+            var destRoot = _outRoot.GetFolder("Tag0Filtered")
                 .EnsureEmpty();
 
             var target = new GitGet.GitCommands.Get(repo);
@@ -78,7 +76,7 @@ namespace GitPackage.Tests.GitCommands
 
             var glob = "**/folder1/*.txt";
 
-            var destRoot = OutRoot.GetFolder(nameof(GetNoAnchorFiltered))
+            var destRoot = _outRoot.GetFolder(nameof(GetNoAnchorFiltered))
                 .EnsureEmpty();
 
             var target = new GitGet.GitCommands.Get(repo);

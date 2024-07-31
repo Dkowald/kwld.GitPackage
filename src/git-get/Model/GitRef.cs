@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace GitPackage.Cli.Model;
+namespace GitGet.Model;
 
 /// <summary>
 /// Present user input as valid git refs. <br/>
