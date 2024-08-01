@@ -1,6 +1,7 @@
 ﻿using GitGet.Utility;
 using LibGit2Sharp;
 using System.Diagnostics;
+using GitGet.Model;
 
 namespace GitPackage.Tests.TestHelpers;
 
@@ -28,6 +29,7 @@ static class TestRepository
                 Init(repo);
                 UpdateDeleteAndMove(repo);
                 IncludeNestedSameNameFolder(repo);
+                BranchHasStatusFile(repo);
             }
 
             var bare = Path.GetFolder(".git");
@@ -107,5 +109,20 @@ static class TestRepository
         repo.Index.Write();
         repo.Commit(nameof(IncludeNestedSameNameFolder), Sig, Sig);
         repo.ApplyTag("v1");
+    }
+
+    private static void BranchHasStatusFile(Repository repo)
+    {
+        Commands.Checkout(repo, repo.Branches["master"]);
+        var newBranch = repo.CreateBranch(nameof(BranchHasStatusFile));
+        Commands.Checkout(repo, newBranch);
+
+        Path.GetFile(StatusFile.FileName)
+            .WriteAllText("some data");
+        repo.Index.Add(StatusFile.FileName);
+
+        repo.Index.Write();
+
+        repo.Commit("add status file", Sig, Sig);
     }
 }

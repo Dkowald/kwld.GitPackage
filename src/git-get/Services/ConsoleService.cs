@@ -1,6 +1,6 @@
 ﻿namespace GitGet.Services
 {
-    public class ConsoleService : IConsole
+    internal class ConsoleService : IConsole
     {
         public TextWriter Error => Console.Error;
 

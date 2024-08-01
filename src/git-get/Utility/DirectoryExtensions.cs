@@ -1,6 +1,6 @@
 ﻿namespace GitGet.Utility;
 
-public static class DirectoryExtensions
+internal static class DirectoryExtensions
 {
     /// <summary>
     /// Clear read only attribute on ALL contained files.

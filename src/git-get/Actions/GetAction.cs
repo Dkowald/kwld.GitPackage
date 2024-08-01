@@ -66,7 +66,7 @@ internal class GetAction : IAction
 
         //reset out folder.
         _log.LogInformation("Clean {TargetPath}", args.TargetPath.FullName);
-        CleanTargetPath(args.TargetPath);
+        args.TargetPath.EnsureEmpty();
 
         _log.LogInformation("Extracting files");
         var info = await new GitCommands.Get(repo)
@@ -75,7 +75,12 @@ internal class GetAction : IAction
         package.Commit = info.Commit;
 
         _log.LogInformation("Found {count} files", info.Extracted);
-        
+
+        if (package.TargetPath.GetFile(StatusFile.FileName).Exists())
+        {
+            _log.LogWarning($"Extracted file {StatusFile.FileName} is being overwritten with status file data.");
+        }
+
         await package.Write(_log);
 
         return 0;
@@ -98,7 +103,8 @@ internal class GetAction : IAction
         _log.LogInformation("Fetching Ref '{gitRef}' from server", gitRef.Version);
 
         //fetch.
-        var refSpecs = repo.Network.Remotes["origin"].FetchRefSpecs.Select(x => x.Specification);
+        var remote = repo.Network.Remotes["origin"];
+        var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
 
         var progressStarted = false;
         var transferStarted = false;

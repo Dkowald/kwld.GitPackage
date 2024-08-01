@@ -8,7 +8,7 @@ namespace GitGet.Model.AppLogging;
 /// Simplified console formatter,
 /// to provide cleaner data for 
 /// </summary>
-public class AppLoggerFormatter : ConsoleFormatter
+internal class AppLoggerFormatter : ConsoleFormatter
 {
     private readonly TimeProvider _clock;
 

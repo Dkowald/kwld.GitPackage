@@ -68,23 +68,34 @@ public class GetActionTests
         Assert.True(noWork);
     }
 
-    [Fact(Skip = "todo")]
-    public void RepositoryHasProtectedFile()
+    [Fact]
+    public async Task Run_RepositoryHasProtectedFile()
     {
-        //add StatusFile.FileName to the test repo branch.
-        //verify the true status file created.
-        //verify warning generated.
-    }
+        using var repo = TestRepository.OpenTestRepository();
 
-    [Fact(Skip ="todo: add ability to re-root, so use with mono-repositories is easier.")]
-    public void ReRoot()
-    {
+        using var host = new TestHost(x => x.AddSingleton<GetAction>());
 
-    }
+        var target = host.Get<GetAction>();
 
-    [Fact(Skip = "should create dir, and report as info.")]
-    public void TargetPathNotExist()
-    {
+        var args = new Args(LogLevel.Warning, ActionOptions.Get,
+            Files.AppData.GetFolder(nameof(GetActionTests)),
+            Files.TestPackageCacheRoot)
+        {
+            Cache = Files.TestPackageCacheRoot,
+            Origin = TestRepository.BareRepoPath.AsUri(),
+            Version = new("branch/BranchHasStatusFile")
+        };
 
+        args.TargetPath.EnsureEmpty();
+
+        await target.Run(args);
+
+        var warnOverwrite = host.LogEntries.Count(x => x.Contains(
+            $"Extracted file {StatusFile.FileName} is being overwritten"));
+
+        Assert.True(warnOverwrite > 0);
+
+        var statusFile = args.TargetPath.GetFile(StatusFile.FileName);
+        await VerifyFile(statusFile.FullName);
     }
 }

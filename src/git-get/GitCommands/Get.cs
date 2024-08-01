@@ -4,10 +4,28 @@ using LibGit2Sharp;
 namespace GitGet.GitCommands;
 
 /// <summary>
-/// Get (rather than checkout) files for the repository.
+/// Get (rather than checkout) from a repository.
 /// </summary>
 internal class Get(Repository repository)
 {
+    /// <summary>
+    /// <inheritdoc cref="Get"/>
+    /// </summary>
+    /// <param name="target">
+    /// Folder withing the target git repository
+    /// </param>
+    /// <param name="commit">
+    /// Commit to collect files from
+    /// </param>
+    /// <param name="filter">
+    /// Filter collected files, only extracting those that match.
+    /// </param>
+    /// <param name="subPath">
+    /// Optional sub-path within the repository to use as root path for get.
+    /// </param>
+    /// <returns>
+    /// 
+    /// </returns>
     public async Task<(string Commit, int Extracted)>  Run(IDirectoryInfo target, GitRef commit, 
         GetFilter filter, string? subPath = null)
     {
