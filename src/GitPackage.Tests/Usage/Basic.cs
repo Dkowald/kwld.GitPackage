@@ -94,7 +94,7 @@ public class Basic
     }
 
     [Ordered, Fact]
-    public async Task GetCommonProtosWithRoot()
+    public async Task ReRootProtos()
     {
         var targetFolder = Files.AppData.GetFolder("CommonProtos");
 
@@ -108,8 +108,35 @@ public class Basic
             $"--origin:{origin}",
             $"--version:{version}",
             $"--filter:{filter}",
-            $"--get-root:/src",
-            "--log-level:t"
+            "--get-root:/src",
+            "--log-level:t",
+            "--force:all"
+        };
+
+        await Program.Main(args);
+    }
+
+    [Ordered, Fact]
+    public async Task FilterTestProtos()
+    {
+        var targetFolder = Files.AppData.GetFolder("CommonProtos");
+
+        var origin = "https://github.com/protocolbuffers/protobuf.git";
+        var version = "branch/main";
+        var filter = "/src/google/**/*.proto";
+
+        var ignore = "*unittest*,test_*";
+
+        var args = new[]
+        {
+            $"{targetFolder.FullName}",
+            $"--origin:{origin}",
+            $"--version:{version}",
+            $"--filter:{filter}",
+            $"--ignore:{ignore}",
+            "--get-root:/src",
+            "--log-level:t",
+            "--force:all"
         };
 
         await Program.Main(args);

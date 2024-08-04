@@ -54,7 +54,7 @@ public class GetActionTests
 
         var dir = new MockFileSystem().Current();
 
-        await new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), new())
+        await new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), GlobFilter.MatchAll)
             { Commit = "already-have-commit"}.Write(host.Get<ILogger>());
 
         var target = host.Get<GetAction>();

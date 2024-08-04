@@ -52,7 +52,7 @@ public class StatusFileTests
 
         var original = new StatusFile(dir, 
             new("http://somewhere"), 
-            new("tag/1"), new())
+            new("tag/1"), GlobFilter.MatchAll)
         {
             Commit = "zzzzzzzz1",
             GetRoot = new("/aplace")

@@ -1,4 +1,5 @@
 ﻿using GitGet.Model;
+
 using GitPackage.Tests.TestHelpers;
 
 using Microsoft.Extensions.Logging.Testing;
@@ -7,11 +8,10 @@ namespace GitPackage.Tests.GitCommands
 {
     public class GetTests
     {
-        private readonly IDirectoryInfo _outRoot = 
-            new FileSystem().Project().GetFolder("App_Data", "GitGet");
+        private readonly IDirectoryInfo _outRoot = Files.AppData.GetFolder(nameof(GetTests));
 
         [Fact]
-        public async Task Run_GetSubPath()
+        public async Task GetSubPath()
         {
             using var repo = TestRepository.OpenTestRepository();
 
@@ -19,13 +19,11 @@ namespace GitPackage.Tests.GitCommands
 
             var destRoot = _outRoot.GetFolder("GetSubPath").EnsureEmpty();
 
-            var version = new GitRef("tag/CheckoutAll");
+            var version = new GitRef("tag/v1");
 
-            await target.Run(destRoot, version, new(), "/Folder2");
+            await target.Run(destRoot, version, new("/Folder2/Folder1/*.txt"), "/Folder2");
 
-            await VerifyDirectory(destRoot.FullName)
-                .UseFileName(nameof(Run_GetSubPath))
-                .UseDirectory("Snapshot");
+            await VerifyDirectory(destRoot.FullName);
         }
 
         [Fact]
@@ -38,11 +36,9 @@ namespace GitPackage.Tests.GitCommands
 
             var target = new GitGet.GitCommands.Get(repo);
 
-            await target.Run(destRoot, version, new());
+            await target.Run(destRoot, version, GetFilter.All());
 
-            await VerifyDirectory(destRoot.FullName)
-                .UseFileName(nameof(GetByAnnotatedTag))
-                .UseDirectory("Snapshot");
+            await VerifyDirectory(destRoot.FullName);
         }
 
         [Fact]
@@ -53,16 +49,14 @@ namespace GitPackage.Tests.GitCommands
 
             var glob = "Folder1/**/*.md,Folder2/**/*";
 
-            var destRoot = _outRoot.GetFolder("Tag0Filtered")
+            var destRoot = _outRoot.GetFolder(nameof(GetFiltered))
                 .EnsureEmpty();
 
             var target = new GitGet.GitCommands.Get(repo);
 
             await target.Run(destRoot, commit, new(glob));
 
-            await VerifyDirectory(destRoot.FullName)
-                .UseFileName(nameof(GetFiltered))
-                .UseDirectory("Snapshot");
+            await VerifyDirectory(destRoot.FullName);
         }
 
         [Fact]
@@ -83,9 +77,7 @@ namespace GitPackage.Tests.GitCommands
 
             await target.Run(destRoot, commit, new(glob));
 
-            await VerifyDirectory(destRoot.FullName)
-                .UseFileName(nameof(GetNoAnchorFiltered))
-                .UseDirectory("Snapshot");
+            await VerifyDirectory(destRoot.FullName);
         }
     }
 }

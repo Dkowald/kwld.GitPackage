@@ -17,7 +17,7 @@ internal class Get(Repository repository)
     /// <param name="commit">
     /// Commit to collect files from
     /// </param>
-    /// <param name="filter">
+    /// <param name="include">
     /// Filter collected files, only extracting those that match.
     /// </param>
     /// <param name="subPath">
@@ -27,7 +27,7 @@ internal class Get(Repository repository)
     /// 
     /// </returns>
     public async Task<(string Commit, int Extracted)>  Run(IDirectoryInfo target, GitRef commit, 
-        GetFilter filter, string? subPath = null)
+        GetFilter include, string? subPath = null)
     {
         var commitRef = repository.Refs[commit.Value]
             ?.ResolveToDirectReference()
@@ -35,13 +35,13 @@ internal class Get(Repository repository)
             ?? throw new Exception($"Commit {commit} not found");
 
         var rootTree = TryFindRoot(commitRef.Tree, subPath);
-        if(rootTree == null)
+        if(rootTree.Tree == null)
         {
             throw new Exception($"Subpath {subPath} not found");
         }
 
         int count = 0;
-        foreach (var file in ReadTree(rootTree, filter))
+        foreach (var file in ReadTree(rootTree.Tree, include, rootTree.Path))
         {
             if (file.Item.TargetType != TreeEntryTargetType.Blob)
                 throw new Exception("can only handle blobs.");
@@ -49,8 +49,8 @@ internal class Get(Repository repository)
             var content = (Blob)file.Item.Target;
             var outFile = target.GetFile(file.Path[1..]);
 
-            using var rd = content.GetContentStream();
-            using var wr = outFile.EnsureDirectory().Create();
+            await using var rd = content.GetContentStream();
+            await using var wr = outFile.EnsureDirectory().Create();
             await rd.CopyToAsync(wr);
             count++;
         }
@@ -60,7 +60,7 @@ internal class Get(Repository repository)
 
     private record BlobEntry(string Path, TreeEntry Item);
 
-    private IEnumerable<BlobEntry> ReadTree(Tree root, GetFilter filters)
+    private IEnumerable<BlobEntry> ReadTree(Tree root, GetFilter include, string rootPath)
     {
         var stack = new Stack<(Tree Tree, string Path)>([(root, "")]);
 
@@ -79,30 +79,35 @@ internal class Get(Repository repository)
 
                 var path = $"{next.Path}/{item.Name}";
 
-                if (filters.IsMatch(path))
+                var actualRepoPath = $"{rootPath}{path}";
+                if (include.IsMatch(actualRepoPath))
                     yield return new(path, item);
             }
         }
     }
 
-    private Tree? TryFindRoot(Tree trueRoot, string? subPath) 
+    private (Tree? Tree, string Path) TryFindRoot(Tree trueRoot, string? subPath) 
     {
-        if (string.IsNullOrEmpty(subPath)) return trueRoot;
+        if (string.IsNullOrEmpty(subPath)) return (trueRoot, "");
 
         var parts = subPath.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         var current = trueRoot;
+        var rootPath = "";
         foreach(var part in parts)
         {
             var entry = current
-                .FirstOrDefault(x => x is not null && x.Name.Same(part));
+                .FirstOrDefault(x => x is not null && x.Name.Same(part) && x.TargetType == TreeEntryTargetType.Tree);
 
-            current = entry?.Target != null ?repository.Lookup<Tree>(entry.Target.Sha) : null;
+            if (entry == null){ current = null; break;}
+
+            current = entry.Target != null ?repository.Lookup<Tree>(entry.Target.Sha) : null;
+            rootPath = $"{rootPath}/{entry.Name}";
 
             if (current == null) break;
         }
         
-        return current;
+        return (current, rootPath);
 
     }
 }

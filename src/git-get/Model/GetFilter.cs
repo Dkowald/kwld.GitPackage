@@ -1,46 +1,33 @@
-﻿using DotNet.Globbing;
-
-namespace GitGet.Model;
+﻿namespace GitGet.Model;
 
 /// <summary>
-/// A set of glob filter(s) to select files.
-/// The default is match all.
+/// Combines an include and optional ignore filter
+/// to filter git get results.
 /// </summary>
-/// <remarks>
-/// Consider making this behave like gitignore
-/// https://git-scm.com/docs/gitignore?ref=linuxandubuntu.com#_pattern_format
-/// </remarks>
 internal class GetFilter : IEquatable<GetFilter>
 {
-    public const string NoFilter = "**/*";
-
-    private readonly Glob[] _filters;
+    private readonly GlobFilter _include;
+    private readonly GlobFilter? _ignore;
 
     /// <summary>
-    /// Create glob filter, defaults to no filter glob.
+    /// Create filter to match all; with optional ignore.
     /// </summary>
-    /// <param name="globs">series of comma seperated globs</param>
-    public GetFilter(string globs = NoFilter)
+    /// <returns></returns>
+    public static GetFilter All(string? ignore = null)
+        => new(GlobFilter.MatchAll, ignore == null ? null : new(ignore));
+    
+    public GetFilter(string include, string? ignore = null):
+        this(new(include), ignore is null? null : new GlobFilter(ignore)){}
+
+    public GetFilter(GlobFilter include, GlobFilter? ignore = null)
     {
-        var options = GlobOptions.Default;
-        options.Evaluation.CaseInsensitive = true;
-
-        var parts = globs.Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-        parts = parts.Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(Encode)
-            .ToArray();
-
-        _filters = parts.Length == 0 ?
-            [Glob.Parse("**/*")] :
-            parts.Select(Glob.Parse).ToArray();
+        _include = include;
+        _ignore = ignore;
     }
 
-    public bool IsMatch(string path) =>
-        _filters.Any(x => x.IsMatch(path));
-
-    public override string ToString()
-        => string.Join(',', _filters.Select(x => Decode(x.ToString())));
+    public bool IsMatch(string path)=>
+        _include.IsMatch(path) && 
+        _ignore?.IsMatch(path) != true;
 
     #region Equal
     public override bool Equals(object? obj) =>
@@ -49,28 +36,16 @@ internal class GetFilter : IEquatable<GetFilter>
     public bool Equals(GetFilter? rhs) {
         if (rhs is null) return false;
 
-        var lhsFilters = _filters.Select(x => x.ToString())
-            .Order().ToArray();
-
-        var rhsFilters = rhs._filters.Select(x => x.ToString())
-            .Order().ToArray();
-
-        return lhsFilters.SequenceEqual(rhsFilters);
+        return _include == rhs._include &&
+               _ignore == rhs._ignore;
     }
 
     public override int GetHashCode() =>
-        _filters.Aggregate(0, (v, x) => HashCode.Combine(v, x.ToString()));
+        HashCode.Combine(_include, _ignore);
 
     public static bool operator ==(GetFilter? lhs, GetFilter? rhs)
-        => lhs is not null ? lhs.Equals(rhs) : rhs is null;
+        => lhs?.Equals(rhs) ?? rhs is null;
 
     public static bool operator !=(GetFilter? lhs, GetFilter? rhs) => !(lhs == rhs);
     #endregion
-
-    private string Encode(string glob)
-        => glob.StartsWith('/') || glob.StartsWith("**/")
-            ? glob : $"**/{glob}";
-
-    private static string Decode(string glob)
-        => glob.StartsWith("**/") ? glob[3..] : glob;
 }

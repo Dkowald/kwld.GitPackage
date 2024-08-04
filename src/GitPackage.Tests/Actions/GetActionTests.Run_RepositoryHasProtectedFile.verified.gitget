@@ -1,5 +1,6 @@
 Origin = file:///C:/Source/kwld/kwld.GitPackage/src/GitPackage.Tests/App_Data/TestRepository/
 Version = branch/BranchHasStatusFile
 Filter = *
+Ignore = 
 GetRoot = /
 Commit = 04f3551052795aab558d87656f4ef050a72a2bf0

@@ -69,8 +69,9 @@ internal class GetAction : IAction
         args.TargetPath.EnsureEmpty();
 
         _log.LogInformation("Extracting files");
+        var filter = new GetFilter(package.Filter, package.Ignore);
         var info = await new GitCommands.Get(repo)
-            .Run(package.TargetPath, package.Version, package.Filter, package.GetRoot);
+            .Run(package.TargetPath, package.Version, filter, package.GetRoot);
 
         package.Commit = info.Commit;
 
@@ -139,39 +140,6 @@ internal class GetAction : IAction
         var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
 
         return targetRef;
-    }
-
-    private static void CleanTargetPath(IDirectoryInfo targetPath)
-    {
-        if (!targetPath.Exists()) return;
-
-        foreach(var item in targetPath.EnumerateFileSystemInfos())
-        {
-            if(item is IDirectoryInfo dir)
-            {
-                try
-                {
-                    dir.Delete(true);
-                }catch(Exception ex)
-                {
-                    throw new Exception($"Failed delete {dir.FullName}", ex);
-                }
-            }
-
-            if(item is IFileInfo file)
-            {
-                if (file.Name == StatusFile.FileName && file.DirectoryName == targetPath.FullName)
-                    continue;
-
-                try
-                {
-                    file.Delete();
-                }catch(Exception ex)
-                {
-                    throw new Exception($"Filed delete {file.FullName}", ex);
-                }
-            }
-        }
     }
 
     private bool IsForce(Args args, GitRef targetRef)

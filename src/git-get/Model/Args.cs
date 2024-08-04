@@ -10,6 +10,7 @@ internal class Args
     private const string OrignKey = "--origin:";
     private const string VersionKey = "--version:";
     private const string FilterKey = "--filter:";
+    private const string IgnoreKey = "--ignore:";
     private const string GetRootKey = "--get-root:";
     private const string CacheKey = "--cache:";
     private const string ForceKey = "--force:";
@@ -40,7 +41,8 @@ internal class Args
         IDirectoryInfo? targetPath = null;
         Uri? origin = null;
         GitRef? version = null;
-        GetFilter? filter = null;
+        GlobFilter? filter = null;
+        GlobFilter? ignore = null;
         RootPath? root = null;
         IDirectoryInfo? cache = null;
         ForceOption? force = null;
@@ -149,6 +151,26 @@ internal class Args
                 continue;
             }
 
+            if (next.StartsWith(IgnoreKey))
+            {
+                if (ignore is not null)
+                {
+                    log.LogError("Ignore already provided");
+                    return null;
+                }
+                var value = next[IgnoreKey.Length..];
+                try
+                {
+                    ignore = new(value);
+                }
+                catch (Exception ex)
+                {
+                    log.LogError("Invalid ignore: {ignore}", value);
+                    log.LogInformation(ex, $"Failed create {nameof(Ignore)}");
+                }
+                continue;
+            }
+
             if (next.StartsWith(GetRootKey))
             {
                 if (root is not null)
@@ -249,6 +271,7 @@ internal class Args
             Origin = origin,
             Version = version,
             Filter = filter,
+            Ignore = ignore,
             GetRoot = root ?? RootPath.Default,
             Force = force,
             User = user
@@ -273,7 +296,9 @@ internal class Args
 
     public GitRef? Version { get; init; }
 
-    public GetFilter? Filter { get; init; }
+    public GlobFilter? Filter { get; init; }
+
+    public GlobFilter? Ignore { get; init; }
 
     public RootPath GetRoot { get; init; } = RootPath.Default;
 

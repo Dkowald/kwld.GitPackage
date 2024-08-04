@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
 
@@ -15,7 +16,8 @@ internal class StatusFile
         
         Uri? origin;
         GitRef? version;
-        GetFilter? filter;
+        GlobFilter? filter;
+        GlobFilter? ignore;
         RootPath? getRoot;
         string? commit = stored?.Commit;
 
@@ -42,9 +44,12 @@ internal class StatusFile
         if (filter is null)
         {
             log.LogWarning("No filter found from status file or arguments, using default");
-            filter = new();
+            filter = GlobFilter.MatchAll;
             changed = true;
         }
+
+        ignore = args.Ignore ?? stored?.Ignore;
+        changed |= ignore != stored?.Ignore;
 
         getRoot = args.GetRoot;
         changed |= getRoot != stored?.GetRoot;
@@ -65,7 +70,8 @@ internal class StatusFile
 
         Uri? origin = null;
         GitRef? version = null;
-        GetFilter? filter = null;
+        GlobFilter? filter = null;
+        GlobFilter? ignore = null;
         string? getRoot = null;
         string? commit = null;
 
@@ -111,6 +117,12 @@ internal class StatusFile
                 continue;
             }
 
+            if (key.Same(nameof(Ignore)))
+            {
+                ignore = value.IsNullOrEmpty()? null : new(value);
+                continue;
+            }
+
             if (key.Same(nameof(GetRoot)))
             {
                 getRoot = value.IsNullOrWhiteSpace() ? null : value;
@@ -132,11 +144,12 @@ internal class StatusFile
         return new StatusFile(dataFolder, origin, version, filter)
         {
             Commit = commit,
+            Ignore = ignore,
             GetRoot = RootPath.TryParse(getRoot) ?? RootPath.Default
         };
     }
 
-    public StatusFile(IDirectoryInfo targetFolder, Uri origin, GitRef version, GetFilter filter)
+    public StatusFile(IDirectoryInfo targetFolder, Uri origin, GitRef version, GlobFilter filter)
     {
         TargetPath = targetFolder;
 
@@ -150,11 +163,12 @@ internal class StatusFile
     /// </summary>
     public async Task<StatusFile> Write(ILogger log)
     {
-        var content = new[]
+        var content = new List<string>
         {
             $"{nameof(Origin)} = {Origin}",
             $"{nameof(Version)} = {Version.Version}",
             $"{nameof(Filter)} = {Filter}",
+            $"{nameof(Ignore)} = {Ignore}",
             $"{nameof(GetRoot)} = {GetRoot}"
         };
 
@@ -183,12 +197,17 @@ internal class StatusFile
     /// If not prefixed with tags or heads; then it is assumed to be tags.
     /// </summary>
     public GitRef Version { get; set; }
-
+    
     /// <summary>
     /// Optional glob filter on source files.
     /// Defaults to 
     /// </summary>
-    public GetFilter Filter { get; set; }
+    public GlobFilter Filter { get; set; }
+
+    /// <summary>
+    /// Optional ignore filter
+    /// </summary>
+    public GlobFilter? Ignore { get; set; }
 
     /// <summary>
     /// Sub path in repository tree to use as root.
@@ -204,6 +223,8 @@ internal class StatusFile
     /// The commit used for current files, if files have been collected
     /// </summary>
     public string? Commit { get; set; }
+
+    public GetFilter GetFilter => new(Filter, Ignore);
 
     public bool Same(StatusFile? rhs)
     {

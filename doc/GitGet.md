@@ -117,6 +117,11 @@ Defaults to all: **/*.
 glob entries are case-insensitive.  
 glob's are simple pattern match, using ** to match any-folder and * to match any char.
 
+### --ignore:[globs]
+A set of comma ',' delimited globs to ignore some selected files.
+Defaults to none: null
+
+
 #### --get-root:[get-root]
 A sub-path withing the origin repository tree to 
 collect files from. Only repository files withing this path will be 

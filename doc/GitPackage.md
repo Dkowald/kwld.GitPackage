@@ -15,6 +15,8 @@ __Item metadata__
 |Origin|git repository origin url|
 |Verison|git ref to fetch from|
 |Filter|glob filter(s) for source files|
+|Ignore|glob filter(s) to ignore selected files|
+|GetRoot|Optional sub-path with repository to get from|
 |User|username for private repo|
 |Password|password for private repo| 
 

@@ -22,7 +22,9 @@
     <ItemGroup>
       <Args Include="--origin:%(GitPackage.Origin)" />
       <Args Include="--version:%(GitPackage.Version)" />
-      <Args Include="--filter:%(GitPackage.Filter)" />
+      <Args Include="--filter:%(GitPackage.Filter)" Condition="'%(GitPackage.Filter)' != ''" />
+      <Args Include="--ignore:%(GitPackage.Ignore)" Condition="'%(GitPackage.Ignore)' != ''" />
+      <Args Include="--get-root:%(GitPackage.GetRoot)" Condition="'%(GitPackage.GetRoot)' != ''"  />
       <Args Include="--log-level:$(GitPackage-LogLevel)" Condition="'$(GitPackage-LogLevel)' != ''" />
       <Args Include="--cache:$(GitPackage-Cache)" Condition="'$(GitPackage-Cache)' != ''" />
     </ItemGroup>
