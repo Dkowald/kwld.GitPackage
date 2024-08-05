@@ -105,7 +105,7 @@ internal class GetAction : IAction
 
         //fetch.
         var remote = repo.Network.Remotes["origin"];
-        var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+        var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification).ToArray();
 
         var progressStarted = false;
         var transferStarted = false;

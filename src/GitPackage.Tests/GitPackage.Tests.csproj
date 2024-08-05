@@ -1,13 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <UserSecretsId>8c90dc28-1cf1-4dac-b2eb-0e29bf85141d</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,54 +17,22 @@
   </PropertyGroup>
   <!-- Manually include the build project assets -->
   <Import Project="../GitPackage/build/GitPackage.targets" />
-  
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="8.5.0" />
-    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="20.0.4" />
-    <PackageReference Include="Verify.Xunit" Version="24.1.0" />
-    <PackageReference Include="xunit" Version="2.8.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="NSubstitute" Version="5.1.0" />
-    <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="InMemoryLogger" Version="1.0.66" />
-    <PackageReference Include="kwld.CoreUtil" Version="1.3.2" />
-    <PackageReference Include="kwld.Xunit.Ordering" Version="1.0.0-preview1" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\git-get\git-get.csproj" />
-    <ProjectReference Include="..\GitPackage\GitPackage.csproj" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
-  <!--<ItemGroup>
-    --><!--Include readme's for used projects--><!--
+  <ItemGroup> 
+  <!--Include readme's for used projects-->
     <GitPackage Include="App_Data/external/LibGit2Sharp" Origin="https://github.com/libgit2/libgit2sharp.git" Version="branch/master" Filter="/*.md" />
-
     <GitPackage Include="App_Data/external/DotNet.Glob" Origin="https://github.com/dazinator/DotNet.Glob.git" Version="tag/3.1.3" Filter="/*.md" /> 
-  </ItemGroup>-->
-
-  <ItemGroup>
-    <None Update="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="App_Data/.gitpackages/**/*" />
-    <None Include="**/.gitget/**" />
-  </ItemGroup>
-    
 </Project>

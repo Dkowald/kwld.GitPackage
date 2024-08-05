@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="GitPackage.Tests" />
+    <InternalsVisibleTo Include="git-get.Tests" />
   </ItemGroup>
 
   <ItemGroup>
