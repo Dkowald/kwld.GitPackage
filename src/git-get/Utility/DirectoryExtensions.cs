@@ -15,4 +15,22 @@ internal static class DirectoryExtensions
         return target;
     }
 
+    public static IDirectoryInfo MakeEmpty(this IDirectoryInfo target)
+    {
+        if (!target.Exists())
+        {
+            target.Create();
+            return target;
+        }
+
+        foreach (var item in target.EnumerateFileSystemInfos())
+        {
+            if (item is IDirectoryInfo dir)
+            { dir.EnsureDelete(); }
+            else
+                ((IFileInfo)item).Delete();
+        }
+
+        return target;
+    }
 }

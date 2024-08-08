@@ -1,9 +1,9 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
-
+using GitGet.Actions;
 using GitGet.Model;
 
 using GitPackage.Tests.TestHelpers;
-
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 
 namespace GitPackage.Tests.Model;
@@ -24,8 +24,8 @@ public class StatusFileTests
         }.Write(new FakeLogger());
 
         var args = new Args(
-            Microsoft.Extensions.Logging.LogLevel.Trace,
-            GitGet.Actions.ActionOptions.About,
+            LogLevel.Trace,
+            ActionOptions.About,
             files.Current(), files.Current())
         {
             Origin = new("http://updatedurl"),

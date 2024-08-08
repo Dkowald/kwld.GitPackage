@@ -38,7 +38,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\git-get\git-get.csproj" />
-    <ProjectReference Include="..\GitPackage\GitPackage.csproj" />
   </ItemGroup>
   
   <ItemGroup>
@@ -50,6 +49,10 @@
   <ItemGroup>
     <None Include="App_Data/.gitpackages/**/*" />
     <None Include="**/.gitget/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Data\.gitpackages\local\" />
   </ItemGroup>
     
 </Project>

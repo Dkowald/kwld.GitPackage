@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 namespace GitGet.Model;
 
 /// <summary>
-/// Present user input as valid git refs. <br/>
+/// Present user input as valid git refs.<br/>
 /// Cannot be empty. <br/>
-/// Value can be a regular git-ref, or short-form <br/>
-/// Must have origin remote for branches <br/>
+/// Value can be a regular full-form git-ref, or short-form <br/>
+/// Must have origin remote for branches (full-form)<br/>
 /// <list type="bullet">
 /// <item>[tag]</item>
 /// <item>tag/[tag]</item>
@@ -131,8 +131,8 @@ internal record GitRef : IDataString<GitRef>
     [return: NotNullIfNotNull(nameof(GitRef))]
     public static implicit operator string?(GitRef? self) => self?.ToString();
 
-    /// <inheritdoc cref="Value"/>
-    public override string ToString() => Value;
+    /// <inheritdoc cref="Version"/>
+    public override string ToString() => Version;
 
     private string GitToShortForm =>
         _prefix.Same(BranchRefPrefix) ? "branch" : "tag";

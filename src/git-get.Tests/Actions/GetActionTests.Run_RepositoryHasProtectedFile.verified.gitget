@@ -1,4 +1,4 @@
-Origin = file:///C:/Source/kwld/kwld.GitPackage/src/GitPackage.Tests/App_Data/TestRepository/
+Origin = file:///C:/Source/kwld/kwld.GitPackage/src/git-get.Tests/App_Data/TestRepository/
 Version = branch/BranchHasStatusFile
 Filter = *
 Ignore = 

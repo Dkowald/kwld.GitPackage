@@ -21,7 +21,7 @@ namespace GitPackage.Tests.Model
             var result = GitRef.TryParse("v2.0");
             Assert.NotNull(result);
 
-            Assert.Equal("refs/tags/v2.0", result.ToString());
+            Assert.Equal("refs/tags/v2.0", result.Value);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace GitPackage.Tests.Model
             var result = GitRef.TryParse("refs/remotes/origin/main");
             Assert.NotNull(result);
 
-            Assert.Equal("refs/remotes/origin/main", result.ToString());
+            Assert.Equal("refs/remotes/origin/main", result.Value);
             Assert.Equal("branch/main", result.Version);
         }
 

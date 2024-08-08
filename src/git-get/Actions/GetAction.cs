@@ -1,4 +1,7 @@
-﻿using GitGet.Model;
+﻿using GitGet.Actions.Errors;
+using GitGet.Model;
+using GitGet.Utility;
+
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
@@ -64,10 +67,8 @@ internal class GetAction : IAction
             return 1;
         }
 
-        //reset out folder.
-        _log.LogInformation("Clean {TargetPath}", args.TargetPath.FullName);
-        args.TargetPath.EnsureEmpty();
-
+        ResetOutputPath(args.TargetPath);
+        
         _log.LogInformation("Extracting files");
         var filter = new GetFilter(package.Filter, package.Ignore);
         var info = await new GitCommands.Get(repo)
@@ -87,11 +88,26 @@ internal class GetAction : IAction
         return 0;
     }
 
+    private void ResetOutputPath(IDirectoryInfo targetPath)
+    {
+        //reset out folder.
+        _log.LogInformation("Clean {TargetPath}", targetPath.FullName);
+
+        try
+        {
+            targetPath.MakeEmpty();
+        }
+        catch (Exception ex)
+        {
+            throw new ErrorCannotCleanTarget(targetPath.FullName, ex);
+        }
+    }
+
     private DirectReference? FetchReference(Repository repo, GitRef gitRef, bool force, CredentialsHandler? creds)
     {
         if (gitRef.IsTag && !force)
         {
-            var tagRef = repo.Refs[gitRef];
+            var tagRef = repo.Refs[gitRef.Value];
             if(tagRef != null)
             {
                 _log.LogInformation("Ref '{gitRef}' found in cache", gitRef.Version);
@@ -137,7 +153,7 @@ internal class GetAction : IAction
         
         Commands.Fetch(repo, "origin", refSpecs, options, "");
         
-        var targetRef = repo.Refs[gitRef]?.ResolveToDirectReference();
+        var targetRef = repo.Refs[gitRef.Value]?.ResolveToDirectReference();
 
         return targetRef;
     }
