@@ -1,12 +1,8 @@
 ﻿using System.Diagnostics;
-
-using GitGet;
-
-using GitPackage.Tests.TestHelpers;
-
+using GitGet.Tests.TestHelpers;
 using Microsoft.Extensions.Configuration;
 
-namespace GitPackage.Tests.Usage;
+namespace GitGet.Tests.Usage;
 
 public class SecureRepository
 {

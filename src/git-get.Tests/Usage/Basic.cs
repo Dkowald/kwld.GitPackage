@@ -1,8 +1,6 @@
-﻿using GitGet;
+﻿using GitGet.Tests.TestHelpers;
 
-using GitPackage.Tests.TestHelpers;
-
-namespace GitPackage.Tests.Usage;
+namespace GitGet.Tests.Usage;
 
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class Basic
@@ -68,77 +66,5 @@ public class Basic
         Assert.Equal(0, result);
 
         await VerifyDirectory(_root.FullName);
-    }
-
-    //todo: move to its own sample.
-    [Ordered, Fact]
-    public async Task GetCommonProtos() 
-    {
-        var targetFolder = Files.AppData.GetFolder("CommonProtos");
-
-        var origin = "https://github.com/protocolbuffers/protobuf.git";
-        var version = "branch/main";
-        var filter = "/src/google/**/*.proto";
-
-        var args = new[]
-        {
-            $"{targetFolder.FullName}",
-            $"--origin:{origin}",
-            $"--version:{version}",
-            $"--filter:{filter}"
-        };
-
-        await Program.Main(args);
-
-        //await VerifyDirectory(targetFolder.FullName);
-    }
-
-    [Ordered, Fact]
-    public async Task ReRootProtos()
-    {
-        var targetFolder = Files.AppData.GetFolder("CommonProtos");
-
-        var origin = "https://github.com/protocolbuffers/protobuf.git";
-        var version = "branch/main";
-        var filter = "/src/google/**/*.proto";
-
-        var args = new[]
-        {
-            $"{targetFolder.FullName}",
-            $"--origin:{origin}",
-            $"--version:{version}",
-            $"--filter:{filter}",
-            "--get-root:/src",
-            "--log-level:t",
-            "--force:all"
-        };
-
-        await Program.Main(args);
-    }
-
-    [Ordered, Fact]
-    public async Task FilterTestProtos()
-    {
-        var targetFolder = Files.AppData.GetFolder("CommonProtos");
-
-        var origin = "https://github.com/protocolbuffers/protobuf.git";
-        var version = "branch/main";
-        var filter = "/src/google/**/*.proto";
-
-        var ignore = "*unittest*,test_*";
-
-        var args = new[]
-        {
-            $"{targetFolder.FullName}",
-            $"--origin:{origin}",
-            $"--version:{version}",
-            $"--filter:{filter}",
-            $"--ignore:{ignore}",
-            "--get-root:/src",
-            "--log-level:t",
-            "--force:all"
-        };
-
-        await Program.Main(args);
     }
 }

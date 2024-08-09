@@ -1,6 +1,6 @@
 ﻿using GitGet.Model;
 
-namespace GitPackage.Tests.Model
+namespace GitGet.Tests.Model
 {
     public class RootPathTests
     {

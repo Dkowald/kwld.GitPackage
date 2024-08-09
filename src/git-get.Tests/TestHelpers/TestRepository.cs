@@ -1,9 +1,9 @@
-﻿using GitGet.Utility;
-using LibGit2Sharp;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using GitGet.Model;
+using GitGet.Utility;
+using LibGit2Sharp;
 
-namespace GitPackage.Tests.TestHelpers;
+namespace GitGet.Tests.TestHelpers;
 
 static class TestRepository
 {

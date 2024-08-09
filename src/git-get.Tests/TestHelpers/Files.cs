@@ -1,4 +1,4 @@
-﻿namespace GitPackage.Tests.TestHelpers;
+﻿namespace GitGet.Tests.TestHelpers;
 
 internal static class Files
 {

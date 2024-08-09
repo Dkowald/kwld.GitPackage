@@ -1,14 +1,11 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
-
 using GitGet.Actions;
 using GitGet.Model;
-
-using GitPackage.Tests.TestHelpers;
-
+using GitGet.Tests.TestHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace GitPackage.Tests.Actions;
+namespace GitGet.Tests.Actions;
 
 public class WhereTests
 {

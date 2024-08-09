@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 
-namespace GitPackage.Tests.Model;
+namespace GitGet.Tests.Model;
 
 public class ArgsTests
 {

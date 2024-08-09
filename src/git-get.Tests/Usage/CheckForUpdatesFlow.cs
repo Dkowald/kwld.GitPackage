@@ -1,12 +1,9 @@
-﻿using GitGet;
-using GitGet.Model;
+﻿using GitGet.Model;
+using GitGet.Tests.TestHelpers;
 using GitGet.Utility;
-
-using GitPackage.Tests.TestHelpers;
-
 using LibGit2Sharp;
 
-namespace GitPackage.Tests.Usage;
+namespace GitGet.Tests.Usage;
 
 [TestCaseOrderer(LineOrderedTests.TypeName, LineOrderedTests.AssemName)]
 public class CheckForUpdatesFlow

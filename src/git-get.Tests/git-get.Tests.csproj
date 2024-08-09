@@ -8,6 +8,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <UserSecretsId>8c90dc28-1cf1-4dac-b2eb-0e29bf85141d</UserSecretsId>
+    <RootNamespace>GitGet.Tests</RootNamespace>
   </PropertyGroup>
   
   <ItemGroup>
@@ -49,10 +50,6 @@
   <ItemGroup>
     <None Include="App_Data/.gitpackages/**/*" />
     <None Include="**/.gitget/**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="App_Data\.gitpackages\local\" />
   </ItemGroup>
     
 </Project>

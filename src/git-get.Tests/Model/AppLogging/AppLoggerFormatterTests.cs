@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 
-namespace GitPackage.Tests.Model.AppLogging;
+namespace GitGet.Tests.Model.AppLogging;
 
 public class AppLoggerFormatterTests
 {

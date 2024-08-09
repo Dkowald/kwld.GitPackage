@@ -56,7 +56,7 @@ internal class StatusFile
         if (changed) commit = null;
         
         var data = new StatusFile(args.TargetPath, origin, version, filter)
-        { Commit = commit, GetRoot = getRoot };
+        { Commit = commit, GetRoot = getRoot, Ignore = ignore};
 
         return (data, changed);
     }

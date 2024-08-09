@@ -1,6 +1,6 @@
 ﻿using GitGet.Services;
 
-namespace GitPackage.Tests.TestHelpers
+namespace GitGet.Tests.TestHelpers
 {
     public class FakeConsole : IConsole
     {

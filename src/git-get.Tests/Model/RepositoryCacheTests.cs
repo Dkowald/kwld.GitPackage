@@ -1,13 +1,10 @@
 ﻿using GitGet.Model;
+using GitGet.Tests.TestHelpers;
 using GitGet.Utility;
-
-using GitPackage.Tests.TestHelpers;
-
 using LibGit2Sharp;
-
 using Microsoft.Extensions.Logging.Testing;
 
-namespace GitPackage.Tests.Model;
+namespace GitGet.Tests.Model;
 
 public class RepositoryCacheTests
 {

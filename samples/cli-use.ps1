@@ -1,11 +1,11 @@
 # Demo to get k8s yaml for 
 # a nfs based volume provider
 
-# install as global tool.
+# (re) install as global tool.
 dotnet tool uninstall git-get --global
 dotnet tool install git-get --global --no-cache
 
-#check verions installed 
+#check version installed 
 git-get about
 
 $dir = "./CliDemo/nfs-provisioner"

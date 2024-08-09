@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Logging.Testing;
-
-using GitGet.Actions;
-using GitPackage.Tests.TestHelpers;
+﻿using GitGet.Actions;
 using GitGet.Model;
+using GitGet.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 
-namespace GitPackage.Tests.Actions
+namespace GitGet.Tests.Actions
 {
     public class InfoTests
     {

@@ -2,19 +2,24 @@
 
 using GitGet.Actions;
 using GitGet.Model;
+using GitGet.Tests.TestHelpers;
 using GitGet.Utility;
-
-using GitPackage.Tests.TestHelpers;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
-namespace GitPackage.Tests.Actions;
+namespace GitGet.Tests.Actions;
 
 public class GetActionTests
 {
+    [Fact(Skip = "true")]
+    public void ReportResults()
+    {
+        //the totals should be reported as info logs.
+    }
+
     [Fact]
     public async Task ReportNetworkActivity()
     {
@@ -25,7 +30,7 @@ public class GetActionTests
         using var host = new TestHost();
 
         var outDir = Files.AppData.GetFolder(nameof(GetActionTests), "OutDir");
-        
+
         outDir.ClearReadonly()
             .EnsureEmptyWithoutDelete();
 
@@ -38,7 +43,7 @@ public class GetActionTests
         };
 
         var exitCode = await target.Run(args);
-        
+
         Assert.Equal(0, exitCode);
 
         Assert.Contains(host.LogEntries, x => x.Contains("Fetch"));
@@ -55,7 +60,7 @@ public class GetActionTests
         var dir = new MockFileSystem().Current();
 
         await new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), GlobFilter.MatchAll)
-            { Commit = "already-have-commit"}.Write(host.Get<ILogger>());
+        { Commit = "already-have-commit" }.Write(host.Get<ILogger>());
 
         var target = host.Get<GetAction>();
 

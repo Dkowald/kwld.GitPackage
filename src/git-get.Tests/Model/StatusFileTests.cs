@@ -1,12 +1,13 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
+
 using GitGet.Actions;
 using GitGet.Model;
+using GitGet.Tests.TestHelpers;
 
-using GitPackage.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 
-namespace GitPackage.Tests.Model;
+namespace GitGet.Tests.Model;
 
 public class StatusFileTests
 {
@@ -32,11 +33,11 @@ public class StatusFileTests
         };
 
         var result = await StatusFile.TryLoadWithOverrides(new FakeLogger(), args);
-        
+
         var package = result.File;
 
         Assert.NotNull(package);
-        
+
         Assert.Equal(current.Filter, package.Filter);
         Assert.Equal(args.Origin, package.Origin);
         Assert.Null(package.Commit);
@@ -50,8 +51,8 @@ public class StatusFileTests
         var dir = Files.AppData.GetFolder(nameof(StatusFileTests), nameof(Write_Read))
             .EnsureEmpty();
 
-        var original = new StatusFile(dir, 
-            new("http://somewhere"), 
+        var original = new StatusFile(dir,
+            new("http://somewhere"),
             new("tag/1"), GlobFilter.MatchAll)
         {
             Commit = "zzzzzzzz1",

@@ -2,7 +2,7 @@ GitPackage aims to use Git Repositories in a similar way as other
 packaging systems.
 
 Originally built as a set of MSBuild Tasks, its now re-booted as a 
-dotnet tool '_Git-Get_', simplifying the MSBuild Tasks to be a wrapper around the tool.
+dotnet tool '_git-get_', simplifying the MSBuild Tasks to be a wrapper around the tool.
 
 #### Details
 - [GitGet](./GitGet.md)
@@ -15,7 +15,7 @@ Install the dotnet tool
 dotnet tool install git-get
 ```
 
-Get the docs for anoterh project.
+Get the docs for another project.
 ``` pwsh
 $origin = "https://github.com/Dkowald/kwld.CoreUtil.git"
 $filter = "/docs/**/*"
@@ -29,10 +29,8 @@ dotnet run git-get ./docs --origin:$origin --filter:$filter --version:$version
 
 1. Add nuget GitPackage
 > Add nuget GitPackage to include the build tools.
-``` xml
-  <ItemGroup>
-    <PackageReference Include="GitPackage" Version="99.0.0" />
-  </ItemGroup>
+``` pwsh
+dotnet add package GitPackage 
 ```
 
 2. Add git repository to project

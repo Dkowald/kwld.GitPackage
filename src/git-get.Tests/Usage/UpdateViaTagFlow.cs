@@ -1,4 +1,4 @@
-﻿namespace GitPackage.Tests.Usage;
+﻿namespace GitGet.Tests.Usage;
 
 public class UpdateViaTagFlow
 {
