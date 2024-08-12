@@ -3,14 +3,14 @@
 public class UpdateViaTagFlow
 {
     [Ordered, Fact]
-    public void CreateOrignWithTag1(){}
+    public void CreateOrignWithTag1() { }
 
     [Ordered, Fact]
-    public void GetPackageWithTag1(){}
+    public void GetPackageWithTag1() { }
 
     [Ordered, Fact]
-    public void UpdateOriginWithTag2(){}
+    public void UpdateOriginWithTag2() { }
 
     [Ordered, Fact]
-    public void UpdatePackageWithTag2(){}
+    public void UpdatePackageWithTag2() { }
 }

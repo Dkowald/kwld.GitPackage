@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "git-get", "git-get\git-get.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "git-get.Tests", "git-get.Tests\git-get.Tests.csproj", "{BD4DB4B8-A481-4ED5-87F5-946C0A4D32FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitPackage.Tests", "GitPackage.Tests\GitPackage.Tests.csproj", "{06F7E8FE-F20A-4647-BBDC-025D3C0811C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitPackage.Tests", "GitPackage.Tests\GitPackage.Tests.csproj", "{06F7E8FE-F20A-4647-BBDC-025D3C0811C2}"
 EndProject
 Global
 	GlobalSection(NestedProjects) = preSolution
@@ -49,6 +49,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A63C9F3B-DCC2-40ED-8925-1FAB867DB73C}
+	EndGlobalSection
+EndGlobal
+tSolution
 		SolutionGuid = {A63C9F3B-DCC2-40ED-8925-1FAB867DB73C}
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
+
 using GitGet.Tests.TestHelpers;
+
 using Microsoft.Extensions.Configuration;
 
 namespace GitGet.Tests.Usage;
@@ -7,7 +9,7 @@ namespace GitGet.Tests.Usage;
 public class SecureRepository
 {
     [Fact]
-    public async Task Get() 
+    public async Task Get()
     {
         var dir = Files.AppData.GetFolder(nameof(SecureRepository))
             .EnsureExists();
@@ -17,12 +19,11 @@ public class SecureRepository
             .Build();
 
         var url = cfg["SecureRepository:Origin"];
-        if (url is null)
-        {
+        if(url is null) {
             Debug.Write("Skipping test: no secure repository defined in project secrets.");
             return;
         }
-        
+
         var args = new[] {
             dir.FullName,
             $"--origin:{url}",

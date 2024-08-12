@@ -15,9 +15,10 @@ internal class GetFilter : IEquatable<GetFilter>
     /// <returns></returns>
     public static GetFilter All(string? ignore = null)
         => new(GlobFilter.MatchAll, ignore == null ? null : new(ignore));
-    
-    public GetFilter(string include, string? ignore = null):
-        this(new(include), ignore is null? null : new GlobFilter(ignore)){}
+
+    public GetFilter(string include, string? ignore = null) :
+        this(new(include), ignore is null ? null : new GlobFilter(ignore))
+    { }
 
     public GetFilter(GlobFilter include, GlobFilter? ignore = null)
     {
@@ -25,16 +26,17 @@ internal class GetFilter : IEquatable<GetFilter>
         _ignore = ignore;
     }
 
-    public bool IsMatch(string path)=>
-        _include.IsMatch(path) && 
+    public bool IsMatch(string path) =>
+        _include.IsMatch(path) &&
         _ignore?.IsMatch(path) != true;
 
     #region Equal
     public override bool Equals(object? obj) =>
         obj is GetFilter f && Equals(f);
 
-    public bool Equals(GetFilter? rhs) {
-        if (rhs is null) return false;
+    public bool Equals(GetFilter? rhs)
+    {
+        if(rhs is null) return false;
 
         return _include == rhs._include &&
                _ignore == rhs._ignore;

@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
+
 using GitGet.Model;
 using GitGet.Utility;
+
 using LibGit2Sharp;
 
 namespace GitGet.Tests.TestHelpers;
 
-static class TestRepository
+internal static class TestRepository
 {
     private static readonly IDirectoryInfo Path = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepositoryWorking");
@@ -14,26 +16,25 @@ static class TestRepository
         .Project().GetFolder("App_Data", "TestRepository");
 
     private static Signature Sig =>
-        new ("test", "Test@com.au", DateTimeOffset.UtcNow);
+        new("test", "Test@com.au", DateTimeOffset.UtcNow);
 
     internal static Repository OpenTestRepository(bool forceRebuild = false)
     {
-        if (!Repository.IsValid(BareRepoPath.FullName) || forceRebuild)
-        {
+        if(!Repository.IsValid(BareRepoPath.FullName) || forceRebuild) {
             Debug.WriteLine("Creating test repository");
             BareRepoPath.ClearReadonly().EnsureEmpty();
             Path.ClearReadonly().EnsureEmpty();
 
-            using (var repo = new Repository(Repository.Init(Path.FullName)))
-            {
+            using(var repo = new Repository(Repository.Init(Path.FullName))) {
                 Init(repo);
                 UpdateDeleteAndMove(repo);
                 IncludeNestedSameNameFolder(repo);
                 BranchHasStatusFile(repo);
+                ManyTotals(repo);
             }
 
             var bare = Path.GetFolder(".git");
-            
+
             bare.MergeForce(BareRepoPath);
             using var bareRepo = new Repository(BareRepoPath.FullName);
             bareRepo.Config.Set("core.bare", true);
@@ -41,7 +42,7 @@ static class TestRepository
             Path.ClearReadonly().EnsureDelete();
         }
 
-        if (!Repository.IsValid(BareRepoPath.FullName))
+        if(!Repository.IsValid(BareRepoPath.FullName))
             throw new Exception("Create test repository failed");
 
         return new Repository(BareRepoPath.FullName);
@@ -66,7 +67,7 @@ static class TestRepository
             .EnsureDirectory()
             .WriteAllText("item2.txt");
         repo.Index.Add("Folder2/item2.txt");
-        
+
         repo.Index.Write();
 
         repo.Commit("Init", Sig, Sig);
@@ -98,12 +99,12 @@ static class TestRepository
     {
         Commands.Checkout(repo, "refs/tags/v0");
 
-        Commands.Checkout(repo, 
+        Commands.Checkout(repo,
         repo.CreateBranch(nameof(IncludeNestedSameNameFolder)));
-        
+
         var f = Path.GetFile("Folder2", "Folder1", "nested.txt");
         f.EnsureDirectory().WriteAllText("nested.txt");
-        
+
         repo.Index.Add(f.GetRelativePath(Path));
 
         repo.Index.Write();
@@ -124,5 +125,42 @@ static class TestRepository
         repo.Index.Write();
 
         repo.Commit("add status file", Sig, Sig);
+    }
+
+    private static void ManyTotals(Repository repo)
+    {
+        Commands.Checkout(repo, repo.Branches[nameof(BranchHasStatusFile)]);
+        var newBranch = repo.CreateBranch(nameof(ManyTotals));
+        Commands.Checkout(repo, newBranch);
+
+        var manyFiles = Path.GetFolder("manyFiles").EnsureExists();
+        
+        var file = manyFiles.GetFile("f0.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("f1.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("f2.x.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("Dir1", "f3-dir1.txt").EnsureDirectory();
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("Dir1", "f4-dir1.x.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("Dir1", "f5-dir1.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+        
+        repo.Index.Write();
+
+        repo.Commit("Many files", Sig, Sig);
     }
 }

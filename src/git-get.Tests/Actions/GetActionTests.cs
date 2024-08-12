@@ -36,8 +36,7 @@ public class GetActionTests
 
         var target = new GetAction(host.Get<ILogger>());
 
-        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot)
-        {
+        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot) {
             Origin = TestRepository.BareRepoPath.AsUri(),
             Version = new("branch/master")
         };
@@ -52,15 +51,13 @@ public class GetActionTests
     [Fact]
     public async Task NoFetchIfHaveRef()
     {
-        using var host = new TestHost(x =>
-        {
+        using var host = new TestHost(x => {
             x.AddSingleton<GetAction>();
         });
 
         var dir = new MockFileSystem().Current();
 
-        await new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), GlobFilter.MatchAll)
-        { Commit = "already-have-commit" }.Write(host.Get<ILogger>());
+        await new StatusFile(dir, new("https://goes-no-where"), new("branch/main"), GlobFilter.MatchAll) { Commit = "already-have-commit" }.Write(host.Get<ILogger>());
 
         var target = host.Get<GetAction>();
 
@@ -84,8 +81,7 @@ public class GetActionTests
 
         var args = new Args(LogLevel.Warning, ActionOptions.Get,
             Files.AppData.GetFolder(nameof(GetActionTests)),
-            Files.TestPackageCacheRoot)
-        {
+            Files.TestPackageCacheRoot) {
             Cache = Files.TestPackageCacheRoot,
             Origin = TestRepository.BareRepoPath.AsUri(),
             Version = new("branch/BranchHasStatusFile")

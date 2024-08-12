@@ -21,11 +21,10 @@ internal static class FilesExtension
     /// </summary>
     public static IDirectoryInfo EnsureEmptyWithoutDelete(this IDirectoryInfo folder)
     {
-        if (!folder.Exists()) return folder.EnsureExists();
+        if(!folder.Exists()) return folder.EnsureExists();
 
-        foreach (var item in folder.EnumerateFileSystemInfos())
-        {
-            if (item is IDirectoryInfo dir)
+        foreach(var item in folder.EnumerateFileSystemInfos()) {
+            if(item is IDirectoryInfo dir)
                 dir.Delete(true);
             else
                 item.Delete();

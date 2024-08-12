@@ -32,14 +32,12 @@ public class CaptureConsole : IDisposable
     public void Dispose()
     {
         Flush();
-        
+
         _stdOut.Dispose();
         _stdError.Dispose();
 
-        Console.SetOut(new StreamWriter(Console.OpenStandardOutput())
-        { AutoFlush = true });
-        Console.SetError(new StreamWriter(Console.OpenStandardError())
-        { AutoFlush = true });
+        Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
+        Console.SetError(new StreamWriter(Console.OpenStandardError()) { AutoFlush = true });
 
         IsRedirecting = false;
 

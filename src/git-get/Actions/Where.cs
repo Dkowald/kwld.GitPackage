@@ -18,10 +18,9 @@ namespace GitGet.Actions
             _console = console;
         }
 
-        public async Task<int> Run(Args args) 
+        public async Task<int> Run(Args args)
         {
-            if (args.Origin is null)
-            {
+            if(args.Origin is null) {
                 _log.LogError("Missing target repository origin");
                 return 1;
             }

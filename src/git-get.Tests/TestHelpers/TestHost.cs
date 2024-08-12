@@ -1,5 +1,7 @@
 ﻿using GitGet.Services;
+
 using InMemLogger;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -14,8 +16,7 @@ public class TestHost : IDisposable
     public TestHost(Action<IServiceCollection>? cfg = null)
     {
         var cont = new ServiceCollection()
-            .AddLogging(x =>
-            {
+            .AddLogging(x => {
                 x.AddInMemory()
                  .AddDebug()
                  .AddConsole();
@@ -35,8 +36,8 @@ public class TestHost : IDisposable
         _svc = cont.BuildServiceProvider();
     }
 
-    public T Get<T>(object? key = null) where T:class => 
-        key is null? _svc.GetRequiredService<T>() :
+    public T Get<T>(object? key = null) where T : class =>
+        key is null ? _svc.GetRequiredService<T>() :
             _svc.GetRequiredKeyedService<T>(key);
 
     public readonly List<string> LogEntries = [];

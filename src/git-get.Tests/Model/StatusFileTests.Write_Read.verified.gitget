@@ -1,6 +1,5 @@
 Origin = http://somewhere/
 Version = tag/1
 Filter = *
-Ignore = 
 GetRoot = /aplace
 Commit = zzzzzzzz1

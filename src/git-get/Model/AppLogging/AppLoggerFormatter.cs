@@ -21,7 +21,7 @@ internal class AppLoggerFormatter : ConsoleFormatter
         IExternalScopeProvider? scopeProvider, TextWriter textWriter)
     {
         var message = logEntry.Formatter(logEntry.State, logEntry.Exception);
-        if (message.IsNullOrEmpty()) return;
+        if(message.IsNullOrEmpty()) return;
 
         var level = logEntry.LogLevel.ToString().ToUpper();
 

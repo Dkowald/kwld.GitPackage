@@ -7,17 +7,16 @@ namespace GitGet.Tests.TestHelpers
         private readonly StringWriter _out = new();
         private readonly StringWriter _error = new();
 
-        public string StdOut
-        {
-            get{
+        public string StdOut {
+            get {
                 _out.Flush();
                 return _out.GetStringBuilder().ToString();
 
             }
         }
 
-        public string StdError { 
-            get{
+        public string StdError {
+            get {
                 _error.Flush();
                 return _error.GetStringBuilder().ToString();
             }

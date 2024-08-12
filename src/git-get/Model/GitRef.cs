@@ -39,24 +39,21 @@ internal record GitRef : IDataString<GitRef>
         data = data.Trim();
 
         //explicit ref.
-        if (data.StartsWith("refs"))
-        {
+        if(data.StartsWith("refs")) {
             var isBranchRef = data.StartsWith(BranchRefPrefix, StringComparison.OrdinalIgnoreCase);
             var isTagRef = data.StartsWith(TagRefPrefix, StringComparison.OrdinalIgnoreCase);
 
-            if (!isBranchRef && !isTagRef)
+            if(!isBranchRef && !isTagRef)
                 return ($"{nameof(GitRef)} explicit ref must be either branch ('{BranchRefPrefix}/[branch]') or tag '{TagRefPrefix}/[tag]' ", null);
 
-            if (isBranchRef)
-            {
-                if (data.Same(BranchRefPrefix))
+            if(isBranchRef) {
+                if(data.Same(BranchRefPrefix))
                     return ($"{nameof(GitRef)} explicit branch ref must include path to branch", null);
                 return (null, new(BranchRefPrefix, data[(BranchRefPrefix.Length + 1)..]));
             }
 
-            if (isTagRef)
-            {
-                if (data.Same(TagRefPrefix))
+            if(isTagRef) {
+                if(data.Same(TagRefPrefix))
                     return ($"{nameof(GitRef)} explicit tag ref must include path to branch", null);
                 return (null, new(TagRefPrefix, data[(TagRefPrefix.Length + 1)..]));
             }
@@ -66,15 +63,13 @@ internal record GitRef : IDataString<GitRef>
 
         var parts = data.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length == 0) return ($"{nameof(GitRef)} Cannot be empty", null);
+        if(parts.Length == 0) return ($"{nameof(GitRef)} Cannot be empty", null);
 
-        if (parts[0].Same("refs"))
-        {
+        if(parts[0].Same("refs")) {
             return (null, new($"{parts[0]}/{parts[1]}", string.Join('/', parts[2..])));
         }
 
-        if (parts.Length == 1)
-        {
+        if(parts.Length == 1) {
             return (null, new(TagRefPrefix, parts[0]));
         }
 
@@ -82,7 +77,7 @@ internal record GitRef : IDataString<GitRef>
             parts[0].Same("branch") ? BranchRefPrefix :
             parts[0].Same("tag") ? TagRefPrefix : null;
 
-        if (prefix is null)
+        if(prefix is null)
             return ("short form must use branch or tag", null);
 
         var path = string.Join('/', parts[1..]);
@@ -93,7 +88,7 @@ internal record GitRef : IDataString<GitRef>
     /// <summary>Try parse version as a <see cref="GitRef"/> </summary>
     public static GitRef? TryParse(string? data)
     {
-        if (data is null) return null;
+        if(data is null) return null;
 
         var (_, item) = TryRead(data);
 
@@ -105,7 +100,7 @@ internal record GitRef : IDataString<GitRef>
     {
         var (error, item) = TryRead(data);
 
-        if (item is null)
+        if(item is null)
             throw new ArgumentException(error ?? "Invalid format", nameof(data));
 
         _prefix = item._prefix;

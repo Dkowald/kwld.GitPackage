@@ -22,7 +22,7 @@ internal class GlobFilter : IEquatable<GlobFilter>
     {
         var parts = globs.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Order();
-        
+
         _globs = parts.Select(Encode)
             .Select(x => Glob.Parse(x, Options))
             .ToArray();
@@ -40,11 +40,11 @@ internal class GlobFilter : IEquatable<GlobFilter>
 
     public bool Equals(GlobFilter? rhs)
     {
-        if (rhs is null) return false;
-        return ToString().ToLower() == rhs.ToString().ToLower();
+        if(rhs is null) return false;
+        return ToString().Equals(rhs.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
-    public override int GetHashCode() 
+    public override int GetHashCode()
         => ToString().ToLower().GetHashCode();
 
     public static bool operator ==(GlobFilter? lhs, GlobFilter? rhs)

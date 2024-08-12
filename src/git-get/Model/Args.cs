@@ -1,13 +1,14 @@
 ﻿using GitGet.Actions;
 using GitGet.Utility;
+
 using Microsoft.Extensions.Logging;
 
 namespace GitGet.Model;
 
-internal class Args
+internal record Args
 {
     private const string LogLevelKey = "--log-level:";
-    private const string OrignKey = "--origin:";
+    private const string OriginKey = "--origin:";
     private const string VersionKey = "--version:";
     private const string FilterKey = "--filter:";
     private const string IgnoreKey = "--ignore:";
@@ -19,25 +20,26 @@ internal class Args
     private const string PasswordKey = "--password:";
 
     public static readonly string DefaultCacheFolderName = ".gitpackages";
+    public static readonly LogLevel DefaultLogLevel = LogLevel.Information;
 
     public static LogLevel ReadLogLevel(string[] args)
     {
-        var entry = args.LastOrDefault(x => x.StartsWith(LogLevelKey))?[LogLevelKey.Length..]
-            ?? "i";
+        var entry = args.LastOrDefault(x => x.StartsWith(LogLevelKey))?[LogLevelKey.Length..];
 
-        if (entry.Same("c")) return LogLevel.Critical;
-        if (entry.Same("e")) return LogLevel.Error;
-        if (entry.Same("w")) return LogLevel.Warning;
-        if (entry.Same("i")) return LogLevel.Information;
-        if (entry.Same("d")) return LogLevel.Debug;
-        if (entry.Same("t")) return LogLevel.Trace;
+        if(entry is null) return DefaultLogLevel;
+        if(entry.Same("c")) return LogLevel.Critical;
+        if(entry.Same("e")) return LogLevel.Error;
+        if(entry.Same("w")) return LogLevel.Warning;
+        if(entry.Same("i")) return LogLevel.Information;
+        if(entry.Same("d")) return LogLevel.Debug;
+        if(entry.Same("t")) return LogLevel.Trace;
 
         throw new Exception($"Unknown LogLevel '{entry}'");
     }
 
     public static Args? Load(IFileSystem files, ILogger log, LogLevel logLevel, string[] inputArgs)
     {
-        ActionOptions? action;
+        ActionOptions? action = null;
         IDirectoryInfo? targetPath = null;
         Uri? origin = null;
         GitRef? version = null;
@@ -48,9 +50,8 @@ internal class Args
         ForceOption? force = null;
         string? user = null;
         string? password = null;
-        
-        if (inputArgs.Length == 0)
-        {
+
+        if(inputArgs.Length == 0) {
             log.LogTrace("No arguments; get using the current folder.");
             return new(logLevel, ActionOptions.Get, files.Current(), DefaultCache(files, log));
         }
@@ -58,150 +59,110 @@ internal class Args
         var idx = 1;
 
         var arg0 = inputArgs.First();
-
-        if (arg0.Same(nameof(Init)))
-        { action = ActionOptions.Init; }
-
-        else if (arg0.Same(nameof(Info)))
-        { action = ActionOptions.Info; }
-
-        else if (arg0.Same(nameof(Where)))
-        { action = ActionOptions.Where; }
-
-        else if (arg0.Same(nameof(About))){
-            action = ActionOptions.About;
-        }
+        
+        if(arg0.Same(nameof(Init))) { action = ActionOptions.Init; } 
+        else if(arg0.Same(nameof(Info))) { action = ActionOptions.Info; } 
+        else if(arg0.Same(nameof(Where))) { action = ActionOptions.Where; } 
+        else if(arg0.Same(nameof(About))) {action = ActionOptions.About;} 
+        else if(arg0.StartsWith("--")) {idx = 0;} 
         else {
-            action = ActionOptions.Get;
-            if (arg0.StartsWith("--"))
-            {
-                idx = 0;
-                targetPath = files.Current();
-                log.LogDebug("No action provided, using get with current directory");
-            }
-            else
-            {
-                var isFile = files.Current().GetFile(arg0);
+            var isFile = files.Current().GetFile(arg0);
 
-                targetPath = isFile.Exists? isFile.Directory : files.Current().GetFolder(arg0);
+            targetPath = isFile.Exists ? isFile.Directory! : files.Current().GetFolder(arg0);
 
-                if (isFile.Exists)
-                { log.LogWarning("Target path is a file, using its containing directory"); }
-                else { log.LogTrace("Target path set from action"); }
+            if(isFile.Exists) {
+                log.LogWarning("Target path is a file, using its containing directory");
+            } else {
+                log.LogTrace("Target path set from action");
             }
         }
 
-        if (action is null) throw new Exception("Failed resolve action");
+        action ??= ActionOptions.Get;
 
-        for (; idx < inputArgs.Length; idx++)
-        {
+        for(; idx < inputArgs.Length; idx++) {
             var next = inputArgs[idx];
 
-            if (next.StartsWith(OrignKey))
-            {
-                if (origin is not null)
-                {
+            if(next.StartsWith(OriginKey)) {
+                if(origin is not null) {
                     log.LogError("Origin url already provided");
                     return null;
                 }
-                var value = next[OrignKey.Length..];
-                if (!Uri.TryCreate(value, UriKind.Absolute, out origin))
-                {
+                var value = next[OriginKey.Length..];
+                if(!Uri.TryCreate(value, UriKind.Absolute, out origin)) {
                     log.LogError("Invalid Origin '{origin}' must be a valid url to the repository", value);
                     return null;
                 }
                 continue;
             }
 
-            if (next.StartsWith(VersionKey))
-            {
-                if (version is not null)
-                {
+            if(next.StartsWith(VersionKey)) {
+                if(version is not null) {
                     log.LogError("Version already provided");
                     return null;
                 }
 
                 var value = next[VersionKey.Length..];
                 (var error, version) = GitRef.TryRead(value);
-                if (version is null)
-                {
+                if(version is null) {
                     log.LogError("Invalid version {version}", value);
                     log.LogInformation("Version parse error: {error}", error);
                 }
                 continue;
             }
 
-            if (next.StartsWith(FilterKey))
-            {
-                if (filter is not null)
-                {
+            if(next.StartsWith(FilterKey)) {
+                if(filter is not null) {
                     log.LogError("Filter already provided");
                     return null;
                 }
                 var value = next[FilterKey.Length..];
-                try
-                {
+                try {
                     filter = new(value);
-                }
-                catch (Exception ex)
-                {
+                } catch(Exception ex) {
                     log.LogError("Invalid filter : {filter}", value);
                     log.LogInformation(ex, $"Failed create {nameof(GetFilter)}");
                 }
                 continue;
             }
 
-            if (next.StartsWith(IgnoreKey))
-            {
-                if (ignore is not null)
-                {
+            if(next.StartsWith(IgnoreKey)) {
+                if(ignore is not null) {
                     log.LogError("Ignore already provided");
                     return null;
                 }
                 var value = next[IgnoreKey.Length..];
-                try
-                {
+                try {
                     ignore = new(value);
-                }
-                catch (Exception ex)
-                {
+                } catch(Exception ex) {
                     log.LogError("Invalid ignore: {ignore}", value);
                     log.LogInformation(ex, $"Failed create {nameof(Ignore)}");
                 }
                 continue;
             }
 
-            if (next.StartsWith(GetRootKey))
-            {
-                if (root is not null)
-                {
+            if(next.StartsWith(GetRootKey)) {
+                if(root is not null) {
                     log.LogError("GetRoot already provided");
                     return null;
                 }
                 var value = next[GetRootKey.Length..];
-                try
-                {
+                try {
                     root = new(value);
-                }
-                catch (Exception ex)
-                {
+                } catch(Exception ex) {
                     log.LogError("Invalid get-root: {get-root}", value);
                     log.LogInformation(ex, $"Failed create {nameof(GetRoot)}");
                 }
                 continue;
             }
 
-            if (next.StartsWith(CacheKey))
-            {
-                if (cache is not null)
-                {
+            if(next.StartsWith(CacheKey)) {
+                if(cache is not null) {
                     log.LogError("Cache already provided");
                     return null;
                 }
 
                 var value = next[ForceKey.Length..];
-                if (files.Current().GetFile(value).Exists)
-                {
+                if(files.Current().GetFile(value).Exists) {
                     log.LogError("Cache folder cannot be a file");
                     return null;
                 }
@@ -209,12 +170,10 @@ internal class Args
                 continue;
             }
 
-            if (next.StartsWith(ForceKey))
-            {
+            if(next.StartsWith(ForceKey)) {
                 var value = next[ForceKey.Length..];
 
-                if (!Enum.TryParse<ForceOption>(value, true, out var forceValue))
-                {
+                if(!Enum.TryParse<ForceOption>(value, true, out var forceValue)) {
                     log.LogError("Invalid force option {force}", value);
                     return null;
                 }
@@ -224,16 +183,13 @@ internal class Args
                 continue;
             }
 
-            if (next.StartsWith(TargetPathKey))
-            {
-                if (targetPath is not null)
-                {
+            if(next.StartsWith(TargetPathKey)) {
+                if(targetPath is not null) {
                     log.LogError("TargetPath already provided");
                     return null;
                 }
                 var value = next[TargetPathKey.Length..];
-                if (files.Current().GetFile(value).Exists)
-                {
+                if(files.Current().GetFile(value).Exists) {
                     log.LogError("Target path cannot be a file");
                     return null;
                 }
@@ -241,17 +197,15 @@ internal class Args
                 continue;
             }
 
-            if (next.StartsWith(LogLevelKey)) continue;
+            if(next.StartsWith(LogLevelKey)) continue;
 
-            if (next.StartsWith(PasswordKey))
-            {
+            if(next.StartsWith(PasswordKey)) {
                 var value = next[PasswordKey.Length..];
                 password = value;
                 continue;
             }
 
-            if (next.StartsWith(UsernameKey))
-            {
+            if(next.StartsWith(UsernameKey)) {
                 var value = next[UsernameKey.Length..];
                 user = value;
                 continue;
@@ -265,8 +219,7 @@ internal class Args
 
         cache ??= DefaultCache(files, log);
 
-        return new(logLevel, action.Value, targetPath, cache)
-        {
+        return new(logLevel, action.Value, targetPath, cache) {
             _password = password,
             Origin = origin,
             Version = version,
@@ -292,6 +245,8 @@ internal class Args
 
     public IDirectoryInfo TargetPath { get; init; }
 
+    public IDirectoryInfo Cache { get; init; }
+
     public Uri? Origin { get; init; }
 
     public GitRef? Version { get; init; }
@@ -302,23 +257,20 @@ internal class Args
 
     public RootPath GetRoot { get; init; } = RootPath.Default;
 
-    public IDirectoryInfo Cache { get; init; }
-
     public ForceOption? Force { get; init; }
 
     public string? User { get; init; }
 
-    //so its more difficult to accidently use. 
+    //so its more difficult to accidentally use. 
     private string? _password;
-    public bool HasPassword => _password != null;    
+    public bool HasPassword => _password != null;
     internal string? UsePassword() => _password;
 
     private static IDirectoryInfo DefaultCache(IFileSystem files, ILogger log)
     {
         var home = files.TryGetHome();
 
-        if (home is null)
-        {
+        if(home is null) {
             log.LogWarning("No home directory found!, using cwd");
             home = files.Current();
         }

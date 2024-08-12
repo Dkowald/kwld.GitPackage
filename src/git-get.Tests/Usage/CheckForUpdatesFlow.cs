@@ -1,6 +1,7 @@
 ﻿using GitGet.Model;
 using GitGet.Tests.TestHelpers;
 using GitGet.Utility;
+
 using LibGit2Sharp;
 
 namespace GitGet.Tests.Usage;
@@ -10,10 +11,9 @@ public class CheckForUpdatesFlow
 {
     private readonly IDirectoryInfo _root = Files.AppData.GetFolder("Usage", nameof(CheckForUpdatesFlow));
     private readonly Signature _sig = new("test", "Test@com.au", DateTimeOffset.UtcNow);
-
-    readonly IDirectoryInfo _origin;
-    readonly IDirectoryInfo _cache;
-    readonly IDirectoryInfo _working;
+    private readonly IDirectoryInfo _origin;
+    private readonly IDirectoryInfo _cache;
+    private readonly IDirectoryInfo _working;
 
     public CheckForUpdatesFlow()
     {
@@ -33,7 +33,7 @@ public class CheckForUpdatesFlow
     }
 
     [Ordered, Fact]
-    public void CreateOriginRepo() 
+    public void CreateOriginRepo()
     {
         Repository.Init(_origin.FullName);
         using var repo = new Repository(_origin.FullName);
@@ -46,7 +46,7 @@ public class CheckForUpdatesFlow
     }
 
     [Ordered, Fact]
-    public async Task GetOriginal() 
+    public async Task GetOriginal()
     {
         var args = new[]
         {
@@ -65,12 +65,12 @@ public class CheckForUpdatesFlow
     }
 
     [Ordered, Fact]
-    public void UpdateOriginRepo() 
+    public void UpdateOriginRepo()
     {
         _origin.GetFile("Readme.md").AppendAllLines(["Updated"]);
 
         using var repo = new Repository(_origin.FullName);
-        
+
         repo.Index.Add("Readme.md");
         repo.Index.Write();
         repo.Commit("Updated", _sig, _sig);

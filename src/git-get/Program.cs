@@ -26,14 +26,12 @@ internal static class Program
             svc.GetRequiredService<ILogger>(),
             logLevel, args);
 
-        if (parsedArgs is null)
-        {
+        if(parsedArgs is null) {
             log.LogCritical("Command line parse failed; aborting");
             return 1;
         }
 
-        IAction action = parsedArgs.Action switch
-        {
+        IAction action = parsedArgs.Action switch {
             ActionOptions.Get =>
                 svc.GetRequiredService<GetAction>(),
             ActionOptions.Init =>
@@ -63,12 +61,11 @@ internal static class Program
         cont.AddSingleton(TimeProvider.System)
             .AddSingleton<IFileSystem, FileSystem>();
 
-        cont.AddLogging(log =>
-        {
+        cont.AddLogging(log => {
             log.AddDebug()
                .AddConsole(x => {
-                x.LogToStandardErrorThreshold = LogLevel.Error;
-                x.FormatterName = nameof(AppLoggerFormatter);
+                   x.LogToStandardErrorThreshold = LogLevel.Error;
+                   x.FormatterName = nameof(AppLoggerFormatter);
                });
 
             log.AddConsoleFormatter<AppLoggerFormatter, SimpleConsoleFormatterOptions>();

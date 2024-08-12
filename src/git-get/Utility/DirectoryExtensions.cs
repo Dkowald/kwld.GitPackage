@@ -7,27 +7,23 @@ internal static class DirectoryExtensions
     /// </summary>
     public static IDirectoryInfo ClearReadonly(this IDirectoryInfo target)
     {
-        if (!target.Exists()) return target;
+        if(!target.Exists()) return target;
 
         var files = target.GetFiles("*.*", SearchOption.AllDirectories);
-        foreach (var item in files) { item.IsReadOnly = false; }
+        foreach(var item in files) { item.IsReadOnly = false; }
 
         return target;
     }
 
     public static IDirectoryInfo MakeEmpty(this IDirectoryInfo target)
     {
-        if (!target.Exists())
-        {
+        if(!target.Exists()) {
             target.Create();
             return target;
         }
 
-        foreach (var item in target.EnumerateFileSystemInfos())
-        {
-            if (item is IDirectoryInfo dir)
-            { dir.EnsureDelete(); }
-            else
+        foreach(var item in target.EnumerateFileSystemInfos()) {
+            if(item is IDirectoryInfo dir) { dir.EnsureDelete(); } else
                 ((IFileInfo)item).Delete();
         }
 

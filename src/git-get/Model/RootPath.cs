@@ -8,7 +8,7 @@ namespace GitGet.Model
     /// <br /> Always starts with /
     /// <br/> Cannot be empty.
     /// <br /> Trimmed
-    /// <br /> auto prefixed with / if need
+    /// <br /> auto prefixed with '/'
     /// </summary>
     public record RootPath : IDataString
     {
@@ -17,7 +17,7 @@ namespace GitGet.Model
         private static (string? error, string? value) TryRead(string data)
         {
             data = data.Trim();
-            if (data == string.Empty)
+            if(data == string.Empty)
                 return ("Cannot be empty", null);
 
             data = data[0] == '/' ? data : $"/{data}";
@@ -27,20 +27,21 @@ namespace GitGet.Model
 
         public static RootPath? TryParse(string? value)
         {
-            if (value is null) return null;
+            if(value is null) return null;
 
             var (_, data) = TryRead(value);
 
-            return data is null? null : new(data, true);
+            return data is null ? null : new(data, true);
         }
 
         public static readonly RootPath Default = new("/");
 
-        private RootPath(string value, bool isChecked) {
-            if (!isChecked) {
+        private RootPath(string value, bool isChecked)
+        {
+            if(!isChecked) {
                 var (error, clean) = TryRead(value);
 
-                if (clean is null)
+                if(clean is null)
                     throw new ArgumentException(error, nameof(value));
 
                 value = clean;
@@ -48,8 +49,8 @@ namespace GitGet.Model
             _value = value;
         }
 
-        public RootPath(string value): this(value, false){}
-        
+        public RootPath(string value) : this(value, false) { }
+
         [return: NotNullIfNotNull(nameof(data))]
         public static implicit operator string?(RootPath? data) => data?.ToString();
 

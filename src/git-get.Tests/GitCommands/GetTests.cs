@@ -1,5 +1,9 @@
-﻿using GitGet.Model;
+﻿using System.IO.Abstractions.TestingHelpers;
+
+using GitGet.GitCommands;
+using GitGet.Model;
 using GitGet.Tests.TestHelpers;
+
 using Microsoft.Extensions.Logging.Testing;
 
 namespace GitGet.Tests.GitCommands;
@@ -8,10 +12,25 @@ public class GetTests
 {
     private readonly IDirectoryInfo _outRoot = Files.AppData.GetFolder(nameof(GetTests));
 
-    [Fact(Skip = "true")]
-    public void ReportResult()
+    [Fact]
+    public async Task ReportResult()
     {
-        //Report totals: found; extracted and ignored
+        var files = new MockFileSystem();
+
+        using var _ = TestRepository.OpenTestRepository();
+
+        using var repo = new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
+            .CloneIfMissing(TestRepository.BareRepoPath.AsUri(), null);
+
+        var target = new Get(repo);
+
+        var result = await target.Run(files.Current(), new("branch/ManyTotals"), 
+            new("f*.txt"), new("*.x*"), new("/manyFiles"));
+
+        Assert.Equal(8, result.TotalItems);
+        Assert.Equal(6, result.IncludedItemsCount);
+        Assert.Equal(2, result.IgnoredItemsCount);
+        Assert.Equal(result.IncludedItemsCount - result.IgnoredItemsCount, files.Current().EnumerateFiles().Count());
     }
 
     [Fact]
@@ -19,13 +38,13 @@ public class GetTests
     {
         using var repo = TestRepository.OpenTestRepository();
 
-        var target = new GitGet.GitCommands.Get(repo);
+        var target = new Get(repo);
 
         var destRoot = _outRoot.GetFolder("GetSubPath").EnsureEmpty();
 
         var version = new GitRef("tag/v1");
 
-        await target.Run(destRoot, version, new("/Folder2/Folder1/*.txt"), "/Folder2");
+        await target.Run(destRoot, version, new("/Folder2/Folder1/*.txt"), null, new("/Folder2"));
 
         await VerifyDirectory(destRoot.FullName);
     }
@@ -38,9 +57,9 @@ public class GetTests
         var destRoot = _outRoot.GetFolder("Tag0")
             .EnsureEmpty();
 
-        var target = new GitGet.GitCommands.Get(repo);
+        var target = new Get(repo);
 
-        await target.Run(destRoot, version, GetFilter.All());
+        await target.Run(destRoot, version);
 
         await VerifyDirectory(destRoot.FullName);
     }
@@ -56,7 +75,7 @@ public class GetTests
         var destRoot = _outRoot.GetFolder(nameof(GetFiltered))
             .EnsureEmpty();
 
-        var target = new GitGet.GitCommands.Get(repo);
+        var target = new Get(repo);
 
         await target.Run(destRoot, commit, new(glob));
 
@@ -64,7 +83,7 @@ public class GetTests
     }
 
     [Fact]
-    public async Task GetNoAnchorFiltered() 
+    public async Task GetNoAnchorFiltered()
     {
         //need cloned repo so have origin.
         using var repo = new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
@@ -77,7 +96,7 @@ public class GetTests
         var destRoot = _outRoot.GetFolder(nameof(GetNoAnchorFiltered))
             .EnsureEmpty();
 
-        var target = new GitGet.GitCommands.Get(repo);
+        var target = new Get(repo);
 
         await target.Run(destRoot, commit, new(glob));
 

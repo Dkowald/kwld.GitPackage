@@ -5,7 +5,7 @@ namespace GitGet.Tests.Model
     public class RootPathTests
     {
         [Fact]
-        public void ctor_AutoPrefix()
+        public void Ctor_AutoPrefix()
         {
             var autoFixed = new RootPath("apath");
 

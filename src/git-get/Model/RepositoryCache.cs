@@ -1,4 +1,5 @@
 ﻿using GitGet.Utility;
+
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
@@ -35,8 +36,7 @@ internal class RepositoryCache
 
     public CacheEntry Get(Uri origin)
     {
-        if (origin.IsFile)
-        {
+        if(origin.IsFile) {
             _log.LogDebug("Repository is Local folder, using 'local' as cache host name");
 
             var localRepo = _cacheRoot.FileSystem.DirectoryInfo.New(origin.LocalPath);
@@ -67,14 +67,12 @@ internal class RepositoryCache
 
     public Repository CloneIfMissing(CacheEntry cache, CredentialsHandler? creds)
     {
-        if (cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName))
-        {
+        if(cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName)) {
             _log.LogDebug("Cached repository {origin} found", cache.Origin);
             return new Repository(cache.CachePath.FullName);
         }
 
-        if (cache.CachePath.Exists)
-        {
+        if(cache.CachePath.Exists) {
             _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
             cache.CachePath.ClearReadonly().EnsureDelete();
         }
@@ -89,10 +87,8 @@ internal class RepositoryCache
 
         var progressStarted = false;
         options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
-        options.FetchOptions.OnProgress += _ =>
-        {
-            if (!progressStarted)
-            {
+        options.FetchOptions.OnProgress += _ => {
+            if(!progressStarted) {
                 _log.LogDebug($"Fetching objects to transfer");
                 progressStarted = true;
             }
@@ -100,10 +96,8 @@ internal class RepositoryCache
         };
 
         var transferStarted = false;
-        options.FetchOptions.OnTransferProgress = x =>
-        {
-            if (!transferStarted)
-            {
+        options.FetchOptions.OnTransferProgress = x => {
+            if(!transferStarted) {
                 _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
                 transferStarted = true;
             }
@@ -120,8 +114,7 @@ internal class RepositoryCache
     public RepositoryCache Purge(Uri origin)
     {
         var entry = Get(origin);
-        if (entry.CachePath.Exists())
-        {
+        if(entry.CachePath.Exists()) {
             entry.CachePath.ClearReadonly().EnsureDelete();
         }
         return this;
@@ -129,8 +122,7 @@ internal class RepositoryCache
 
     private CacheEntry? TryResolveEntry(IDirectoryInfo repoPath)
     {
-        if (!Repository.IsValid(repoPath.FullName))
-        {
+        if(!Repository.IsValid(repoPath.FullName)) {
             _log.LogWarning("Cache folder {cache} is NOT a valid repository",
                 repoPath.FullName);
             return null;
@@ -141,14 +133,12 @@ internal class RepositoryCache
         var origin = config
             .Get<string>("remote.origin.url", ConfigurationLevel.Local)
             ?.Value;
-        if (origin is null)
-        {
+        if(origin is null) {
             _log.LogError("Repository cache {cache} doesnt have origin remote", repoPath.FullName);
             return null;
         }
 
-        if (!Uri.TryCreate(origin, UriKind.Absolute, out var originUri))
-        {
+        if(!Uri.TryCreate(origin, UriKind.Absolute, out var originUri)) {
             _log.LogError("Cache {cache} origin url is not a uri",
                 repoPath.FullName);
             return null;

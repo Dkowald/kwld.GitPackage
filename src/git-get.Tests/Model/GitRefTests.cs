@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+
 using GitGet.Model;
 
 namespace GitGet.Tests.Model
@@ -12,7 +13,7 @@ namespace GitGet.Tests.Model
 
             var json = JsonSerializer.Serialize(data);
             var reload = JsonSerializer.Deserialize<GitRef>(json);
-            Assert.Equal(data,reload);
+            Assert.Equal(data, reload);
         }
 
         [Fact]
@@ -46,12 +47,10 @@ namespace GitGet.Tests.Model
         [Fact]
         public void Ctor_InvalidForm()
         {
-            try
-            {
+            try {
                 _ = new GitRef("ref/heads/main");
                 Assert.Fail("Should not create");
-            }
-            catch (ArgumentException){}
+            } catch(ArgumentException) { }
         }
     }
 }

@@ -16,10 +16,9 @@ internal class Init : IAction
     {
         var (file, changed) = await StatusFile.TryLoadWithOverrides(_log, args);
 
-        if (file == null) return 1;
+        if(file == null) return 1;
 
-        if (changed)
-        {
+        if(changed) {
             _log.LogInformation("Writing updated package file");
             await file.Write(_log);
         }
