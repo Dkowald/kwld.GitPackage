@@ -1,4 +1,4 @@
-Origin = file:///C:/Source/Play/kwld.GitPackage/src/git-get.Tests/App_Data/TestRepository/
+Origin = file:///C:/Source/kwld/kwld.GitPackage/src/git-get.Tests/App_Data/TestRepository/
 Version = branch/BranchHasStatusFile
 Filter = *
-Commit = 015292c35040ab8aef8067548af0373d9e2e2734
+Commit = 5a1f6c1e32a3d0147951ee8ae5c45dbf5897335c

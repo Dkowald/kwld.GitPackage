@@ -12,15 +12,23 @@ internal static class TestRepository
     private static readonly IDirectoryInfo Path = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepositoryWorking");
 
-    public static readonly IDirectoryInfo BareRepoPath = new FileSystem()
+    private static readonly IDirectoryInfo RepoPath = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepository");
+
+    internal static IDirectoryInfo BareRepoPath {
+        get {
+            if(!Repository.IsValid(RepoPath.FullName))
+                OpenTestRepository().Dispose();
+            return RepoPath;
+        }
+    }
 
     private static Signature Sig =>
         new("test", "Test@com.au", DateTimeOffset.UtcNow);
-
+    
     internal static Repository OpenTestRepository(bool forceRebuild = false)
     {
-        if(!Repository.IsValid(BareRepoPath.FullName) || forceRebuild) {
+        if(!Repository.IsValid(RepoPath.FullName) || forceRebuild) {
             Debug.WriteLine("Creating test repository");
             BareRepoPath.ClearReadonly().EnsureEmpty();
             Path.ClearReadonly().EnsureEmpty();
@@ -42,12 +50,14 @@ internal static class TestRepository
             Path.ClearReadonly().EnsureDelete();
         }
 
-        if(!Repository.IsValid(BareRepoPath.FullName))
+        if(!Repository.IsValid(RepoPath.FullName))
             throw new Exception("Create test repository failed");
 
-        return new Repository(BareRepoPath.FullName);
-    }
+        var result = new Repository(BareRepoPath.FullName);
 
+        return result;
+    }
+    
     private static void Init(Repository repo)
     {
         Path.GetFile("readme.md")
