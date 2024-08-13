@@ -1,0 +1,14 @@
+
+syntax = "proto3";
+
+package logging.basic;
+
+message LogEntry{
+    string category = 1;
+
+    string template = 2;
+}
+
+service Logging{
+    rpc Log(LogEntry) returns void;
+}

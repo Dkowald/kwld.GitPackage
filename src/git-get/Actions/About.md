@@ -3,9 +3,7 @@
  > See [Source](https://github.com/Dkowald/kwld.GitPackage) for details  
  > Version: 99.0
 -------
-
 ## Action
-
 * about  - show this info
 * init  - create / update a .gitget package status file
 * info   - show info on cached repositories, and target .gitget if found

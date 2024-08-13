@@ -51,5 +51,11 @@
     <None Include="App_Data/.gitpackages/**/*" />
     <None Include="**/.gitget/**" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Data\.gitpackages\local\" />
+    <Folder Include="App_Data\Usage\Basic\" />
+    <Folder Include="App_Data\Usage\CommonProtos\" />
+  </ItemGroup>
     
 </Project>

@@ -30,7 +30,7 @@ internal static class TestRepository
                 UpdateDeleteAndMove(repo);
                 IncludeNestedSameNameFolder(repo);
                 BranchHasStatusFile(repo);
-                ManyTotals(repo);
+                ManyFiles(repo);
             }
 
             var bare = Path.GetFolder(".git");
@@ -127,15 +127,23 @@ internal static class TestRepository
         repo.Commit("add status file", Sig, Sig);
     }
 
-    private static void ManyTotals(Repository repo)
+    private static void ManyFiles(Repository repo)
     {
         Commands.Checkout(repo, repo.Branches[nameof(BranchHasStatusFile)]);
-        var newBranch = repo.CreateBranch(nameof(ManyTotals));
+        var newBranch = repo.CreateBranch(nameof(ManyFiles));
         Commands.Checkout(repo, newBranch);
 
         var manyFiles = Path.GetFolder("manyFiles").EnsureExists();
-        
-        var file = manyFiles.GetFile("f0.txt");
+
+        var file = manyFiles.GetFile("d0.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("d1.txt");
+        file.WriteAllText(file.Name);
+        repo.Index.Add(file.GetRelativePath(Path));
+
+        file = manyFiles.GetFile("f0.txt");
         file.WriteAllText(file.Name);
         repo.Index.Add(file.GetRelativePath(Path));
 

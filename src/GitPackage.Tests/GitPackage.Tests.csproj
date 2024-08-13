@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GitPackage\GitPackage.csproj" PrivateAssets="All"/>
+    <ProjectReference Include="..\GitPackage\GitPackage.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -81,6 +81,10 @@
       <Filter>/*.md</Filter>
     </GitPackage>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="App_Data\" />
   </ItemGroup>
 
 

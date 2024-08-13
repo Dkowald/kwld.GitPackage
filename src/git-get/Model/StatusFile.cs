@@ -125,7 +125,7 @@ internal record StatusFile
         return new StatusFile(dataFolder, origin, version, filter) {
             Commit = commit,
             Ignore = ignore,
-            GetRoot = RootPath.TryParse(getRoot) ?? RootPath.Default
+            GetRoot = RootPath.TryParse(getRoot)
         };
     }
 
@@ -140,7 +140,7 @@ internal record StatusFile
 
         Filter = filter ?? GlobFilter.MatchAll;
         Ignore = ignore;
-        GetRoot = getRoot ?? RootPath.Default;
+        GetRoot = getRoot;
     }
 
     /// <summary>
@@ -152,9 +152,11 @@ internal record StatusFile
         {
             $"{nameof(Origin)} = {Origin}",
             $"{nameof(Version)} = {Version.Version}",
-            $"{nameof(Filter)} = {Filter}",
-            $"{nameof(GetRoot)} = {GetRoot}"
+            $"{nameof(Filter)} = {Filter}"
         };
+
+        if (GetRoot != null)
+            content.Add($"{nameof(GetRoot)} = {GetRoot}");
 
         if(Ignore != null)
             content.Add($"{nameof(Ignore)} = {Ignore}");
@@ -204,7 +206,7 @@ internal record StatusFile
     /// <summary>
     /// Sub path in repository tree to use as root.
     /// </summary>
-    public RootPath GetRoot { get; init; }
+    public RootPath? GetRoot { get; init; }
 
     /// <summary>
     /// The commit used for current files, if files have been collected

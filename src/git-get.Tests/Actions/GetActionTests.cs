@@ -14,10 +14,41 @@ namespace GitGet.Tests.Actions;
 
 public class GetActionTests
 {
-    [Fact(Skip = "true")]
-    public void ReportResults()
+    [Fact(Skip = "Support GitLink - submodules in source repositories.")]
+    public void SubModuleSupport() 
     {
-        //the totals should be reported as info logs.
+        var origin = "https://github.com/protocolbuffers/protobuf.git";
+        var version = "tag/v27.3";
+        var filter = "any.proto";
+        var ignore = "*unittest*,test_*,_test*";
+
+
+        //todo: add switch to fetch sub-modules.
+        //todo: include files from sub-modules.
+    }
+
+    [Fact]
+    public async Task ReportResults()
+    {
+        using var host = new TestHost();
+
+        var outDir = Files.AppData.GetFolder(nameof(GetActionTests), "OutDir");
+
+        var target = new GetAction(host.Get<ILogger>());
+
+        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot)
+        {
+            Origin = TestRepository.BareRepoPath.AsUri(),
+            Version = new("branch/master"),
+            Force = ForceOption.All
+        };
+
+        var exitCode = await target.Run(args);
+
+        Assert.Equal(0, exitCode);
+
+        var line = host.LogEntries.SingleOrDefault(x => x.Contains("Found"));
+        Assert.NotNull(line);
     }
 
     [Fact]

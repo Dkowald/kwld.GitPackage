@@ -7,6 +7,7 @@ namespace GitGet.Model
     /// path segments can contain anything.
     /// <br /> Always starts with /
     /// <br/> Cannot be empty.
+    /// <br/> Must contain a sub-path (cannot be '/')
     /// <br /> Trimmed
     /// <br /> auto prefixed with '/'
     /// </summary>
@@ -19,9 +20,11 @@ namespace GitGet.Model
             data = data.Trim();
             if(data == string.Empty)
                 return ("Cannot be empty", null);
+            if (data == "/")
+                return ("Must contain a sub-path (cannot be '/')", null);
 
             data = data[0] == '/' ? data : $"/{data}";
-
+            
             return new(null, data);
         }
 
@@ -33,8 +36,6 @@ namespace GitGet.Model
 
             return data is null ? null : new(data, true);
         }
-
-        public static readonly RootPath Default = new("/");
 
         private RootPath(string value, bool isChecked)
         {

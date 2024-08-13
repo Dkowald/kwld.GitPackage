@@ -9,7 +9,7 @@ namespace GitGet.GitCommands;
 /// <summary>
 /// Get (rather than checkout) from a repository.
 /// </summary>
-internal class Get(Repository repository)
+internal class Get(Repository repository, bool skipSubModules = true)
 {
     /// <summary>
     /// <inheritdoc cref="Get"/>
@@ -48,6 +48,9 @@ internal class Get(Repository repository)
         var included = 0;
         var ignored = 0;
         foreach(var file in ReadTree(rootTree.Tree)) {
+
+            if(skipSubModules && file.Item.TargetType == TreeEntryTargetType.GitLink)
+            { continue;}
 
             if(file.Item.TargetType != TreeEntryTargetType.Blob)
                 throw new Exception("can only handle blobs.");

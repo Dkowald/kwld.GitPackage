@@ -28,6 +28,7 @@ internal class GetAction : IAction
         _log.LogDebug("  Repo: {origin}", package.Origin);
         _log.LogDebug("  Ver: {version}", package.Version);
         _log.LogDebug("  Filter: {filter}", package.Filter);
+        _log.LogDebug("  Ignore: {ignore}", package.Ignore);
         _log.LogDebug("  GetRoot: {get-root}", package.GetRoot);
 
         _log.LogDebug("  User: {user}", args.User ?? "");
@@ -66,7 +67,6 @@ internal class GetAction : IAction
         ResetOutputPath(args.TargetPath);
 
         _log.LogInformation("Extracting files");
-        var filter = new GetFilter(package.Filter, package.Ignore);
         var info = await new GitCommands.Get(repo)
             .Run(package.TargetPath, package.Version, package.Filter, package.Ignore, package.GetRoot);
 

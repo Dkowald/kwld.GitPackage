@@ -24,13 +24,15 @@ public class GetTests
 
         var target = new Get(repo);
 
-        var result = await target.Run(files.Current(), new("branch/ManyTotals"), 
+        var result = await target.Run(files.Current(), new("branch/ManyFiles"), 
             new("f*.txt"), new("*.x*"), new("/manyFiles"));
 
         Assert.Equal(8, result.TotalItems);
         Assert.Equal(6, result.IncludedItemsCount);
         Assert.Equal(2, result.IgnoredItemsCount);
-        Assert.Equal(result.IncludedItemsCount - result.IgnoredItemsCount, files.Current().EnumerateFiles().Count());
+
+        var allFiles = files.Current().EnumerateFiles("*", SearchOption.AllDirectories);
+        Assert.Equal(result.IncludedItemsCount - result.IgnoredItemsCount, allFiles.Count());
     }
 
     [Fact]
@@ -70,7 +72,7 @@ public class GetTests
         using var repo = TestRepository.OpenTestRepository();
         var commit = new GitRef("tag/v0");
 
-        var glob = "Folder1/**/*.md,Folder2/**/*";
+        var glob = "*.md,Folder2/**/*";
 
         var destRoot = _outRoot.GetFolder(nameof(GetFiltered))
             .EnsureEmpty();

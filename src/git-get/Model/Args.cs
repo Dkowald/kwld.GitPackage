@@ -225,7 +225,7 @@ internal record Args
             Version = version,
             Filter = filter,
             Ignore = ignore,
-            GetRoot = root ?? RootPath.Default,
+            GetRoot = root,
             Force = force,
             User = user
         };
@@ -255,7 +255,7 @@ internal record Args
 
     public GlobFilter? Ignore { get; init; }
 
-    public RootPath GetRoot { get; init; } = RootPath.Default;
+    public RootPath? GetRoot { get; init; }
 
     public ForceOption? Force { get; init; }
 
