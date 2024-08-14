@@ -36,7 +36,7 @@ internal class GlobFilter : IEquatable<GlobFilter>
 
     #region Eqality
     public override bool Equals(object? obj)
-        => obj is GetFilter f && Equals(f);
+        => obj is GlobFilter f && Equals(f);
 
     public bool Equals(GlobFilter? rhs)
     {

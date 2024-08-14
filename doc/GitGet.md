@@ -10,6 +10,11 @@ Repositories are pulled with _--bare_ and stored in a (configurable)
 local cache folder.
 
 The target folder includes a '.gitget' file to track options used, including resultant commit.
+
+**Note:**  
+git submodules NOT supported.
+
+
 ## Basic usage.
 
 ``` pwsh

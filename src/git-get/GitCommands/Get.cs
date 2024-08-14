@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-using GitGet.Model;
+﻿using GitGet.Model;
 
 using LibGit2Sharp;
 

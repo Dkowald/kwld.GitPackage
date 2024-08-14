@@ -213,8 +213,6 @@ internal record StatusFile
     /// </summary>
     public string? Commit { get; set; }
 
-    public GetFilter GetFilter => new(Filter, Ignore);
-
     public bool Same(StatusFile? rhs)
     {
         if(rhs is null) return false;

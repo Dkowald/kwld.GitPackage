@@ -37,7 +37,7 @@ internal record Args
         throw new Exception($"Unknown LogLevel '{entry}'");
     }
 
-    public static Args? Load(IFileSystem files, ILogger log, LogLevel logLevel, string[] inputArgs)
+    public static Args? Load(IFileSystem files, ILogger log, LogLevel logLevel, params string[] inputArgs)
     {
         ActionOptions? action = null;
         IDirectoryInfo? targetPath = null;
@@ -120,7 +120,7 @@ internal record Args
                     filter = new(value);
                 } catch(Exception ex) {
                     log.LogError("Invalid filter : {filter}", value);
-                    log.LogInformation(ex, $"Failed create {nameof(GetFilter)}");
+                    log.LogInformation(ex, $"Failed create {nameof(GlobFilter)}");
                 }
                 continue;
             }
