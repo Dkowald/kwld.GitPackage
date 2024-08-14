@@ -58,7 +58,7 @@ public class ArgsTests
         Assert.Equal(files.Current().FullName, args.TargetPath.FullName);
         Assert.Equal(ActionOptions.Get, args.Action);
         Assert.Equal($@"c:\temp\cache\{Args.DefaultCacheFolderName}", args.Cache.FullName);
-        
+
         Assert.Equal(files.Current().FullName, args.TargetPath.FullName);
     }
 }

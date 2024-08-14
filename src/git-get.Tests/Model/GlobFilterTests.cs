@@ -4,7 +4,7 @@ namespace GitGet.Tests.Model;
 
 public class GlobFilterTests
 {
-    public static TheoryData<string?,string,bool> Data => new() {
+    public static TheoryData<string?, string, bool> Data => new() {
         //edge
         {"/readme.md,deploy/**/*.yaml", "data/deploy/objects/README.md", false},
 
@@ -39,7 +39,7 @@ public class GlobFilterTests
         {null, "/docs/other/x.md", true},
         {"**/*", "/docs/other/x.md", true}
     };
-    
+
     [Theory]
     [MemberData(nameof(Data))]
     public void MatchCheck(string? pattern, string input, bool isMatch)

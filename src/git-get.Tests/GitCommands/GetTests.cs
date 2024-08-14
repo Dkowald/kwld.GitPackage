@@ -24,7 +24,7 @@ public class GetTests
 
         var target = new Get(repo);
 
-        var result = await target.Run(files.Current(), new("branch/ManyFiles"), 
+        var result = await target.Run(files.Current(), new("branch/ManyFiles"),
             new("f*.txt"), new("*.x*"), new("/manyFiles"));
 
         Assert.Equal(8, result.TotalItems);

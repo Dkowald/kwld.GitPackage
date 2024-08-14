@@ -48,19 +48,19 @@ internal class Get(Repository repository, bool skipSubModules = true)
         foreach(var file in ReadTree(rootTree.Tree)) {
 
             if(skipSubModules && file.Item.TargetType == TreeEntryTargetType.GitLink)
-            { continue;}
+            { continue; }
 
             if(file.Item.TargetType != TreeEntryTargetType.Blob)
                 throw new Exception("can only handle blobs.");
 
             total++;
             var actualRepoPath = $"{subPath}{file.Path}";
-            
+
             if(!include.IsMatch(actualRepoPath)) { continue; }
             included++;
 
             if(ignore?.IsMatch(actualRepoPath) == true) {
-                ignored++; 
+                ignored++;
                 continue;
             }
 
@@ -97,7 +97,7 @@ internal class Get(Repository repository, bool skipSubModules = true)
             }
         }
     }
-    
+
     private (Tree? Tree, string Path) TryFindRoot(Tree trueRoot, string? subPath)
     {
         if(string.IsNullOrEmpty(subPath)) return (trueRoot, "");

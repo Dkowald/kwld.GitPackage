@@ -15,14 +15,14 @@ namespace GitGet.Tests.Actions;
 public class GetActionTests
 {
     [Fact(Skip = "Support GitLink - submodules in source repositories.")]
-    public void SubModuleSupport() 
+    public void SubModuleSupport()
     {
         //sample repo:
         //var origin = "https://github.com/protocolbuffers/protobuf.git";
         //var version = "tag/v27.3";
         //var filter = "any.proto";
         //var ignore = "*unittest*,test_*,_test*";
-        
+
         //todo: add switch to fetch sub-modules.
         //todo: include files from sub-modules.
     }
@@ -36,8 +36,7 @@ public class GetActionTests
 
         var target = new GetAction(host.Get<ILogger>());
 
-        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot)
-        {
+        var args = new Args(LogLevel.Trace, ActionOptions.Get, outDir, Files.TestPackageCacheRoot) {
             Origin = TestRepository.BareRepoPath.AsUri(),
             Version = new("branch/master"),
             Force = ForceOption.All

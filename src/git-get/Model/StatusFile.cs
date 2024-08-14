@@ -46,8 +46,8 @@ internal record StatusFile
         var commit = changed ? null : stored?.Commit;
 
         var data = new StatusFile(args.TargetPath, origin, version, filter) {
-            Commit = commit, 
-            GetRoot = getRoot, 
+            Commit = commit,
+            GetRoot = getRoot,
             Ignore = ignore
         };
 
@@ -155,7 +155,7 @@ internal record StatusFile
             $"{nameof(Filter)} = {Filter}"
         };
 
-        if (GetRoot != null)
+        if(GetRoot != null)
             content.Add($"{nameof(GetRoot)} = {GetRoot}");
 
         if(Ignore != null)

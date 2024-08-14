@@ -72,7 +72,7 @@ internal class GetAction : IAction
 
         package.Commit = info.Commit;
 
-        _log.LogInformation("Found {count} files, Matched {included}, Ignored {ignored}", 
+        _log.LogInformation("Found {count} files, Matched {included}, Ignored {ignored}",
             info.TotalItems, info.IncludedItemsCount, info.IgnoredItemsCount);
 
         if(package.TargetPath.GetFile(StatusFile.FileName).Exists()) {
@@ -117,7 +117,7 @@ internal class GetAction : IAction
         var progressStarted = false;
         var transferStarted = false;
 
-        var options = new FetchOptions() {
+        var options = new FetchOptions {
             TagFetchMode = TagFetchMode.All,
             Prune = true,
             CredentialsProvider = creds,

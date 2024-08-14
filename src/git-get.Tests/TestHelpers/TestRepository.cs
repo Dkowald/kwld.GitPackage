@@ -25,7 +25,7 @@ internal static class TestRepository
 
     private static Signature Sig =>
         new("test", "Test@com.au", DateTimeOffset.UtcNow);
-    
+
     internal static Repository OpenTestRepository(bool forceRebuild = false)
     {
         if(!Repository.IsValid(RepoPath.FullName) || forceRebuild) {
@@ -57,7 +57,7 @@ internal static class TestRepository
 
         return result;
     }
-    
+
     private static void Init(Repository repo)
     {
         Path.GetFile("readme.md")
@@ -176,7 +176,7 @@ internal static class TestRepository
         file = manyFiles.GetFile("Dir1", "f5-dir1.txt");
         file.WriteAllText(file.Name);
         repo.Index.Add(file.GetRelativePath(Path));
-        
+
         repo.Index.Write();
 
         repo.Commit("Many files", Sig, Sig);

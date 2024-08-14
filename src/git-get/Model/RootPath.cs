@@ -20,11 +20,11 @@ namespace GitGet.Model
             data = data.Trim();
             if(data == string.Empty)
                 return ("Cannot be empty", null);
-            if (data == "/")
+            if(data == "/")
                 return ("Must contain a sub-path (cannot be '/')", null);
 
             data = data[0] == '/' ? data : $"/{data}";
-            
+
             return new(null, data);
         }
 

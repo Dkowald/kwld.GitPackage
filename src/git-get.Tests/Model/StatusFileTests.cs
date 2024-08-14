@@ -18,8 +18,7 @@ public class StatusFileTests
 
         var workDir = files.Current();
 
-        var current = await new StatusFile(workDir, new("http://someurl"), new("tag/1"), new("*.md"))
-        {
+        var current = await new StatusFile(workDir, new("http://someurl"), new("tag/1"), new("*.md")) {
             Commit = "commit",
             GetRoot = new("/some/where")
         }.Write(new FakeLogger());
@@ -27,8 +26,8 @@ public class StatusFileTests
         var args = new Args(
             LogLevel.Trace,
             ActionOptions.About,
-            files.Current(), files.Current())
-        {
+            files.Current(), 
+            files.Current()) {
             Origin = new("http://updatedurl"),
         };
 
@@ -53,8 +52,7 @@ public class StatusFileTests
 
         var original = new StatusFile(dir,
             new("http://somewhere"),
-            new("tag/1"), GlobFilter.MatchAll)
-        {
+            new("tag/1"), GlobFilter.MatchAll) {
             Commit = "zzzzzzzz1",
             GetRoot = new("/aplace")
         };
