@@ -1,0 +1,133 @@
+# Default CI build
+# restore --> build --> test --> pack
+# Triggers on PR's to protected branches.
+#    Artifact to preserve packages.
+# Triggers on 
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+    - "v*"
+  pull_request:
+    branches:
+      - master
+      - development
+
+defaults:
+  run: 
+    shell: pwsh 
+
+jobs:
+  version_info:
+    name: 'read version info from tag'
+    runs-on: ubuntu-latest
+    outputs:
+      publish_packages: '${{steps.version_from_tag.outputs.publish_packages}}'
+      is_preview: '${{steps.version_from_tag.outputs.is_preview}}'
+      version_prefix: '${{steps.version_from_tag.outputs.version_prefix}}'
+      version_suffix: '${{steps.version_from_tag.outputs.version_suffix}}'
+      package_version: '${{steps.version_from_tag.outputs.package_version}}'
+    steps:
+    - name: version_from_tag
+      id: version_from_tag
+      run: |
+        $refType = '${{github.ref_type}}'
+        
+        $isTagBuild = $refType -eq 'tag' ;
+        
+        $publish_packages = if($isTagBuild){'true'}else{'false'};
+
+        $VersionPrefix = "0.0.0"
+        $VersionSuffix = ""
+
+        if($isTagBuild){
+
+          $refName = '${{github.ref_name}}'
+
+          $tagVersion = $refName.Substring(1);
+          $parts = $tagVersion.Split('-');
+          
+          $VersionPrefix = $parts[0];
+          $VersionSuffix =  if($parts.Length -gt 1){$parts[1]}else{""}
+        }
+
+        echo publish_packages="$isTagBuild" >> $env:GITHUB_OUTPUT
+
+        echo version_prefix="$VersionPrefix" >> $env:GITHUB_OUTPUT
+        
+        echo version_suffix="$VersionSuffix" >> $env:GITHUB_OUTPUT
+
+        $isPreview = if($VersionSuffix -eq ""){"false"}else{"true"}
+        echo is_preview="$isPreview" >> $env:GITHUB_OUTPUT
+
+        $PackageSuffix = if($VersionSuffix -eq ""){""}else{"-$($VersionSuffix)"}
+        $PackageVersion = "$($VersionPrefix)$($PackageSuffix)"
+        echo package_version="$PackageVersion" >> $env:GITHUB_OUTPUT
+  
+  build:
+    runs-on: ubuntu-latest
+    name: "Build and test"
+    needs: "version_info"
+    steps:
+    - uses: actions/checkout@v3
+  
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          8.0.x
+    
+    - name: Restore dependencies
+      run: dotnet restore src/
+
+    - name: Build
+      run: >
+        dotnet build 
+        --no-restore 
+        -p:GeneratePackageOnBuild=false
+        -p:ContinuousIntegrationBuild=true
+        -p:VersionPrefix="${{needs.version_info.outputs.version_prefix}}"
+        -p:VersionSuffix="${{needs.version_info.outputs.version_suffix}}"
+        -c Release 
+        src/ 
+        
+    - name: Test
+      run: >
+        dotnet test 
+        --no-build 
+        -c Release 
+        --verbosity normal 
+        --logger trx 
+        --results-directory "TestResults" 
+        src/
+
+    - name: Pack 
+      run: >
+        dotnet pack 
+        --no-build 
+        -c Release 
+        -p:PackageVersion="${{needs.version_info.outputs.package_version}}"
+        -o ./packages 
+        src/
+
+    - name: Keep package artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: package
+        path: packages/
+        if-no-files-found: error
+
+    - name: Nuget publish
+      if: needs.version_info.outputs.publish_packages == 'true'
+      run: >
+        write-host "will push git-get"
+        write-host "will push GitPackage"
+
+    - name: Create release
+      uses: ncipollo/release-action@v1      
+      with:
+        draft: false
+        prerelease: "${{needs.version_info.outputs.is_preview}}"
+        artifacts: "./packages/*"
