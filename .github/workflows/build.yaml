@@ -39,7 +39,7 @@ jobs:
         
         $publish_packages = if($isTagBuild){'true'}else{'false'};
 
-        $VersionPrefix = ""
+        $VersionPrefix = "0.0.0"
         $VersionSuffix = ""
 
         if($isTagBuild){
@@ -87,8 +87,8 @@ jobs:
         --no-restore 
         -p:GeneratePackageOnBuild=false
         -p:ContinuousIntegrationBuild=true
-        -p:VersionPrefix=${{needs.version_info.outputs.version_prefix}}
-        -p:VersionSuffix=${{needs.version_info.outputs.version_suffix}}
+        -p:VersionPrefix="${{needs.version_info.outputs.version_prefix}}"
+        -p:VersionSuffix="${{needs.version_info.outputs.version_suffix}}"
         -c Release 
         src/ 
         
@@ -107,7 +107,7 @@ jobs:
         dotnet pack 
         --no-build 
         -c Release 
-        -p:PackageVersion=${{needs.version_info.outputs.package_version}}
+        -p:PackageVersion="${{needs.version_info.outputs.package_version}}"
         -o ./packages 
         src/
 
@@ -128,5 +128,5 @@ jobs:
       uses: ncipollo/release-action@v1      
       with:
         draft: false
-        prerelease: ${{needs.version_info.outputs.is_preview}}
+        prerelease: "${{needs.version_info.outputs.is_preview}}"
         artifacts: "./packages/*"
