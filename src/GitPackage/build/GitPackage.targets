@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <GitPackage-Tool Condition="'$(GitPackage-Tool)' == ''" >$(MSBuildThisFileDirectory)/../cli/git-get.exe </GitPackage-Tool>
+    <GitPackage-Tool Condition="'$(GitPackage-Tool)' == ''" >dotnet $(MSBuildThisFileDirectory)/../cli/git-get.dll</GitPackage-Tool>
     
     <GitPackage-LogLevel Condition="'$(GitPackage-LogLevel)' == ''" >i</GitPackage-LogLevel>
     
