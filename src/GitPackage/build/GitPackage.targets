@@ -1,0 +1,65 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <GitPackage-Tool Condition="'$(GitPackage-Tool)' == ''" >$(MSBuildThisFileDirectory)/../cli/git-get.exe </GitPackage-Tool>
+    
+    <GitPackage-LogLevel Condition="'$(GitPackage-LogLevel)' == ''" >i</GitPackage-LogLevel>
+    
+    <GitPackage-DesignTimeBuild Condition="$(GitPackage-DesignTimeBuild) == ''" >false</GitPackage-DesignTimeBuild>
+
+    <!--<GitPackage-Cache Condition="'$(GitPackage-Cache)' == '' And '$(HOME)' != ''">$(HOME)/.gitpackages</GitPackage-Cache>
+    <GitPackage-Cache Condition="'$(GitPackage-Cache)' == '' And '$(USERPROFILE)' != ''">$(USERPROFILE)/.gitpackages</GitPackage-Cache>-->
+
+    <CollectUpToDateCheckInputDesignTimeDependsOn>
+      $(CollectUpToDateCheckInputDesignTimeDependsOn);_gpInputs
+    </CollectUpToDateCheckInputDesignTimeDependsOn>
+  
+</PropertyGroup>
+
+  <!--Run tool-->
+  <Target Name="gpRestore" Inputs="@(GitPackage)"
+			Outputs="%(GitPackage.Identity)/.gitpackage"
+      BeforeTargets="Build">
+    <ItemGroup>
+      <Args Include="--origin:%(GitPackage.Origin)" />
+      <Args Include="--version:%(GitPackage.Version)" />
+      <Args Include="--filter:%(GitPackage.Filter)" Condition="'%(GitPackage.Filter)' != ''" />
+      <Args Include="--ignore:%(GitPackage.Ignore)" Condition="'%(GitPackage.Ignore)' != ''" />
+      <Args Include="--get-root:%(GitPackage.GetRoot)" Condition="'%(GitPackage.GetRoot)' != ''"  />
+      <Args Include="--log-level:$(GitPackage-LogLevel)" Condition="'$(GitPackage-LogLevel)' != ''" />
+      <Args Include="--cache:$(GitPackage-Cache)" Condition="'$(GitPackage-Cache)' != ''" />
+    </ItemGroup>
+
+    <Message Text="GitPackage Restore: %(GitPackage.Identity)" Importance="High" />
+
+    <MakeDir Directories="%(GitPackage.Identity)"/>
+
+    <Exec Command="$(GitPackage-Tool) @(Args, ' ')"
+			  WorkingDirectory="%(GitPackage.Identity)">
+    </Exec>
+  </Target>
+
+  <!-- DesignTime run -->
+  <Target Name="gpDesignTimeRestore"
+          BeforeTargets="ResolveProjectReferences"
+          Condition="$(BuildingInsideVisualStudio) == 'true' And $(GitPackage-DesignTimeBuild) == 'true'"
+          DependsOnTargets="gpRestore">
+    <!--
+		This will include GitPackage restore in visual-studio design time builds.
+		See: https://github.com/dotnet/project-system/blob/master/docs/design-time-builds.md
+	  -->
+  </Target>
+
+  <!--
+  Include git package status files as inputs for fast-build
+  https://github.com/dotnet/project-system/blob/main/docs/up-to-date-check.md
+  -->
+  <Target Name="_gpInputs">
+    <ItemGroup>
+      <UpToDateCheckInput Include="%(GitPackage.Identity)/.gitget"/>
+    </ItemGroup>
+  </Target>
+
+  <!--
+  TODO: build schema for gitpackage item
+  -->
+</Project>

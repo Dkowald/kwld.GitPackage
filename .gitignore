@@ -1,6 +1,11 @@
 Old/
 
-src/**/bin/
-src/**/obj/
+**/bin/*
+**/obj/*
+.vs/
+samples/packages/
+App_Data/
 
-
+*.received.*
+/src/*.user
+/src/_ReSharper.Caches/

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "GitPackage.Cli": {
+      "commandName": "Project",
+      "workingDirectory": "./App_Data",
+      "commandLineArgs": "about"
+    }
+  }
+}
