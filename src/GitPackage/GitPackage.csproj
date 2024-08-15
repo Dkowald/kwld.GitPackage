@@ -18,14 +18,28 @@
       Reboot
     </PackageReleaseNotes>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Git,git-get,msbuild</PackageTags>
   </PropertyGroup>
-  
+  <PropertyGroup>
+    <Authors>Derek Kowald</Authors>
+    <Product>GitPackage</Product>
+    <Title>Git Package</Title>
+    <Description>msbuild tooling to extract a sub-set of files from a git repository</Description>
+    <PackageProjectUrl>https://github.com/Dkowald/kwld.GitPackage</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Dkowald/kwld.GitPackage.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <Copyright>Copyright (c) Derek Kowald 2024.</Copyright>
+  </PropertyGroup>
+
   <ItemGroup>
     <Content Include="build\**" target="build" Pack="true" PackagePath="%(Identity)" />
   </ItemGroup>
   
   <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="/" />
     <None Include="./Readme.md" Pack="true" PackagePath="" />
     <None Include="../git-get/bin/$(Configuration)/net8.0/publish/**/*" Exclude="**/*.pdb">
       <Link>cli/%(RecursiveDir)%(FileName)%(Extension)</Link>

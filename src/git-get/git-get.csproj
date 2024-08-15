@@ -18,10 +18,24 @@
       Reboot
     </PackageReleaseNotes>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
-  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>git,git-get,utility</PackageTags>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Authors>Derek Kowald</Authors>
+    <Product>git-get</Product>
+    <Title>git-get</Title>
+    <Description>tooling to extract a sub-set of files from a git repository</Description>
+    <PackageProjectUrl>https://github.com/Dkowald/kwld.GitPackage</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Dkowald/kwld.GitPackage.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <Copyright>Copyright (c) Derek Kowald 2024.</Copyright>
   </PropertyGroup>
   
   <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="/" />
     <None Include="./Readme.md" Pack="true" PackagePath="" />
     <!--Include exe in tool package-->
     <None Include="bin/$(Configuration)/net8.0/publish/git-get.exe">

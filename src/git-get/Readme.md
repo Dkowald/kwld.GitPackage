@@ -1,8 +1,8 @@
-﻿__git-get__
+__git-get__
 
 A cli tool for re-using git repositories as source packages.
 
-See [Repo](https://github.com/Dkowald/kwld.GitPackage/blob/wip/layout/doc/Home.md) for more info.
+See [Docs](https://github.com/Dkowald/kwld.GitPackage/blob/main/doc/Home.md) for more info.
 
 __e.g__
 

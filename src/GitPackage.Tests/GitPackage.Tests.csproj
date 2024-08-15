@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <GitPackage Include="App_Data/credits/kwld.utils">
+    <GitPackage Include="App_Data/credits/kwld.CoreUtil">
       <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
       <Version>tag/v1.3.2</Version>
       <Filter>/*</Filter>
@@ -82,10 +82,5 @@
     </GitPackage>
 
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
-
 
 </Project>
