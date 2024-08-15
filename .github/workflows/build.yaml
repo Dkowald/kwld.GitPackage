@@ -69,6 +69,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: "Build and test"
+    needs: "version_info"
     steps:
     - uses: actions/checkout@v3
   
