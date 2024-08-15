@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <!-- use the local git-get build -->
-    <GitPackage-Tool Condition="'$(GitPackageCli)' == ''">$(MSBuildThisFileDirectory)/../git-get/bin/$(Configuration)/net8.0/git-get.exe</GitPackage-Tool>
+    <GitPackage-Tool Condition="'$(GitPackageCli)' == ''">dotnet $(MSBuildThisFileDirectory)../git-get/bin/$(Configuration)/net8.0/git-get.dll</GitPackage-Tool>
     <GitPackage-LogLevel>d</GitPackage-LogLevel>
     <!-- disable design-time build -->
     <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild>
@@ -84,5 +84,5 @@
     </GitPackage>
 
   </ItemGroup>
-  
+
 </Project>
