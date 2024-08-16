@@ -99,7 +99,7 @@ internal static class TestRepository
         WorkingFolderPath.GetFile("item0.txt").Delete();
         repo.Index.Remove("item0.txt");
 
-        var moveTo = WorkingFolderPath.GetFile("folder2/item1.txt");
+        var moveTo = WorkingFolderPath.GetFile("Folder2/item1.txt");
         WorkingFolderPath.GetFile("Folder1/item1.txt").MoveTo(moveTo);
 
         repo.Index.Remove("Folder1/item1.txt");

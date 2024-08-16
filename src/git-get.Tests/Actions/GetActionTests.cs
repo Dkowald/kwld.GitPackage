@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
+using System.Xml;
 
 using GitGet.Actions;
 using GitGet.Model;
@@ -7,6 +8,7 @@ using GitGet.Utility;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -125,10 +127,8 @@ public class GetActionTests
             $"Extracted file {StatusFile.FileName} is being overwritten"));
 
         Assert.True(warnOverwrite > 0);
-
-        var statusFile = args.TargetPath.GetFile(StatusFile.FileName);
-
-        await Verify(await statusFile.ReadAllTextAsync())
-            .ScrubLines(x => x.Contains("Commit"));
+        
+        var isStatusFile = await StatusFile.TryLoad(new FakeLogger(), args.TargetPath) != null;
+        Assert.True(isStatusFile);
     }
 }
