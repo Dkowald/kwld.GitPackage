@@ -37,11 +37,6 @@
   <ItemGroup>
     <None Include="icon.png" Pack="true" PackagePath="/" />
     <None Include="./Readme.md" Pack="true" PackagePath="" />
-    <!--Include exe in tool package-->
-    <None Include="bin/$(Configuration)/net8.0/publish/git-get.exe">
-      <Pack>true</Pack>
-      <PackagePath>tools/$(TargetFramework)/any/git-get.exe</PackagePath>
-    </None>
   </ItemGroup>
   
   <ItemGroup>
