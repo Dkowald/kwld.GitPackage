@@ -1,0 +1,3 @@
+﻿Origin = file:///{ProjectDirectory}App_Data/TestRepository/
+Version = branch/BranchHasStatusFile
+Filter = *

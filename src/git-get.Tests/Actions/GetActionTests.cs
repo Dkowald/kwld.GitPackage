@@ -127,6 +127,8 @@ public class GetActionTests
         Assert.True(warnOverwrite > 0);
 
         var statusFile = args.TargetPath.GetFile(StatusFile.FileName);
-        await VerifyFile(statusFile.FullName);
+
+        await Verify(await statusFile.ReadAllTextAsync())
+            .ScrubLines(x => x.Contains("Commit"));
     }
 }
