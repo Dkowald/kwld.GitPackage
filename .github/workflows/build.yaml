@@ -70,6 +70,9 @@ jobs:
     runs-on: ubuntu-latest
     name: "Build and test"
     needs: "version_info"
+    permissions:
+      contents: write
+      checks: write
     steps:
     - uses: actions/checkout@v3
   
