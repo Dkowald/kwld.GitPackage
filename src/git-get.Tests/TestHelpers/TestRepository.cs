@@ -103,7 +103,7 @@ internal static class TestRepository
         WorkingFolderPath.GetFile("Folder1/item1.txt").MoveTo(moveTo);
 
         repo.Index.Remove("Folder1/item1.txt");
-        repo.Index.Add("folder2/item1.txt");
+        repo.Index.Add("Folder2/item1.txt");
         repo.Index.Write();
 
         repo.Commit("update-del-move", Sig, Sig);
