@@ -17,18 +17,18 @@ public class WhereTests
         using var host = new TestHost(x => { x.AddSingleton<Where>(); });
 
         var files = new MockFileSystem();
-
-        var prjDir = files.DirectoryInfo.New("c://prj");
-        var cache = files.DirectoryInfo.New("c://cache");
-
+        
+        var prjDir = files.DirectoryInfo.New("c:/prj");
+        var cache = files.DirectoryInfo.New("c:/cache");
+        
         var args = new Args(LogLevel.Trace, ActionOptions.Where,
             prjDir, cache) {
             Origin = new("http://someurl/repo.git")
         };
-
+        
         var target = host.Get<Where>();
 
-        var expectedPath = "c:\\cache\\someurl\\repo.git";
+        var expectedPath = cache.GetFolder("someurl", "repo.git").FullName;
 
         var exitCode = await target.Run(args);
 
