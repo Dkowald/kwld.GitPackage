@@ -30,7 +30,7 @@ Defaults to in-built version.
 Optional to over-ride the default git-get cache.
 
 - $(GitPackage-DesignTimeBuild)  
-Toggle to enable restore git packages as part of design time build.  
+Set to 'true' to enable restore git packages as part of design time build.  
 false by default.
 
 - $(GitPackage-LogLevel)  

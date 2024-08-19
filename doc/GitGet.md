@@ -100,11 +100,11 @@ git worktree add ./
 If no options provided, 'target-path/.gitget' file is read for details.
 'target-path/.gitget' is updated to reflect other options (if provided).
 
-#### --origin:[repository-origin]
+### --origin:[repository-origin]
 
 The target repository uri
 
-#### --version:[version-ref]
+### --version:[version-ref]
 
 The short-hand git ref to use
  - branch/main - refer to main branch
@@ -116,7 +116,7 @@ Alternatly, can be a explit git branch or tag ref
 
 Note: _Must_ be for origin remote when using explit branch ref.
 
-#### --filter:[globs]
+### --filter:[globs]
 A set of comma ',' delimited globs to select files.  
 Defaults to all: **/*.  
 glob entries are case-insensitive.  
@@ -127,7 +127,7 @@ A set of comma ',' delimited globs to ignore some selected files.
 Defaults to none: null
 
 
-#### --get-root:[get-root]
+### --get-root:[get-root]
 A sub-path withing the origin repository tree to 
 collect files from. Only repository files withing this path will be 
 extracted. 
@@ -137,7 +137,7 @@ reside in a particular sub-folder.
 
 Defaults to root: '/'
 
-#### --cache:[cache-path]
+### --cache:[cache-path]
 
 Alternate path for local cached repositories.
 
@@ -148,7 +148,7 @@ The cache is determined by:
 - Use _%USERPROFILE%/.gitpackages_ (windows fallback)
 - Use current-directory/.gitpackages as last resort.
 
-#### --force:[force]
+### --force:[force]
 
 Force re-get of files.
 
@@ -164,7 +164,7 @@ If [version] is a branch ref, will also force a fetch from origin.
 - tag : only force if [version-ref] is a tag ref
 - all: force for either a branch or tag references
 
-#### --log-level:[log-level]
+### --log-level:[log-level]
 
 Logging reported whilst running.
 [log-level] is one of
@@ -176,16 +176,16 @@ Logging reported whilst running.
 - d : Debug
 - t : Trace
 
-#### --target-path:[target-path]
+### --target-path:[target-path]
 
 Explicit define target path.  
 Alternately used as the action.  
 Defaults to current directory (./).
 
-__--user:[username]__  
+### --user:[username]
 User name for private / secured Git access.
 
-__--password:[password]__  
+### --password:[password]
 Pasword for private / secured Git access.
 
 ## .gitget format

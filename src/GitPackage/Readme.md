@@ -4,7 +4,7 @@ See [Docs](https://github.com/Dkowald/kwld.GitPackage/blob/main/doc/Home.md) for
 
 #### GitPackage
 
-MSBuild wrapper around git-get to include git source files in a project
+MSBuild wrapper around git-get [src](https://github.com/Dkowald/kwld.GitPackage/tree/main)/[nuget](https://www.nuget.org/packages/git-get) to include git source files in a project
 
 __e.g__  MSBuild to create a local clone and extract files from a repository.
 ``` xml
