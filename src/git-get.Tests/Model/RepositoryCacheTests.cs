@@ -57,13 +57,9 @@ public class RepositoryCacheTests
 
         var cacheTest = target.Get(TestRepository.BareRepoPath.AsUri());
 
-        if(!cacheTest.CachePath.Exists) {
-            //make sure i have at-least the test repo.
-            Repository.Clone(
-                TestRepository.BareRepoPath.AsUri().ToString(),
-                cacheTest.CachePath.FullName, new() { IsBare = true });
-        }
-
+        //make sure I have at-least the test repo.
+        target.CloneIfMissing(cacheTest, null).Dispose();
+        
         var result = target.List().ToArray();
 
         Assert.NotEmpty(result);

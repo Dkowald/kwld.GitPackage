@@ -9,7 +9,7 @@ namespace GitGet.Tests.TestHelpers;
 
 internal static class TestRepository
 {
-    private static readonly IDirectoryInfo Path = new FileSystem()
+    private static readonly IDirectoryInfo WorkingFolderPath = new FileSystem()
         .Project().GetFolder("App_Data", "TestRepositoryWorking");
 
     private static readonly IDirectoryInfo RepoPath = new FileSystem()
@@ -26,14 +26,18 @@ internal static class TestRepository
     private static Signature Sig =>
         new("test", "Test@com.au", DateTimeOffset.UtcNow);
 
-    internal static Repository OpenTestRepository(bool forceRebuild = false)
+    internal static Repository OpenTestRepository()
     {
-        if(!Repository.IsValid(RepoPath.FullName) || forceRebuild) {
+        if(!Repository.IsValid(RepoPath.FullName)) {
             Debug.WriteLine("Creating test repository");
-            BareRepoPath.ClearReadonly().EnsureEmpty();
-            Path.ClearReadonly().EnsureEmpty();
+            
+            if(Repository.IsValid(RepoPath.FullName)) 
+            { return new Repository(RepoPath.FullName); }
 
-            using(var repo = new Repository(Repository.Init(Path.FullName))) {
+            RepoPath.ClearReadonly().EnsureEmpty();
+            WorkingFolderPath.ClearReadonly().EnsureEmpty();
+
+            using(var repo = new Repository(Repository.Init(WorkingFolderPath.FullName))) {
                 Init(repo);
                 UpdateDeleteAndMove(repo);
                 IncludeNestedSameNameFolder(repo);
@@ -41,39 +45,40 @@ internal static class TestRepository
                 ManyFiles(repo);
             }
 
-            var bare = Path.GetFolder(".git");
+            var bare = WorkingFolderPath.GetFolder(".git");
 
-            bare.MergeForce(BareRepoPath);
-            using var bareRepo = new Repository(BareRepoPath.FullName);
+            bare.MergeForce(RepoPath);
+            using var bareRepo = new Repository(RepoPath.FullName);
             bareRepo.Config.Set("core.bare", true);
 
-            Path.ClearReadonly().EnsureDelete();
+            WorkingFolderPath.ClearReadonly().EnsureDelete();
+
         }
 
         if(!Repository.IsValid(RepoPath.FullName))
             throw new Exception("Create test repository failed");
 
-        var result = new Repository(BareRepoPath.FullName);
+        var result = new Repository(RepoPath.FullName);
 
         return result;
     }
 
     private static void Init(Repository repo)
     {
-        Path.GetFile("readme.md")
+        WorkingFolderPath.GetFile("readme.md")
             .WriteAllText("readme.md");
         repo.Index.Add("readme.md");
 
-        Path.GetFile("item0.txt")
+        WorkingFolderPath.GetFile("item0.txt")
             .WriteAllText("item0.txt");
         repo.Index.Add("item0.txt");
 
-        Path.GetFile("Folder1/item1.txt")
+        WorkingFolderPath.GetFile("Folder1/item1.txt")
             .EnsureDirectory()
             .WriteAllText("item1.txt");
         repo.Index.Add("Folder1/item1.txt");
 
-        Path.GetFile("Folder2/item2.txt")
+        WorkingFolderPath.GetFile("Folder2/item2.txt")
             .EnsureDirectory()
             .WriteAllText("item2.txt");
         repo.Index.Add("Folder2/item2.txt");
@@ -86,18 +91,18 @@ internal static class TestRepository
 
     private static void UpdateDeleteAndMove(Repository repo)
     {
-        Path.GetFile("readme.md")
+        WorkingFolderPath.GetFile("readme.md")
             .WriteAllText("Updated");
         repo.Index.Add("readme.md");
 
-        Path.GetFile("item0.txt").Delete();
+        WorkingFolderPath.GetFile("item0.txt").Delete();
         repo.Index.Remove("item0.txt");
 
-        var moveTo = Path.GetFile("folder2/item1.txt");
-        Path.GetFile("Folder1/item1.txt").MoveTo(moveTo);
+        var moveTo = WorkingFolderPath.GetFile("Folder2/item1.txt");
+        WorkingFolderPath.GetFile("Folder1/item1.txt").MoveTo(moveTo);
 
         repo.Index.Remove("Folder1/item1.txt");
-        repo.Index.Add("folder2/item1.txt");
+        repo.Index.Add("Folder2/item1.txt");
         repo.Index.Write();
 
         repo.Commit("update-del-move", Sig, Sig);
@@ -112,10 +117,10 @@ internal static class TestRepository
         Commands.Checkout(repo,
         repo.CreateBranch(nameof(IncludeNestedSameNameFolder)));
 
-        var f = Path.GetFile("Folder2", "Folder1", "nested.txt");
+        var f = WorkingFolderPath.GetFile("Folder2", "Folder1", "nested.txt");
         f.EnsureDirectory().WriteAllText("nested.txt");
 
-        repo.Index.Add(f.GetRelativePath(Path));
+        repo.Index.Add(f.GetRelativePath(WorkingFolderPath));
 
         repo.Index.Write();
         repo.Commit(nameof(IncludeNestedSameNameFolder), Sig, Sig);
@@ -128,7 +133,7 @@ internal static class TestRepository
         var newBranch = repo.CreateBranch(nameof(BranchHasStatusFile));
         Commands.Checkout(repo, newBranch);
 
-        Path.GetFile(StatusFile.FileName)
+        WorkingFolderPath.GetFile(StatusFile.FileName)
             .WriteAllText("some data");
         repo.Index.Add(StatusFile.FileName);
 
@@ -143,39 +148,39 @@ internal static class TestRepository
         var newBranch = repo.CreateBranch(nameof(ManyFiles));
         Commands.Checkout(repo, newBranch);
 
-        var manyFiles = Path.GetFolder("manyFiles").EnsureExists();
+        var manyFiles = WorkingFolderPath.GetFolder("manyFiles").EnsureExists();
 
         var file = manyFiles.GetFile("d0.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("d1.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("f0.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("f1.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("f2.x.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("Dir1", "f3-dir1.txt").EnsureDirectory();
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("Dir1", "f4-dir1.x.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         file = manyFiles.GetFile("Dir1", "f5-dir1.txt");
         file.WriteAllText(file.Name);
-        repo.Index.Add(file.GetRelativePath(Path));
+        repo.Index.Add(file.GetRelativePath(WorkingFolderPath));
 
         repo.Index.Write();
 

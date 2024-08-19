@@ -6,7 +6,7 @@ dotnet tool '_git-get_', simplifying the MSBuild Tasks to be a wrapper around th
 
 #### Details
 - [GitGet](./GitGet.md)
-- [GitPackage](./GitPAckage.md)
+- [GitPackage](./GitPackage.md)
 
 ## Get started: Git-Get
 

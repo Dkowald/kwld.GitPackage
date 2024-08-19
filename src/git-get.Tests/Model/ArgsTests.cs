@@ -7,6 +7,8 @@ using GitGet.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 
+using NSubstitute;
+
 namespace GitGet.Tests.Model;
 
 public class ArgsTests
@@ -25,17 +27,18 @@ public class ArgsTests
     [Fact]
     public void Load_WithDefaultCache()
     {
-        var files = new FileSystem();
+        var files = new MockFileSystem();
         var log = new FakeLogger();
         var args = Array.Empty<string>();
 
         var orgHome = Environment.GetEnvironmentVariable("HOME");
         try {
-            Environment.SetEnvironmentVariable("HOME", "c:/temp");
+            var home = files.Current().GetFolder("temp");
+
+            Environment.SetEnvironmentVariable("HOME", home.FullName);
             var target = Args.Load(new FileSystem(), log, LogLevel.Debug, args);
 
-            var expectedCache = files.DirectoryInfo
-                .New($@"c:\temp\{Args.DefaultCacheFolderName}");
+            var expectedCache = home.GetFolder(Args.DefaultCacheFolderName);
 
             Assert.NotNull(target);
             Assert.Equal(expectedCache.FullName, target.Cache.FullName);
@@ -49,7 +52,9 @@ public class ArgsTests
     {
         var files = new MockFileSystem();
 
-        using var _ = new EnvironmentVar("HOME", @"c:\temp\cache");
+        var home = files.Current().GetFolder(@"\temp\cache");
+
+        using var _ = new EnvironmentVar("HOME", home.FullName);
 
         var args = Args.Load(files, new FakeLogger(), LogLevel.Trace, []);
 
@@ -57,7 +62,7 @@ public class ArgsTests
 
         Assert.Equal(files.Current().FullName, args.TargetPath.FullName);
         Assert.Equal(ActionOptions.Get, args.Action);
-        Assert.Equal($@"c:\temp\cache\{Args.DefaultCacheFolderName}", args.Cache.FullName);
+        Assert.Equal(home.GetFolder(Args.DefaultCacheFolderName).FullName, args.Cache.FullName);
 
         Assert.Equal(files.Current().FullName, args.TargetPath.FullName);
     }

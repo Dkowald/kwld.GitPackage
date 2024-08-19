@@ -67,44 +67,12 @@ internal class RepositoryCache
 
     public Repository CloneIfMissing(CacheEntry cache, CredentialsHandler? creds)
     {
-        if(cache.CachePath.Exists() && Repository.IsValid(cache.CachePath.FullName)) {
-            _log.LogDebug("Cached repository {origin} found", cache.Origin);
+        if(Repository.IsValid(cache.CachePath.FullName)) {
+            _log.LogTrace("Cached repository {origin} found", cache.Origin);
             return new Repository(cache.CachePath.FullName);
         }
 
-        if(cache.CachePath.Exists) {
-            _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
-            cache.CachePath.ClearReadonly().EnsureDelete();
-        }
-
-        _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
-
-        cache.CachePath.EnsureExists();
-
-        var options = new CloneOptions { IsBare = true };
-
-        options.FetchOptions.CredentialsProvider = creds;
-
-        var progressStarted = false;
-        options.FetchOptions.TagFetchMode = TagFetchMode.Auto;
-        options.FetchOptions.OnProgress += _ => {
-            if(!progressStarted) {
-                _log.LogDebug($"Fetching objects to transfer");
-                progressStarted = true;
-            }
-            return true;
-        };
-
-        var transferStarted = false;
-        options.FetchOptions.OnTransferProgress = x => {
-            if(!transferStarted) {
-                _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
-                transferStarted = true;
-            }
-            return true;
-        };
-
-        Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
+        CloneWithLock(cache, creds);
 
         var repo = new Repository(cache.CachePath.FullName);
 
@@ -118,6 +86,49 @@ internal class RepositoryCache
             entry.CachePath.ClearReadonly().EnsureDelete();
         }
         return this;
+    }
+
+    private void CloneWithLock(CacheEntry cache, CredentialsHandler? creds)
+    {
+        if(cache.CachePath.Exists) {
+            _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
+            cache.CachePath.ClearReadonly().EnsureDelete();
+        }
+        _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
+
+        cache.CachePath.EnsureExists();
+
+        var options = new CloneOptions {
+            IsBare = true,
+            FetchOptions =
+            {
+                    CredentialsProvider = creds,
+                    TagFetchMode = TagFetchMode.Auto
+                }
+        };
+
+        var progressStarted = false;
+        options.FetchOptions.OnProgress += _ => {
+            if(!progressStarted) {
+                _log.LogDebug("Fetching objects to transfer");
+                progressStarted = true;
+            }
+
+            return true;
+        };
+
+        var transferStarted = false;
+        options.FetchOptions.OnTransferProgress = x => {
+            if(!transferStarted) {
+                _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
+                transferStarted = true;
+            }
+
+            return true;
+        };
+
+        Repository.Clone(cache.Origin.ToString(), cache.CachePath.FullName, options);
+
     }
 
     private CacheEntry? TryResolveEntry(IDirectoryInfo repoPath)
@@ -134,7 +145,7 @@ internal class RepositoryCache
             .Get<string>("remote.origin.url", ConfigurationLevel.Local)
             ?.Value;
         if(origin is null) {
-            _log.LogError("Repository cache {cache} doesnt have origin remote", repoPath.FullName);
+            _log.LogError("Repository cache {cache} does not have origin remote", repoPath.FullName);
             return null;
         }
 

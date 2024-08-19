@@ -96,7 +96,8 @@ internal class GetAction : IAction
         }
     }
 
-    private DirectReference? FetchReference(Repository repo, GitRef gitRef, bool force, CredentialsHandler? creds)
+    private DirectReference? FetchReference(Repository repo, GitRef gitRef, 
+        bool force, CredentialsHandler? creds)
     {
         if(gitRef.IsTag && !force) {
             var tagRef = repo.Refs[gitRef.Value];
@@ -127,6 +128,7 @@ internal class GetAction : IAction
                     _log.LogDebug("Fetching objects to transfer");
                     progressStarted = true;
                 }
+
                 return true;
             },
             OnTransferProgress = x => {
@@ -134,12 +136,13 @@ internal class GetAction : IAction
                     _log.LogDebug("Fetching {totalObjects} from server", x.TotalObjects);
                     transferStarted = true;
                 }
+
                 return true;
             }
         };
 
         Commands.Fetch(repo, "origin", refSpecs, options, "");
-
+        
         var targetRef = repo.Refs[gitRef.Value]?.ResolveToDirectReference();
 
         return targetRef;

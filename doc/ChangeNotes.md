@@ -1,4 +1,4 @@
-This is a re-boot of the earlier 
+This is a re-boot of the now retired
 [GitPackage](https://github.com/Dkowald/GitPackage)
 
 This time around, I want to remove the dependency on git cli;
