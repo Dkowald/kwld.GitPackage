@@ -25,6 +25,8 @@
       <Args Include='--filter:"%(GitPackage.Filter)"' Condition="'%(GitPackage.Filter)' != ''" />
       <Args Include='--ignore:"%(GitPackage.Ignore)"' Condition="'%(GitPackage.Ignore)' != ''" />
       <Args Include='--get-root:"%(GitPackage.GetRoot)"' Condition="'%(GitPackage.GetRoot)' != ''"  />
+      <Args Include='--user:"%(GitPackage.User)"' Condition="'%(GitPackage.User)' != ''"  />
+      <Args Include='--password:"%(GitPackage.Password)"' Condition="'%(GitPackage.Password)' != ''"  />
       <Args Include="--log-level:$(GitPackage-LogLevel)" Condition="'$(GitPackage-LogLevel)' != ''" />
       <Args Include='--cache:"$(GitPackage-Cache)"' Condition="'$(GitPackage-Cache)' != ''" />
     </ItemGroup>

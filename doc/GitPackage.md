@@ -49,7 +49,7 @@ dotnet msbuild -t:GPUpdate
 
 ### gpRestore
 
-Process __GetPackage__ items, getting files for those that
+Process __GitPackage__ items, getting files for those that
 dont have a commit in the .gitget file.
 
 ### gpDesignTimeRestore
