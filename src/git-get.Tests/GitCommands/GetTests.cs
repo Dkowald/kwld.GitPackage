@@ -11,7 +11,7 @@ namespace GitGet.Tests.GitCommands;
 public class GetTests
 {
     private readonly IDirectoryInfo _outRoot = Files.AppData.GetFolder(nameof(GetTests));
-
+    
     [Fact]
     public async Task ReportResult()
     {

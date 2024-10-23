@@ -7,5 +7,4 @@ samples/packages/
 App_Data/
 
 *.received.*
-/src/*.user
-/src/_ReSharper.Caches/
+/src/**/*.user

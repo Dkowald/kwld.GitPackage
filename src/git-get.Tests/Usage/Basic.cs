@@ -25,7 +25,7 @@ public class Basic
             $"--target-path:{_root.FullName}",
             $"--origin:{_origin}",
             "--version:tag/v1.3.1",
-            "--filter:/readme.md"
+            "--filter:/readme.md, other.txt"
         };
 
         var exitCode = await Program.Main(args);

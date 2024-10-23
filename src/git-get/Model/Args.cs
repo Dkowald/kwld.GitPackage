@@ -84,7 +84,7 @@ internal record Args
 
             if(next.StartsWith(OriginKey)) {
                 if(origin is not null) {
-                    log.LogError("Origin url already provided");
+                    log.LogError("argument already provided - Origin url");
                     return null;
                 }
                 var value = next[OriginKey.Length..];
@@ -97,7 +97,7 @@ internal record Args
 
             if(next.StartsWith(VersionKey)) {
                 if(version is not null) {
-                    log.LogError("Version already provided");
+                    log.LogError("argument already provided - Version");
                     return null;
                 }
 
@@ -112,7 +112,7 @@ internal record Args
 
             if(next.StartsWith(FilterKey)) {
                 if(filter is not null) {
-                    log.LogError("Filter already provided");
+                    log.LogError("argument already provided - Filter");
                     return null;
                 }
                 var value = next[FilterKey.Length..];
@@ -127,7 +127,7 @@ internal record Args
 
             if(next.StartsWith(IgnoreKey)) {
                 if(ignore is not null) {
-                    log.LogError("Ignore already provided");
+                    log.LogError("argument already provided - Ignore");
                     return null;
                 }
                 var value = next[IgnoreKey.Length..];
@@ -142,7 +142,7 @@ internal record Args
 
             if(next.StartsWith(GetRootKey)) {
                 if(root is not null) {
-                    log.LogError("GetRoot already provided");
+                    log.LogError("argument already provided - GetRoot");
                     return null;
                 }
                 var value = next[GetRootKey.Length..];
@@ -157,7 +157,7 @@ internal record Args
 
             if(next.StartsWith(CacheKey)) {
                 if(cache is not null) {
-                    log.LogError("Cache already provided");
+                    log.LogError("argument already provided - Cache");
                     return null;
                 }
 
@@ -185,7 +185,7 @@ internal record Args
 
             if(next.StartsWith(TargetPathKey)) {
                 if(targetPath is not null) {
-                    log.LogError("TargetPath already provided");
+                    log.LogError("argument already provided - TargetPath");
                     return null;
                 }
                 var value = next[TargetPathKey.Length..];
