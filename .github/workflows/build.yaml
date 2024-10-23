@@ -10,9 +10,12 @@ on:
   push:
     tags:
     - "v*"
+    branches:
+    - main
+    - development
   pull_request:
     branches:
-      - master
+      - main
       - development
 
 defaults:
