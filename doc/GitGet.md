@@ -94,11 +94,13 @@ git worktree add ./
 
 ```
 
-
 ## options
 
-If no options provided, 'target-path/.gitget' file is read for details.
-'target-path/.gitget' is updated to reflect other options (if provided).
+Options are read from the coresponding arguments,
+them merged with values found in _target_path/.gitget
+
+This means you can provide a minimal cli call and reuse previous options 
+saved in _target_path/.gitget_
 
 ### --origin:[repository-origin]
 
@@ -207,4 +209,4 @@ The .gitpackages folder maintains a local cache of cloned repositories.
 
 Each repository is in a sub-folder made from the origin url.
 
-If a local git-repository is use, it is stored un .gitpackages/local/
+If a local git-repository is use, it is stored under .gitpackages/local/
