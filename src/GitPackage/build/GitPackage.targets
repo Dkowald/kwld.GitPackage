@@ -36,7 +36,8 @@
     <MakeDir Directories="%(GitPackage.Identity)"/>
 
     <Exec Command="$(GitPackage-Tool) @(Args, ' ')"
-			  WorkingDirectory="%(GitPackage.Identity)">
+        WorkingDirectory="%(GitPackage.Identity)"
+        LogStandardErrorAsError="true">
     </Exec>
   </Target>
 

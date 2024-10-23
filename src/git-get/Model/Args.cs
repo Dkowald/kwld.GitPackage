@@ -105,7 +105,8 @@ internal record Args
                 (var error, version) = GitRef.TryRead(value);
                 if(version is null) {
                     log.LogError("Invalid version {version}", value);
-                    log.LogInformation("Version parse error: {error}", error);
+                    log.LogError("Version parse error: {error}", error);
+                    return null;
                 }
                 continue;
             }
@@ -120,7 +121,8 @@ internal record Args
                     filter = new(value);
                 } catch(Exception ex) {
                     log.LogError("Invalid filter : {filter}", value);
-                    log.LogInformation(ex, $"Failed create {nameof(GlobFilter)}");
+                    log.LogError(ex, $"Failed create {nameof(GlobFilter)}");
+                    return null;
                 }
                 continue;
             }
@@ -135,7 +137,8 @@ internal record Args
                     ignore = new(value);
                 } catch(Exception ex) {
                     log.LogError("Invalid ignore: {ignore}", value);
-                    log.LogInformation(ex, $"Failed create {nameof(Ignore)}");
+                    log.LogError(ex, $"Failed create {nameof(Ignore)}");
+                    return null;
                 }
                 continue;
             }
@@ -150,7 +153,8 @@ internal record Args
                     root = new(value);
                 } catch(Exception ex) {
                     log.LogError("Invalid get-root: {get-root}", value);
-                    log.LogInformation(ex, $"Failed create {nameof(GetRoot)}");
+                    log.LogError(ex, $"Failed create {nameof(GetRoot)}");
+                    return null;
                 }
                 continue;
             }
