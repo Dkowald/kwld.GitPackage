@@ -22,6 +22,12 @@ __Item metadata__
 
 ## Properties
 
+- $(GitPackage-UpdateOnRebuild)
+When true, rebuild solution will 
+also trigger re-fresh from server when a branch is used:
+**--force:branch**.  
+Defaults to true.
+
 - $(GitPackage-Tool)  
 Path to git-get.exe. 
 Defaults to in-built version.

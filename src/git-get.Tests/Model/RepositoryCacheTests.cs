@@ -2,8 +2,6 @@
 using GitGet.Tests.TestHelpers;
 using GitGet.Utility;
 
-using LibGit2Sharp;
-
 using Microsoft.Extensions.Logging.Testing;
 
 namespace GitGet.Tests.Model;

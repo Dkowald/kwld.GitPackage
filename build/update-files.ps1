@@ -33,9 +33,8 @@ write-host "Update $file"
 $content = (Get-Content $file)
 $content = $content.replace("https://github.com/Dkowald/kwld.GitPackage/blob/main/doc/Home.md", "https://github.com/Dkowald/kwld.GitPackage/blob/$($tagName)/doc/Home.md");
 $content = $content.replace("https://github.com/Dkowald/kwld.GitPackage/tree/main", "https://github.com/Dkowald/kwld.GitPackage/tree/$($tagName)")
-$content = $content.replace("https://www.nuget.org/packages/GitPackage", "https://www.nuget.org/packages/GitPackage/$($tagName)")
+$content = $content.replace("https://www.nuget.org/packages/GitPackage", "https://www.nuget.org/packages/GitPackage/$($PackageVersion)")
 $content = $content.replace("99.0.0", "$($PackageVersion)");
-$content = $content.replace("tag/v99", "$($tagName)");
 set-content -path $file -Value $content
 
 $file = "$($GitPackageDir)/Readme.md"
@@ -43,8 +42,9 @@ write-host "Update $file"
 $content = (Get-Content $file)
 $content = $content.replace("https://github.com/Dkowald/kwld.GitPackage/blob/main/doc/Home.md", "https://github.com/Dkowald/kwld.GitPackage/blob/$($tagName)/doc/Home.md");
 $content = $content.replace("https://github.com/Dkowald/kwld.GitPackage/tree/main", "https://github.com/Dkowald/kwld.GitPackage/tree/$($tagName)");
-$content = $content.replace("https://www.nuget.org/packages/git-get", "https://www.nuget.org/packages/git-get/$($tagName)");
+$content = $content.replace("https://www.nuget.org/packages/git-get", "https://www.nuget.org/packages/git-get/$($PackageVersion)");
 $content = $content.replace("99.0.0", "$($PackageVersion)");
+$content = $content.replace("tag/v99", "tag/$($tagName)");
 set-content -path $file -Value $content
 
 pop-location

@@ -34,6 +34,10 @@ Aditional options
 
 ``` xml
 <PropertyGroup>
+  <!--when re-build project; get latest from server if using a branch version--> 
+  <!--true by default-->
+  <GitPackage-UpdateOnRebuild>true</GitPackage-UpdateOnRebuild>
+
   <!--Specify an alternate cli to use -->
   <GitPackage-Tool>dotnet tool git-get</GitPackage-Tool>
 

@@ -12,7 +12,7 @@ dotnet tool '_git-get_', simplifying the MSBuild Tasks to be a wrapper around th
 
 Install the dotnet tool 
 ``` pwsh
-dotnet tool install git-get
+dotnet tool install -g git-get
 ```
 
 Get the docs for another project.

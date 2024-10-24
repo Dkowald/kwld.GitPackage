@@ -7,8 +7,6 @@ using GitGet.Tests.TestHelpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 
-using NSubstitute;
-
 namespace GitGet.Tests.Model;
 
 public class ArgsTests

@@ -1,5 +1,4 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
-using System.Xml;
 
 using GitGet.Actions;
 using GitGet.Model;

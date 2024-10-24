@@ -6,6 +6,9 @@
     
     <GitPackage-DesignTimeBuild Condition="$(GitPackage-DesignTimeBuild) == ''" >false</GitPackage-DesignTimeBuild>
 
+    <GitPackage-UpdateOnRebuild Condition="'$(GitPackage-UpdateOnRebuild)' == ''">true</GitPackage-UpdateOnRebuild>
+
+    <!--handled by git-package cli-->
     <!--<GitPackage-Cache Condition="'$(GitPackage-Cache)' == '' And '$(HOME)' != ''">$(HOME)/.gitpackages</GitPackage-Cache>
     <GitPackage-Cache Condition="'$(GitPackage-Cache)' == '' And '$(USERPROFILE)' != ''">$(USERPROFILE)/.gitpackages</GitPackage-Cache>-->
 
@@ -17,28 +20,51 @@
 
   <!--Run tool-->
   <Target Name="gpRestore" Inputs="@(GitPackage)"
-			Outputs="%(GitPackage.Identity)/.gitpackage"
+			Outputs="%(GitPackage.Identity)/.gitget"
       BeforeTargets="Build">
     <ItemGroup>
-      <Args Include="--origin:%(GitPackage.Origin)" />
-      <Args Include="--version:%(GitPackage.Version)" />
-      <Args Include='--filter:"%(GitPackage.Filter)"' Condition="'%(GitPackage.Filter)' != ''" />
-      <Args Include='--ignore:"%(GitPackage.Ignore)"' Condition="'%(GitPackage.Ignore)' != ''" />
-      <Args Include='--get-root:"%(GitPackage.GetRoot)"' Condition="'%(GitPackage.GetRoot)' != ''"  />
-      <Args Include='--user:"%(GitPackage.User)"' Condition="'%(GitPackage.User)' != ''"  />
-      <Args Include='--password:"%(GitPackage.Password)"' Condition="'%(GitPackage.Password)' != ''"  />
-      <Args Include="--log-level:$(GitPackage-LogLevel)" Condition="'$(GitPackage-LogLevel)' != ''" />
-      <Args Include='--cache:"$(GitPackage-Cache)"' Condition="'$(GitPackage-Cache)' != ''" />
+      <gpArg Include="--origin:%(GitPackage.Origin)" />
+      <gpArg Include="--version:%(GitPackage.Version)" />
+      <gpArg Include='--filter:"%(GitPackage.Filter)"' Condition="'%(GitPackage.Filter)' != ''" />
+      <gpArg Include='--ignore:"%(GitPackage.Ignore)"' Condition="'%(GitPackage.Ignore)' != ''" />
+      <gpArg Include='--get-root:"%(GitPackage.GetRoot)"' Condition="'%(GitPackage.GetRoot)' != ''"  />
+      <gpArg Include='--user:"%(GitPackage.User)"' Condition="'%(GitPackage.User)' != ''"  />
+      <gpArg Include='--password:"%(GitPackage.Password)"' Condition="'%(GitPackage.Password)' != ''"  />
+      <gpArg Include="--log-level:$(GitPackage-LogLevel)" Condition="'$(GitPackage-LogLevel)' != ''" />
+      <gpArg Include='--cache:"$(GitPackage-Cache)"' Condition="'$(GitPackage-Cache)' != ''" />
     </ItemGroup>
 
     <Message Text="GitPackage Restore: %(GitPackage.Identity)" Importance="High" />
 
     <MakeDir Directories="%(GitPackage.Identity)"/>
 
-    <Exec Command="$(GitPackage-Tool) @(Args, ' ')"
+    <Exec Command="$(GitPackage-Tool) @(gpArg, ' ')"
         WorkingDirectory="%(GitPackage.Identity)"
-        LogStandardErrorAsError="true">
-    </Exec>
+        LogStandardErrorAsError="true" />
+  </Target>
+
+  <!--Update branch packages-->
+  <Target Name="gpUpdate" Inputs="@(GitPackage)" Outputs="%(GitPackage.Identity)/.gitget">
+    <ItemGroup>
+      <gpArg Include="--origin:%(GitPackage.Origin)" />
+      <gpArg Include="--version:%(GitPackage.Version)" />
+      <gpArg Include='--filter:"%(GitPackage.Filter)"' Condition="'%(GitPackage.Filter)' != ''" />
+      <gpArg Include='--ignore:"%(GitPackage.Ignore)"' Condition="'%(GitPackage.Ignore)' != ''" />
+      <gpArg Include='--get-root:"%(GitPackage.GetRoot)"' Condition="'%(GitPackage.GetRoot)' != ''"  />
+      <gpArg Include='--user:"%(GitPackage.User)"' Condition="'%(GitPackage.User)' != ''"  />
+      <gpArg Include='--password:"%(GitPackage.Password)"' Condition="'%(GitPackage.Password)' != ''"  />
+      <gpArg Include="--log-level:$(GitPackage-LogLevel)" Condition="'$(GitPackage-LogLevel)' != ''" />
+      <gpArg Include='--cache:"$(GitPackage-Cache)"' Condition="'$(GitPackage-Cache)' != ''" />
+      <gpArg Include="--force:branch" />
+    </ItemGroup>
+
+    <Message Text="GitPackage Update: %(GitPackage.Identity)" Importance="High" />
+
+    <MakeDir Directories="%(GitPackage.Identity)"/>
+
+    <Exec Command="$(GitPackage-Tool) @(gpArg, ' ')"
+          WorkingDirectory="%(GitPackage.Identity)"
+          LogStandardErrorAsError="true" />
   </Target>
 
   <!-- DesignTime run -->
@@ -52,6 +78,13 @@
 	  -->
   </Target>
 
+  <!--force fetch branch  from server when do a rebuild-->
+  <Target Name="_gpUpdateOnRebuild" BeforeTargets="BeforeRebuild"
+          Condition="$(GitPackage-UpdateOnRebuild) == 'true'">
+    <ItemGroup>
+      <gpArg Include="--force:branch" />
+    </ItemGroup>
+  </Target>
   <!--
   Include git package status files as inputs for fast-build
   https://github.com/dotnet/project-system/blob/main/docs/up-to-date-check.md
