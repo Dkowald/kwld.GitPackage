@@ -65,7 +65,7 @@ internal class Get(Repository repository, bool skipSubModules = true)
             }
 
             var content = (Blob)file.Item.Target;
-            var outFile = target.GetFile(file.Path[1..]);
+            var outFile = target.GetFile( ((string)file.Path)[1..]);
 
             await using var rd = content.GetContentStream();
             await using var wr = outFile.EnsureDirectory().Create();
@@ -75,7 +75,7 @@ internal class Get(Repository repository, bool skipSubModules = true)
         return new(commitRef.Sha, total, included, ignored);
     }
 
-    private record BlobEntry(string Path, TreeEntry Item);
+    private record BlobEntry(RootPath Path, TreeEntry Item);
 
     private IEnumerable<BlobEntry> ReadTree(Tree root)
     {
@@ -93,7 +93,7 @@ internal class Get(Repository repository, bool skipSubModules = true)
 
                 var path = $"{next.Path}/{item.Name}";
 
-                yield return new(path, item);
+                yield return new(new(path), item);
             }
         }
     }

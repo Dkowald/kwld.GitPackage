@@ -104,4 +104,20 @@ public class GetTests
 
         await VerifyDirectory(destRoot.FullName);
     }
+
+    [Fact]
+    public async Task GetFilteredWithRoot()
+    {
+        using var repo = new RepositoryCache(new FakeLogger(), Files.TestPackageCacheRoot)
+            .CloneIfMissing(TestRepository.BareRepoPath.AsUri(), null);
+
+        var target = new Get(repo);
+
+        var destRoot = _outRoot.GetFolder(nameof(GetNoAnchorFiltered))
+            .EnsureEmpty();
+
+        await target.Run(destRoot, new("branch/ManyFiles"), new("dir1/*.x.txt"), null, new("/manyfiles/dir1/"));
+
+        await VerifyDirectory(destRoot.FullName);
+    }
 }

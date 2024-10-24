@@ -10,6 +10,7 @@ namespace GitGet.Model
     /// <br/> Must contain a sub-path (cannot be '/')
     /// <br /> Trimmed
     /// <br /> auto prefixed with '/'
+    /// <br /> trailing '/' removed (if any)
     /// </summary>
     public record RootPath : IDataString
     {
@@ -24,6 +25,8 @@ namespace GitGet.Model
                 return ("Must contain a sub-path (cannot be '/')", null);
 
             data = data[0] == '/' ? data : $"/{data}";
+
+            data = data[^1] == '/' ? data[..^1] : data;
 
             return new(null, data);
         }
