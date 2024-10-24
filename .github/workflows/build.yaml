@@ -10,9 +10,12 @@ on:
   push:
     tags:
     - "v*"
+    branches:
+    - main
+    - development
   pull_request:
     branches:
-      - master
+      - main
       - development
 
 defaults:
@@ -70,11 +73,14 @@ jobs:
     runs-on: ubuntu-latest
     name: "Build and test"
     needs: "version_info"
+    permissions:
+      contents: write
+      checks: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
   
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
           8.0.x
@@ -82,6 +88,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore src/
 
+    - name: FilePrep
+      run: |
+        $version = "${{needs.version_info.outputs.package_version}}";
+        write-host "Package Version - '$version'"
+        
+        ./build/update-files.ps1 -PackageVersion $version
+        
     - name: Build
       run: >
         dotnet build 
@@ -103,6 +116,13 @@ jobs:
         --results-directory "TestResults" 
         src/
 
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: |
+          TestResults/**/*.trx
+
     - name: Pack 
       run: >
         dotnet pack 
@@ -113,20 +133,23 @@ jobs:
         src/
 
     - name: Keep package artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: package
+        name: packages
         path: packages/
         if-no-files-found: error
 
     - name: Nuget publish
       if: needs.version_info.outputs.publish_packages == 'true'
       run: >
-        write-host "will push git-get"
-        write-host "will push GitPackage"
+        dotnet nuget push
+        "packages/*.*"
+        --api-key ${{secrets.NUGETPUSH}}
+        --source https://api.nuget.org/v3/index.json
 
     - name: Create release
-      uses: ncipollo/release-action@v1      
+      uses: ncipollo/release-action@v1
+      if: needs.version_info.outputs.publish_packages == 'true'
       with:
         draft: false
         prerelease: "${{needs.version_info.outputs.is_preview}}"

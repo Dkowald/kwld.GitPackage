@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- use the local git-get build -->
+    <GitPackage-Tool>dotnet $(MSBuildThisFileDirectory)../git-get/bin/$(Configuration)/net8.0/git-get.dll</GitPackage-Tool>
+    <GitPackage-LogLevel>d</GitPackage-LogLevel>
+    <!-- disable design-time build -->
+    <GitPackage-DesignTimeBuild>!true</GitPackage-DesignTimeBuild>
+  </PropertyGroup>
+  <!-- Manually include the build project assets -->
+  <Import Project="../GitPackage/build/GitPackage.targets" />
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitPackage\GitPackage.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="kwld.CoreUtil" Version="1.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <GitPackage Include="App_Data/credits/kwld.CoreUtil">
+      <Origin>https://github.com/Dkowald/kwld.CoreUtil.git</Origin>
+      <Version>tag/v1.3.2</Version>
+      <Filter>/*</Filter>
+      <Ignore>/.gitignore</Ignore>
+    </GitPackage>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(ContinuousIntegrationBuild) != 'true'">
+    <GitPackage Include="App_Data/credits/DotNet.Glob">
+      <Origin>https://github.com/dazinator/DotNet.Glob.git</Origin>
+      <Version>tag/3.1.3</Version>
+      <Filter>/*.md, other.*</Filter>
+    </GitPackage>
+
+    <GitPackage Include="App_Data/credits/LibGit2Sharp">
+      <Origin>https://github.com/libgit2/libgit2sharp.git</Origin>
+      <Version>branch/master</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(ContinuousIntegrationBuild) != 'true'">
+    <!--credist for testing libs-->
+    <GitPackage Include="App_Data/credits/Testing/NSubstitute">
+      <Origin>https://github.com/nsubstitute/NSubstitute.git</Origin>
+      <Version>tag/v5.1.0</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="App_Data/credits/Testing/Verify">
+      <Origin>https://github.com/VerifyTests/Verify.git</Origin>
+      <Version>branch/main</Version>
+      <Filter>/readme.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="App_Data/credits/Testing/InMemoryLogger">
+      <Origin>https://github.com/horsdal/InMemoryLogger.git</Origin>
+      <Version>branch/master</Version>
+      <Filter>/readme.md</Filter>
+    </GitPackage>
+
+    <GitPackage Include="App_Data/credits/Testing/Ordering">
+      <Origin>https://github.com/Dkowald/kwld.Xunit.Ordering.git</Origin>
+      <Version>branch/main</Version>
+      <Filter>/*.md</Filter>
+    </GitPackage>
+
+  </ItemGroup>
+
+</Project>

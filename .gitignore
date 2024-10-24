@@ -1,6 +1,10 @@
 Old/
 
-src/**/bin/
-src/**/obj/
+**/bin/*
+**/obj/*
+.vs/
+samples/packages/
+App_Data/
 
-
+*.received.*
+/src/**/*.user

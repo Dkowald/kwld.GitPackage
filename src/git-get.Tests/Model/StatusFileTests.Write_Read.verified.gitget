@@ -1,0 +1,5 @@
+Origin = http://somewhere/
+Version = tag/1
+Filter = *
+GetRoot = /aplace
+Commit = zzzzzzzz1

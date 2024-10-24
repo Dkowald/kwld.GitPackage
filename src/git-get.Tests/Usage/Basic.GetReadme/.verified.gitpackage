@@ -1,0 +1,4 @@
+Origin = https://github.com/libgit2/libgit2sharp.git
+Version = branch/maint/v0.22
+Filter = /readme.md
+Commit = 6b36f88322042aa82d05353dc1ff95f469319502

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.Build.Traversal/4.1.0">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+  <ItemGroup>
+		<None Include="./*.*" Exclude="./Repository.csproj" />
+    <None Include=".github/**" />
+    <None Include=".vscode/**" />
+    <None Include="doc/**" />
+    <None Include="samples/**/*" Exclude="**/bin/**;**/obj/**;**/.vs/**"/>
+    <None Include="build/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="Readme.md" />
+  </ItemGroup>
+	
+</Project>
