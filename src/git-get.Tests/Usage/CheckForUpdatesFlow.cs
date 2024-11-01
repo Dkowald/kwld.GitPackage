@@ -1,6 +1,5 @@
 ﻿using GitGet.Model;
 using GitGet.Tests.TestHelpers;
-using GitGet.Utility;
 
 using LibGit2Sharp;
 
@@ -27,8 +26,8 @@ public class CheckForUpdatesFlow
     [Ordered, Fact]
     public void Reset()
     {
-        _origin.ClearReadonly().EnsureEmpty();
-        _cache.ClearReadonly().EnsureDelete();
+        _origin.EnsureEmpty();
+        _cache.EnsureDelete();
         _working.EnsureDelete();
     }
 

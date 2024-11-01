@@ -1,5 +1,4 @@
 ﻿using GitGet.Actions;
-using GitGet.Utility;
 
 using Microsoft.Extensions.Logging;
 
@@ -272,7 +271,7 @@ internal record Args
 
     private static IDirectoryInfo DefaultCache(IFileSystem files, ILogger log)
     {
-        var home = files.TryGetHome();
+        var home = files.Home();
 
         if(home is null) {
             log.LogWarning("No home directory found!, using cwd");

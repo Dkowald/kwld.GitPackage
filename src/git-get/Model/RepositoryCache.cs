@@ -1,6 +1,4 @@
-﻿using GitGet.Utility;
-
-using LibGit2Sharp;
+﻿using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
 using Microsoft.Extensions.Logging;
@@ -62,9 +60,16 @@ internal class RepositoryCache
         return entries;
     }
 
+    /// <inheritdoc cref="CloneIfMissing(CacheEntry,LibGit2Sharp.Handlers.CredentialsHandler?)" />
     public Repository CloneIfMissing(Uri origin, CredentialsHandler? creds)
         => CloneIfMissing(Get(origin), creds);
 
+    /// <summary>
+    /// Ensures git repository is in the cache,
+    /// using credentials for clone if provided.
+    /// </summary>
+    /// <param name="cache">Cache entry corresponding to location for the origin</param>
+    /// <param name="creds">Credentials to use when cloning (if needed)</param>
     public Repository CloneIfMissing(CacheEntry cache, CredentialsHandler? creds)
     {
         if(Repository.IsValid(cache.CachePath.FullName)) {
@@ -83,7 +88,7 @@ internal class RepositoryCache
     {
         var entry = Get(origin);
         if(entry.CachePath.Exists()) {
-            entry.CachePath.ClearReadonly().EnsureDelete();
+            entry.CachePath.EnsureDelete();
         }
         return this;
     }
@@ -92,7 +97,7 @@ internal class RepositoryCache
     {
         if(cache.CachePath.Exists) {
             _log.LogWarning("Cached repository broken, resetting {Origin}", cache.Origin);
-            cache.CachePath.ClearReadonly().EnsureDelete();
+            cache.CachePath.EnsureDelete();
         }
         _log.LogInformation("Cloning source repository '{origin}'", cache.Origin);
 

@@ -1,6 +1,5 @@
 ﻿using GitGet.Model;
 using GitGet.Tests.TestHelpers;
-using GitGet.Utility;
 
 using Microsoft.Extensions.Logging.Testing;
 
@@ -9,10 +8,31 @@ namespace GitGet.Tests.Model;
 public class RepositoryCacheTests
 {
     [Fact]
+    public void Purge_()
+    {
+        var localCache = Files.AppData.GetFolder(nameof(RepositoryCacheTests));
+
+        localCache.EnsureEmpty();
+
+
+        var target = new RepositoryCache(new FakeLogger(), localCache);
+
+        var origin = TestRepository.BareRepoPath.AsUri();
+        var cacheEntry = target.Get(origin);
+
+        target.CloneIfMissing(origin, null).Dispose();
+        
+        Assert.True(cacheEntry.CachePath.Exists());
+
+        target.Purge(origin);
+
+        Assert.False(cacheEntry.CachePath.Exists());
+    }
+
+    [Fact]
     public void CloneIfMissing_()
     {
         var cache = Files.AppData.GetFolder(nameof(RepositoryCache), "cache")
-            .ClearReadonly()
             .EnsureEmpty();
 
         var logs = new List<string>();

@@ -1,6 +1,5 @@
 ﻿using GitGet.Actions.Errors;
 using GitGet.Model;
-using GitGet.Utility;
 
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
@@ -90,7 +89,7 @@ internal class GetAction : IAction
         _log.LogInformation("Clean {TargetPath}", targetPath.FullName);
 
         try {
-            targetPath.MakeEmpty();
+            targetPath.EnsureEmpty();
         } catch(Exception ex) {
             throw new ErrorCannotCleanTarget(targetPath.FullName, ex);
         }

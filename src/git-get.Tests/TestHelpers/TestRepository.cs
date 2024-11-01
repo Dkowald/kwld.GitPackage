@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
 using GitGet.Model;
-using GitGet.Utility;
 
 using LibGit2Sharp;
 
@@ -34,8 +33,8 @@ internal static class TestRepository
             if(Repository.IsValid(RepoPath.FullName)) 
             { return new Repository(RepoPath.FullName); }
 
-            RepoPath.ClearReadonly().EnsureEmpty();
-            WorkingFolderPath.ClearReadonly().EnsureEmpty();
+            RepoPath.EnsureEmpty();
+            WorkingFolderPath.EnsureEmpty();
 
             using(var repo = new Repository(Repository.Init(WorkingFolderPath.FullName))) {
                 Init(repo);
@@ -51,7 +50,7 @@ internal static class TestRepository
             using var bareRepo = new Repository(RepoPath.FullName);
             bareRepo.Config.Set("core.bare", true);
 
-            WorkingFolderPath.ClearReadonly().EnsureDelete();
+            WorkingFolderPath.EnsureDelete();
 
         }
 

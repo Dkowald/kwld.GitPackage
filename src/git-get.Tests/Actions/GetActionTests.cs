@@ -3,7 +3,6 @@
 using GitGet.Actions;
 using GitGet.Model;
 using GitGet.Tests.TestHelpers;
-using GitGet.Utility;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -62,8 +61,7 @@ public class GetActionTests
 
         var outDir = Files.AppData.GetFolder(nameof(GetActionTests), "OutDir");
 
-        outDir.ClearReadonly()
-            .EnsureEmptyWithoutDelete();
+        outDir.EnsureEmpty();
 
         var target = new GetAction(host.Get<ILogger>());
 
